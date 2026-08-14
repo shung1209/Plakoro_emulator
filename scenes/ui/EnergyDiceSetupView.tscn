@@ -1,0 +1,94 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/EnergyDiceSetupView.gd" id="1_view"]
+[ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
+
+[ext_resource type="Script" path="res://scripts/ui/GlobalQuitConfirmation.gd" id="quit_guard"]
+
+[node name="EnergyDiceSetupView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_view")
+
+[node name="QuitGuard" type="Node" parent="."]
+script = ExtResource("quit_guard")
+
+[node name="Database" type="Node" parent="."]
+script = ExtResource("2_database")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.055, 0.071, 0.11, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Margin/Main"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Enerkoro Setup"
+
+[node name="PathRow" type="HBoxContainer" parent="Margin/Main"]
+layout_mode = 2
+
+[node name="SetupPathEdit" type="LineEdit" parent="Margin/Main/PathRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LoadButton" type="Button" parent="Margin/Main/PathRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Load"
+
+[node name="ValidationLabel" type="Label" parent="Margin/Main"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Validation"
+
+[node name="Body" type="HSplitContainer" parent="Margin/Main"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 650
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/Main/Body"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="DiceContainer" type="VBoxContainer" parent="Margin/Main/Body/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="ProbabilityPanel" type="PanelContainer" parent="Margin/Main/Body"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+
+[node name="ProbabilityLabel" type="Label" parent="Margin/Main/Body/ProbabilityPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Probability"

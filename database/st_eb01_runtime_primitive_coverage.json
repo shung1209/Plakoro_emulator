@@ -1,0 +1,136 @@
+{
+  "milestone": "10.6d",
+  "source_moves": 105,
+  "coverage": [
+    {
+      "category": "condition.low_hp",
+      "move_count": 1,
+      "runtime_status": "existing condition.if evaluator path; exact condition mapping reviewed in 10.6e"
+    },
+    {
+      "category": "condition.previous_opponent_turn",
+      "move_count": 1,
+      "runtime_status": "deferred: Battle history primitive 10.6e"
+    },
+    {
+      "category": "condition.previous_self_turn",
+      "move_count": 3,
+      "runtime_status": "deferred: Battle history primitive 10.6e"
+    },
+    {
+      "category": "damage.copy_previous_opponent_attack",
+      "move_count": 1,
+      "runtime_status": "deferred: Battle history/copy primitive 10.6e"
+    },
+    {
+      "category": "damage.fixed_bonus",
+      "move_count": 66,
+      "runtime_status": "supported: damage.add"
+    },
+    {
+      "category": "damage.fixed_outcome",
+      "move_count": 1,
+      "runtime_status": "supported: damage.set"
+    },
+    {
+      "category": "damage.from_dice_result",
+      "move_count": 2,
+      "runtime_status": "deferred: Kyokoro/dice dynamic resolver 10.6e"
+    },
+    {
+      "category": "damage.multiplier",
+      "move_count": 1,
+      "runtime_status": "supported: damage.multiply"
+    },
+    {
+      "category": "damage.no_damage_outcome",
+      "move_count": 4,
+      "runtime_status": "supported: damage.set / outcome rule"
+    },
+    {
+      "category": "damage.outcome_variable",
+      "move_count": 1,
+      "runtime_status": "supported structurally by outcome_rules + damage.set; orientation mapping pending"
+    },
+    {
+      "category": "damage.recoil",
+      "move_count": 10,
+      "runtime_status": "supported: damage.recoil"
+    },
+    {
+      "category": "defense.attack_damage_immunity",
+      "move_count": 3,
+      "runtime_status": "supported: incoming_damage.immunity"
+    },
+    {
+      "category": "defense.incoming_damage_reduction",
+      "move_count": 10,
+      "runtime_status": "supported: incoming_damage.modify (one-shot or persistent)"
+    },
+    {
+      "category": "energy_dice.opponent_decrease",
+      "move_count": 7,
+      "runtime_status": "supported: energy_dice.modify target=opponent"
+    },
+    {
+      "category": "energy_dice.self_decrease",
+      "move_count": 6,
+      "runtime_status": "supported: energy_dice.modify target=self"
+    },
+    {
+      "category": "energy_dice.self_increase",
+      "move_count": 5,
+      "runtime_status": "supported: energy_dice.modify target=self"
+    },
+    {
+      "category": "heal.self",
+      "move_count": 5,
+      "runtime_status": "supported: hp.restore"
+    },
+    {
+      "category": "kyokoro.opponent_disable",
+      "move_count": 2,
+      "runtime_status": "deferred: Kyokoro roll-control 10.6e"
+    },
+    {
+      "category": "kyokoro.opponent_roll",
+      "move_count": 2,
+      "runtime_status": "deferred: Kyokoro opponent-roll 10.6e"
+    },
+    {
+      "category": "kyokoro.repeat_until_fail",
+      "move_count": 2,
+      "runtime_status": "deferred: Kyokoro multi-roll 10.6e"
+    },
+    {
+      "category": "kyokoro.self_reroll",
+      "move_count": 1,
+      "runtime_status": "deferred: Kyokoro multi-roll 10.6e"
+    },
+    {
+      "category": "kyokoro.self_roll_multiple_2",
+      "move_count": 1,
+      "runtime_status": "deferred: Kyokoro multi-roll 10.6e"
+    },
+    {
+      "category": "kyokoro.self_roll_multiple_3",
+      "move_count": 1,
+      "runtime_status": "deferred: Kyokoro multi-roll 10.6e"
+    },
+    {
+      "category": "move_permission.opponent_move_lock",
+      "move_count": 3,
+      "runtime_status": "supported: move.lock (requires selected move_name_id)"
+    },
+    {
+      "category": "move_permission.repeat_same_move",
+      "move_count": 1,
+      "runtime_status": "supported: move.repeat_permission"
+    },
+    {
+      "category": "weakness.ignore",
+      "move_count": 1,
+      "runtime_status": "supported: weakness.disable"
+    }
+  ]
+}

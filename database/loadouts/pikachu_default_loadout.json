@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "loadout_id": "pikachu_default",
+  "pokemon_id": "pikachu_standard",
+  "move_card_ids": [
+    "pikachu_gnaw_stw04_001",
+    "pikachu_thunder_shock_stw04_002",
+    "pikachu_thunderbolt_stw04_004",
+    "pikachu_iron_tail_stw04_007"
+  ],
+  "energy_dice_setup": {
+    "schema_version": "1.0",
+    "dice": [
+      {
+        "die_id": "pikachu_die_1",
+        "fixed": [
+          "electric",
+          "steel"
+        ],
+        "double": [
+          [
+            "electric",
+            "steel"
+          ],
+          [
+            "electric",
+            "electric"
+          ]
+        ],
+        "single": [
+          "electric",
+          "steel"
+        ]
+      },
+      {
+        "die_id": "pikachu_die_2",
+        "fixed": [
+          "water",
+          "fire"
+        ],
+        "double": [
+          [
+            "electric",
+            "water"
+          ],
+          [
+            "electric",
+            "fire"
+          ]
+        ],
+        "single": [
+          "electric",
+          "electric"
+        ]
+      },
+      {
+        "die_id": "pikachu_die_3",
+        "fixed": [
+          "grass",
+          "psychic"
+        ],
+        "double": [
+          [
+            "electric",
+            "grass"
+          ],
+          [
+            "electric",
+            "psychic"
+          ]
+        ],
+        "single": [
+          "electric",
+          "steel"
+        ]
+      }
+    ]
+  }
+}

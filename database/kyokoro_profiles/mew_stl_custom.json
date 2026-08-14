@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "mew_stl_custom",
+  "roll_mode": "weighted",
+  "orientation_weights": {
+    "FACE_DOWN": 2.7331,
+    "FACE_UP": 1.7477,
+    "HEAD_UP": 0.6443,
+    "HEAD_DOWN": 0.1447,
+    "HEAD_LEFT": 0.4038,
+    "HEAD_RIGHT": 0.3265
+  },
+  "scene_path": "",
+  "physics_profile": {}
+}

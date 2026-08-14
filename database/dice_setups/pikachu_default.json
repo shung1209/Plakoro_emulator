@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "pikachu_die_1",
+      "fixed": [
+        "electric",
+        "steel"
+      ],
+      "double": [
+        [
+          "electric",
+          "steel"
+        ],
+        [
+          "electric",
+          "electric"
+        ]
+      ],
+      "single": [
+        "electric",
+        "steel"
+      ]
+    },
+    {
+      "die_id": "pikachu_die_2",
+      "fixed": [
+        "water",
+        "fire"
+      ],
+      "double": [
+        [
+          "electric",
+          "water"
+        ],
+        [
+          "electric",
+          "fire"
+        ]
+      ],
+      "single": [
+        "electric",
+        "electric"
+      ]
+    },
+    {
+      "die_id": "pikachu_die_3",
+      "fixed": [
+        "grass",
+        "psychic"
+      ],
+      "double": [
+        [
+          "electric",
+          "grass"
+        ],
+        [
+          "electric",
+          "psychic"
+        ]
+      ],
+      "single": [
+        "electric",
+        "steel"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "2.0",
+  "energy_types": [
+    {
+      "id": "grass",
+      "display_name": "草"
+    },
+    {
+      "id": "fire",
+      "display_name": "炎"
+    },
+    {
+      "id": "water",
+      "display_name": "水"
+    },
+    {
+      "id": "electric",
+      "display_name": "雷"
+    },
+    {
+      "id": "psychic",
+      "display_name": "超"
+    },
+    {
+      "id": "fighting",
+      "display_name": "鬥"
+    },
+    {
+      "id": "dark",
+      "display_name": "惡"
+    },
+    {
+      "id": "steel",
+      "display_name": "鋼"
+    },
+    {
+      "id": "flying",
+      "display_name": "空"
+    }
+  ]
+}

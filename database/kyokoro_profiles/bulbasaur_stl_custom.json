@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "bulbasaur_stl_custom",
+  "roll_mode": "weighted",
+  "orientation_weights": {
+    "FACE_DOWN": 1.1516,
+    "FACE_UP": 0.7991,
+    "HEAD_UP": 0.8145,
+    "HEAD_DOWN": 0.926,
+    "HEAD_LEFT": 1.158,
+    "HEAD_RIGHT": 1.1508
+  },
+  "scene_path": "",
+  "physics_profile": {}
+}

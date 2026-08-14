@@ -1,0 +1,75 @@
+{
+  "schema_version": "2.0",
+  "id": "mew_reflection_stw06_007",
+  "move_name_id": "reflection",
+  "owner_id": "mew",
+  "display_name": "Reflection",
+  "move_category": "support",
+  "attack_type": "psychic",
+  "energy_cost": [
+    {
+      "energy_type": "psychic",
+      "count": 4
+    }
+  ],
+  "printed_damage": null,
+  "base_actions": [
+    {
+      "opcode": "damage.copy_previous_opponent_move",
+      "args": {
+        "copy": "printed_damage",
+        "ignore_copied_kyokoro_effects": true
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.multiply",
+          "args": {
+            "factor": 2.0
+          }
+        }
+      ],
+      "raw_text": "Reflection damage is doubled."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 2,
+    "card_code": "STW06-007",
+    "raw_text": "Move Effect: Copy the printed damage of the opponent's previous selected attack. Do not copy its Kyokoro effects.\nKyokoro Effect: Reflection damage is doubled.",
+    "move_effect_text": [
+      "Copy the printed damage of the opponent's previous selected attack. Do not copy its Kyokoro effects."
+    ],
+    "kyokoro_effect_text": [
+      "Reflection damage is doubled."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Reflection depends on opponent move history and a Kyokoro multiplier; runtime mapping pending.",
+      "Reflection's base history-copy effect is executable. The printed Kyokoro ×2 effect is represented in special_effects, but exact icon-to-orientation mapping is not guessed."
+    ]
+  },
+  "special_effects": []
+}

@@ -1,0 +1,68 @@
+{
+  "dice": [
+    {
+      "die_id": "onix_die_1",
+      "double": [
+        [
+          "fighting",
+          "fighting"
+        ],
+        [
+          "fighting",
+          "steel"
+        ]
+      ],
+      "fixed": [
+        "fighting",
+        "grass"
+      ],
+      "single": [
+        "fighting",
+        "steel"
+      ]
+    },
+    {
+      "die_id": "onix_die_2",
+      "double": [
+        [
+          "fighting",
+          "fighting"
+        ],
+        [
+          "fighting",
+          "steel"
+        ]
+      ],
+      "fixed": [
+        "flying",
+        "steel"
+      ],
+      "single": [
+        "fighting",
+        "fighting"
+      ]
+    },
+    {
+      "die_id": "onix_die_3",
+      "double": [
+        [
+          "fighting",
+          "fighting"
+        ],
+        [
+          "fighting",
+          "steel"
+        ]
+      ],
+      "fixed": [
+        "electric",
+        "fire"
+      ],
+      "single": [
+        "fighting",
+        "fighting"
+      ]
+    }
+  ],
+  "schema_version": "1.0"
+}

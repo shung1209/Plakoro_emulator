@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/LanguageSelector.gd" id="1_script"]
+
+[node name="LanguageSelector" type="HBoxContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+script = ExtResource("1_script")
+
+[node name="LanguageOption" type="OptionButton" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 36)
+layout_mode = 2
+tooltip_text = "Language"

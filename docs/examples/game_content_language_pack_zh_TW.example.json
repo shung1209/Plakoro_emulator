@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "locale": "zh_TW",
+  "display_name": "我的繁中遊戲內容",
+  "entries": {
+    "pokemon.pikachu.name": "皮卡丘",
+    "move.thunder_shock.name": "電擊",
+    "move.thunder_shock.description": "自訂招式說明。",
+    "move.thunder_shock.effect_0": "自訂效果文字。",
+    "type.electric.name": "電"
+  }
+}

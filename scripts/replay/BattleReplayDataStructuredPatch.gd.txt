@@ -1,0 +1,28 @@
+在 `BattleReplayData.gd` 新增：
+
+var player_energy_dice: Array = []
+var enemy_energy_dice: Array = []
+
+並在 `to_dictionary()` 加入：
+
+"player_energy_dice": player_energy_dice.duplicate(true),
+"enemy_energy_dice": enemy_energy_dice.duplicate(true),
+
+在 `from_dictionary()` 中讀回兩個欄位。
+
+在 `BattleReplayRecorder.start_recording()` 加入：
+
+const DICE_REPLAY_SERIALIZER: Script = preload(
+    "res://scripts/replay/EnergyDiceSetupReplaySerializer.gd"
+)
+
+replay.player_energy_dice = (
+    DICE_REPLAY_SERIALIZER.serialize_loadout_dice(
+        player_loadout
+    )
+)
+replay.enemy_energy_dice = (
+    DICE_REPLAY_SERIALIZER.serialize_loadout_dice(
+        enemy_loadout
+    )
+)

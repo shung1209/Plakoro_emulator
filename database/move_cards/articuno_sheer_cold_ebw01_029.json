@@ -1,0 +1,110 @@
+{
+  "schema_version": "2.0",
+  "id": "articuno_sheer_cold_ebw01_029",
+  "move_name_id": "sheer_cold",
+  "owner_id": "articuno",
+  "display_name": "Sheer Cold",
+  "move_category": "attack",
+  "attack_type": "water",
+  "energy_cost": [
+    {
+      "energy_type": "water",
+      "count": 4
+    }
+  ],
+  "printed_damage": 40,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 40,
+        "damage_type": "water",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "energy_dice.modify",
+          "args": {
+            "target": "opponent",
+            "amount": -2
+          }
+        },
+        {
+          "opcode": "status.add",
+          "args": {
+            "target": "opponent",
+            "status_type": "kyokoro_disable",
+            "timing": "next_owner_turn",
+            "remaining_uses": 1,
+            "stack_mode": "replace",
+            "value": 1
+          }
+        }
+      ],
+      "raw_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 2. They cannot roll thier kyokoro"
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 2,
+    "card_code": "EBW01-029",
+    "raw_text": "Kyokoro Effect: On the opponent's next turn, reduce the number of Enekoro they roll by 2. They cannot roll thier kyokoro",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "On the opponent's next turn, reduce the number of Enekoro they roll by 2. They cannot roll thier kyokoro"
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Special card behavior is now explicitly represented in special_effects instead of being absent. Roll-sequence execution is intentionally pending."
+    ]
+  },
+  "special_effects": [
+    {
+      "effect_type": "kyokoro.opponent_disable",
+      "runtime_status": "executable",
+      "text": "On the opponent's next turn, reduce the number of Enekoro they roll by 2. They cannot roll thier kyokoro",
+      "trigger": "kyokoro_outcome",
+      "source_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 2. They cannot roll thier kyokoro",
+      "confirmed_orientations": [
+        "HEAD_UP",
+        "FACE_UP"
+      ],
+      "parsed_actions": [
+        {
+          "opcode": "status.add",
+          "args": {
+            "target": "opponent",
+            "status_type": "kyokoro_disable",
+            "timing": "next_owner_turn",
+            "remaining_uses": 1,
+            "stack_mode": "replace",
+            "value": 1
+          }
+        }
+      ]
+    }
+  ]
+}

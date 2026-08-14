@@ -1,0 +1,75 @@
+{
+  "schema_version": "2.0",
+  "id": "articuno_ice_wing_ebw01_021",
+  "move_name_id": "ice_wing",
+  "owner_id": "articuno",
+  "display_name": "Ice Wing",
+  "move_category": "attack",
+  "attack_type": "water",
+  "energy_cost": [
+    {
+      "energy_type": "water",
+      "count": 2
+    }
+  ],
+  "printed_damage": 10,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 10,
+        "damage_type": "water",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "energy_dice.modify",
+          "args": {
+            "target": "opponent",
+            "amount": -1
+          }
+        }
+      ],
+      "raw_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 1."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 1,
+    "card_code": "EBW01-021",
+    "raw_text": "Kyokoro Effect: On the opponent's next turn, reduce the number of Enekoro they roll by 1.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "On the opponent's next turn, reduce the number of Enekoro they roll by 1."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

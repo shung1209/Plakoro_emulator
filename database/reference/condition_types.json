@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "condition_types": {
+    "always": {
+      "description": "Always true."
+    },
+    "kyokoro_orientation_any": {
+      "description": "Matches when the rolled Kyokoro orientation is in the supplied list.",
+      "required_args": [
+        "orientations"
+      ]
+    },
+    "hp_at_most": {
+      "description": "Matches when the target HP is less than or equal to value.",
+      "required_args": [
+        "target",
+        "value"
+      ]
+    },
+    "hp_at_least": {
+      "description": "Matches when the target HP is greater than or equal to value.",
+      "required_args": [
+        "target",
+        "value"
+      ]
+    },
+    "all": {
+      "description": "All child conditions must match."
+    },
+    "any": {
+      "description": "At least one child condition must match."
+    },
+    "not": {
+      "description": "Negates one child condition."
+    }
+  }
+}

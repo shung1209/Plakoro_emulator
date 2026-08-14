@@ -1,0 +1,75 @@
+{
+  "schema_version": "2.0",
+  "id": "charmander_flare_storm_stw02_005",
+  "move_name_id": "flare_storm",
+  "owner_id": "charmander",
+  "display_name": "Flare Storm",
+  "move_category": "attack",
+  "attack_type": "fire",
+  "energy_cost": [
+    {
+      "energy_type": "normal",
+      "count": 5
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "fire",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add_per_energy",
+          "args": {
+            "energy_type": "fire",
+            "amount_per_energy": 10
+          }
+        }
+      ],
+      "raw_text": "This attack does 10 damage for each Fire energy produced."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 1,
+    "card_code": "STW02-005",
+    "raw_text": "Kyokoro Effect: This attack does 10 damage for each Fire energy produced.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 10 damage for each Fire energy produced."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Dynamic damage depends on produced Fire energy; runtime encoding pending."
+    ]
+  },
+  "special_effects": []
+}

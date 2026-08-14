@@ -1,0 +1,6 @@
+Japanese UI localization audit
+UI strings: 687
+Traditional-Chinese phrase hits: 0
+Non-allowlisted English hits: 0
+Placeholder mismatches: 0
+Allowed Latin-script terms: project names, Pokémon names, technical identifiers/formats, standard abbreviations.

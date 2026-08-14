@@ -1,0 +1,33 @@
+{
+  "available_move_card_ids": [
+    "grimer_harassment_venom_ebw01_059",
+    "grimer_poison_gas_ebw01_051",
+    "grimer_sludge_ring_ebw01_054",
+    "grimer_sludge_tackle_ebw01_058",
+    "grimer_sludge_toss_ebw01_052",
+    "grimer_toxic_blast_ebw01_057",
+    "grimer_toxic_heal_ebw01_053",
+    "grimer_venom_punch_ebw01_055",
+    "grimer_venom_slip_ebw01_056"
+  ],
+  "display_name": "Grimer",
+  "id": "grimer_eb01_a1",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "dark",
+  "review": {
+    "notes": [
+      "EB01.pdf page 3",
+      "HP 120 and the printed weakness +20 were transcribed from the supplied card."
+    ],
+    "status": "source_transcribed"
+  },
+  "schema_version": "2.0",
+  "species_id": "grimer",
+  "weaknesses": [
+    {
+      "attack_type": "fighting",
+      "bonus_damage": 20.0
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "orientations": [
+    {
+      "id": "FACE_DOWN",
+      "display_name": "正面朝下",
+      "sort_order": 0
+    },
+    {
+      "id": "FACE_UP",
+      "display_name": "背面朝上",
+      "sort_order": 1
+    },
+    {
+      "id": "HEAD_UP",
+      "display_name": "頭朝上",
+      "sort_order": 2
+    },
+    {
+      "id": "HEAD_DOWN",
+      "display_name": "頭朝下",
+      "sort_order": 3
+    },
+    {
+      "id": "HEAD_LEFT",
+      "display_name": "頭朝左",
+      "sort_order": 4
+    },
+    {
+      "id": "HEAD_RIGHT",
+      "display_name": "頭朝右",
+      "sort_order": 5
+    }
+  ]
+}

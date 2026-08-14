@@ -1,0 +1,101 @@
+{
+  "schema_version": "2.0",
+  "id": "eevee_flop_stw05_004",
+  "move_name_id": "flop",
+  "owner_id": "eevee",
+  "display_name": "Flop",
+  "move_category": "support",
+  "attack_type": "normal",
+  "energy_cost": [
+    {
+      "energy_type": "flying",
+      "count": 3
+    }
+  ],
+  "printed_damage": null,
+  "base_actions": [],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.set",
+          "args": {
+            "amount": 70
+          }
+        }
+      ],
+      "raw_text": "This attack does 70 damage."
+    },
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "FACE_UP",
+          "FACE_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.set",
+          "args": {
+            "amount": 40
+          }
+        }
+      ],
+      "raw_text": "This attack does 40 damage."
+    },
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.set",
+          "args": {
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "This attack does 20 damage."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 2,
+    "card_code": "STW05-004",
+    "raw_text": "Kyokoro Effect: This attack does 70 damage.\nKyokoro Effect: This attack does 40 damage.\nKyokoro Effect: This attack does 20 damage.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 70 damage.",
+      "This attack does 40 damage.",
+      "This attack does 20 damage."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Printed damage is outcome-dependent; no single printed base damage is encoded."
+    ]
+  },
+  "special_effects": []
+}

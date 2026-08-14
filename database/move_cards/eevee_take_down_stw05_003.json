@@ -1,0 +1,92 @@
+{
+  "schema_version": "2.0",
+  "id": "eevee_take_down_stw05_003",
+  "move_name_id": "take_down",
+  "owner_id": "eevee",
+  "display_name": "Take Down",
+  "move_category": "attack",
+  "attack_type": "normal",
+  "energy_cost": [
+    {
+      "energy_type": "flying",
+      "count": 2
+    }
+  ],
+  "printed_damage": 30,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 30,
+        "damage_type": "normal",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "This attack does 20 more damage."
+    },
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.recoil",
+          "args": {
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "This Pokémon also does 20 damage to itself."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 2,
+    "card_code": "STW05-003",
+    "raw_text": "Kyokoro Effect: This attack does 20 more damage.\nKyokoro Effect: This Pokémon also does 20 damage to itself.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 20 more damage.",
+      "This Pokémon also does 20 damage to itself."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

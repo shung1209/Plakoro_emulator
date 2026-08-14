@@ -1,0 +1,73 @@
+{
+  "schema_version": "2.0",
+  "id": "pinsir_scissors_charge_ebw01_006",
+  "move_name_id": "scissors_charge",
+  "owner_id": "pinsir",
+  "display_name": "Scissors Charge",
+  "move_category": "attack",
+  "attack_type": "grass",
+  "energy_cost": [
+    {
+      "energy_type": "grass",
+      "count": 2
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "grass",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "energy_dice.modify",
+          "args": {
+            "target": "self",
+            "amount": 1
+          }
+        }
+      ],
+      "raw_text": "On your next turn, increase the number of Enekoro you roll by 1."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 1,
+    "card_code": "EBW01-006",
+    "raw_text": "Kyokoro Effect: On your next turn, increase the number of Enekoro you roll by 1.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "On your next turn, increase the number of Enekoro you roll by 1."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

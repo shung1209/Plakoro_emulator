@@ -1,0 +1,31 @@
+{
+  "available_move_card_ids": [
+    "mew_barrier_stw06_003",
+    "mew_confusion_stw06_001",
+    "mew_memory_skip_stw06_004",
+    "mew_psybeam_stw06_002",
+    "mew_psychic_stw06_006",
+    "mew_psyshot_stw06_005",
+    "mew_reflection_stw06_007"
+  ],
+  "display_name": "Mew",
+  "id": "mew_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "psychic",
+  "review": {
+    "notes": [
+      "ST.pdf page 2",
+      "HP 120 and the printed weakness +20 were transcribed from the supplied card."
+    ],
+    "status": "source_transcribed"
+  },
+  "schema_version": "2.0",
+  "species_id": "mew",
+  "weaknesses": [
+    {
+      "attack_type": "dark",
+      "bonus_damage": 20.0
+    }
+  ]
+}

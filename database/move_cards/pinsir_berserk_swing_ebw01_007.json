@@ -1,0 +1,86 @@
+{
+  "schema_version": "2.0",
+  "id": "pinsir_berserk_swing_ebw01_007",
+  "move_name_id": "berserk_swing",
+  "owner_id": "pinsir",
+  "display_name": "Berserk Swing",
+  "move_category": "attack",
+  "attack_type": "grass",
+  "energy_cost": [
+    {
+      "energy_type": "grass",
+      "count": 3
+    }
+  ],
+  "printed_damage": 10,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 10,
+        "damage_type": "grass",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "condition.if",
+          "args": {
+            "condition": {
+              "type": "previous_self_energy_failed"
+            }
+          },
+          "then": [
+            {
+              "opcode": "damage.add",
+              "args": {
+                "target": "opponent",
+                "amount": 40
+              }
+            }
+          ],
+          "else": []
+        }
+      ],
+      "raw_text": "During your last turn, if your Enekoro roll failed, this attack does 40 more damage"
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 1,
+    "card_code": "EBW01-007",
+    "raw_text": "Kyokoro Effect: During your last turn, if your Enekoro roll failed, this attack does 40 more damage",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "During your last turn, if your Enekoro roll failed, this attack does 40 more damage"
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Previous Energy-roll failure condition is now executable through Battle history."
+    ]
+  },
+  "special_effects": []
+}

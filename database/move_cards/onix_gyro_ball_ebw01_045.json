@@ -1,0 +1,86 @@
+{
+  "schema_version": "2.0",
+  "id": "onix_gyro_ball_ebw01_045",
+  "move_name_id": "gyro_ball",
+  "owner_id": "onix",
+  "display_name": "Gyro Ball",
+  "move_category": "attack",
+  "attack_type": "steel",
+  "energy_cost": [
+    {
+      "energy_type": "steel",
+      "count": 1
+    },
+    {
+      "energy_type": "normal",
+      "count": 2
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "steel",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 2,
+    "card_code": "EBW01-045",
+    "raw_text": "Kyokoro Effect: Your opponent also rolls thier Kyokoro, On Head_down, face_down, this attack does 60 more damage",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "Your opponent also rolls thier Kyokoro, On Head_down, face_down, this attack does 60 more damage"
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Special card behavior is now explicitly represented in special_effects instead of being absent. Roll-sequence execution is intentionally pending.",
+      "10.7b: confirmed Kyokoro faces trigger an opponent Kyokoro roll; bonus damage is applied only if the opponent roll succeeds."
+    ]
+  },
+  "special_effects": [
+    {
+      "effect_type": "kyokoro.opponent_roll",
+      "runtime_status": "executable_10.7b",
+      "text": "Your opponent also rolls thier Kyokoro, On Head_down, face_down, this attack does 60 more damage",
+      "trigger": "kyokoro_outcome",
+      "source_text": "Your opponent also rolls thier Kyokoro, On Head_down, face_down, this attack does 60 more damage",
+      "confirmed_orientations": [
+        "HEAD_UP",
+        "FACE_UP",
+        "HEAD_LEFT",
+        "HEAD_RIGHT"
+      ],
+      "opponent_success_orientations": [
+        "HEAD_DOWN",
+        "FACE_DOWN"
+      ],
+      "opponent_success_actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 60
+          }
+        }
+      ]
+    }
+  ]
+}

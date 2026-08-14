@@ -1,0 +1,3 @@
+file,line,kind,context
+scripts/battle/BattleController.gd,1363,brand,# Plakoro rule: if an attack's own Charakoro/recoil effect causes both
+scripts/database/parsers/MoveCardParser.gd,194,brand,# Normal is a Move-cost wildcard in Plakoro. It is intentionally not

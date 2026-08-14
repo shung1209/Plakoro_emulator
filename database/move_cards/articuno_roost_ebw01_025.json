@@ -1,0 +1,64 @@
+{
+  "schema_version": "2.0",
+  "id": "articuno_roost_ebw01_025",
+  "move_name_id": "roost",
+  "owner_id": "articuno",
+  "display_name": "Roost",
+  "move_category": "support",
+  "attack_type": "flying",
+  "energy_cost": [
+    {
+      "energy_type": "flying",
+      "count": 2
+    }
+  ],
+  "printed_damage": null,
+  "base_actions": [],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "hp.restore",
+          "args": {
+            "target": "self",
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "Heal 20 damage from this Pokémon.\nHeal 20 more damage from this Pokémon."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 2,
+    "card_code": "EBW01-025",
+    "raw_text": "Kyokoro Effect: Heal 20 damage from this Pokémon.\nHeal 20 more damage from this Pokémon.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "Heal 20 damage from this Pokémon.\nHeal 20 more damage from this Pokémon."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

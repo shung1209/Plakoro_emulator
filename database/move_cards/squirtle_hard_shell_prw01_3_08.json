@@ -1,0 +1,73 @@
+{
+  "attack_type": "water",
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "water",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "display_name": "Hard Shell",
+  "energy_cost": [
+    {
+      "count": 3,
+      "energy_type": "water"
+    }
+  ],
+  "id": "squirtle_hard_shell_prw01_3_08",
+  "move_category": "hybrid",
+  "move_name_id": "hard_shell",
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "incoming_damage.modify",
+          "args": {
+            "target": "self",
+            "amount": -50
+          }
+        }
+      ],
+      "raw_text": "During your opponent's next turn, this Pokémon takes 50 less damage from attacks."
+    }
+  ],
+  "owner_id": "squirtle",
+  "printed_damage": 20,
+  "resolution": {
+    "action_execution_mode": "sequential",
+    "outcome_match_mode": "zero_or_one"
+  },
+  "review": {
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "The printed promo card code is small in the supplied PDF; recorded as PRW01-008 and should be visually rechecked before release."
+    ],
+    "orientation_mapping_confirmed": true,
+    "status": "excel_final_mapping_sync_10.6e4"
+  },
+  "schema_version": "2.0",
+  "source": {
+    "card_code": "PRW01-3-08",
+    "document": "ST.pdf",
+    "page": 1.0,
+    "raw_text": "Kyokoro Effect: During your opponent's next turn, this Pokémon takes 50 less damage from attacks.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "During your opponent's next turn, this Pokémon takes 50 less damage from attacks."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "special_effects": []
+}

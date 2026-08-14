@@ -1,0 +1,39 @@
+在現有 `BattleGameUI.gd` 加入：
+
+const ENERGY_SETUP_LOADER: Script = preload(
+    "res://scripts/dice/setup/EnergyDiceSetupLoader.gd"
+)
+const STRUCTURED_DICE_SERVICE: Script = preload(
+    "res://scripts/team_builder/StructuredEnergyDiceService.gd"
+)
+
+在 `_build_pikachu_loadout()` 中，移除三段：
+
+configure_energy_die(...)
+
+改成：
+
+var setup: Variant = ENERGY_SETUP_LOADER.load_setup(
+    "res://database/dice_setups/pikachu_default.json"
+)
+
+if not STRUCTURED_DICE_SERVICE.apply_setup_to_loadout(
+    loadout,
+    setup
+):
+    return null
+
+在 `_build_squirtle_loadout()` 中使用：
+
+var setup: Variant = ENERGY_SETUP_LOADER.load_setup(
+    "res://database/dice_setups/squirtle_default.json"
+)
+
+if not STRUCTURED_DICE_SERVICE.apply_setup_to_loadout(
+    loadout,
+    setup
+):
+    return null
+
+現有 `_create_profiles(loadout)` 不需要更改，因為新的
+StructuredEnergyDieConfigData 同樣提供 `create_profile()`。

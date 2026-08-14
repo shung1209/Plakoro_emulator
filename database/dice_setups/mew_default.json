@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "mew_die_1",
+      "fixed": [
+        "psychic",
+        "fire"
+      ],
+      "double": [
+        [
+          "psychic",
+          "fighting"
+        ],
+        [
+          "psychic",
+          "water"
+        ]
+      ],
+      "single": [
+        "psychic",
+        "psychic"
+      ]
+    },
+    {
+      "die_id": "mew_die_2",
+      "fixed": [
+        "dark",
+        "steel"
+      ],
+      "double": [
+        [
+          "psychic",
+          "dark"
+        ],
+        [
+          "psychic",
+          "grass"
+        ]
+      ],
+      "single": [
+        "psychic",
+        "dark"
+      ]
+    },
+    {
+      "die_id": "mew_die_3",
+      "fixed": [
+        "water",
+        "fighting"
+      ],
+      "double": [
+        [
+          "psychic",
+          "steel"
+        ],
+        [
+          "psychic",
+          "electric"
+        ]
+      ],
+      "single": [
+        "psychic",
+        "steel"
+      ]
+    }
+  ]
+}

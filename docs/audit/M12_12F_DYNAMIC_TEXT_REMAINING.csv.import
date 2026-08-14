@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://ceam2w42wc0e0"
+
+[deps]
+
+files=["res://docs/audit/M12_12F_DYNAMIC_TEXT_REMAINING.line.translation", "res://docs/audit/M12_12F_DYNAMIC_TEXT_REMAINING.classification.translation", "res://docs/audit/M12_12F_DYNAMIC_TEXT_REMAINING.context.translation"]
+
+source_file="res://docs/audit/M12_12F_DYNAMIC_TEXT_REMAINING.csv"
+dest_files=["res://docs/audit/M12_12F_DYNAMIC_TEXT_REMAINING.line.translation", "res://docs/audit/M12_12F_DYNAMIC_TEXT_REMAINING.classification.translation", "res://docs/audit/M12_12F_DYNAMIC_TEXT_REMAINING.context.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

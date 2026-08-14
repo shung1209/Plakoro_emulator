@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "locale": "ja_JP",
+  "display_name": "日本語ゲームコンテンツ",
+  "fallback": "en_US",
+  "entries": {
+    "type.fire.name": "ほのお",
+    "type.water.name": "みず",
+    "type.grass.name": "くさ",
+    "type.electric.name": "でんき",
+    "type.psychic.name": "エスパー",
+    "type.fighting.name": "かくとう",
+    "type.dark.name": "あく",
+    "type.steel.name": "はがね",
+    "type.normal.name": "ノーマル",
+    "type.flying.name": "ひこう",
+    "pokemon.pikachu.name": "ピカチュウ",
+    "pokemon.bulbasaur.name": "フシギダネ",
+    "pokemon.charmander.name": "ヒトカゲ",
+    "pokemon.squirtle.name": "ゼニガメ",
+    "pokemon.eevee.name": "イーブイ",
+    "pokemon.mew.name": "ミュウ",
+    "pokemon.articuno.name": "フリーザー",
+    "pokemon.zapdos.name": "サンダー",
+    "pokemon.moltres.name": "ファイヤー",
+    "pokemon.onix.name": "イワーク",
+    "pokemon.grimer.name": "ベトベター",
+    "pokemon.pinsir.name": "カイロス"
+  }
+}

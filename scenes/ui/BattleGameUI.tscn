@@ -1,0 +1,530 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/BattleGameUI.gd" id="1_ui"]
+[ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
+[ext_resource type="Script" path="res://scripts/presentation/timeline/BattleTimelineView.gd" id="3_timeline"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/BattleDiceRollPresenter.tscn" id="4_roll"]
+[ext_resource type="Script" path="res://scripts/ui/components/BattlePendingEffectIndicator.gd" id="5_pending_effect"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="lang_selector"]
+
+[node name="BattleGameUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ui")
+
+[node name="Database" type="Node" parent="."]
+script = ExtResource("2_database")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.027, 0.034, 0.05, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 44)
+
+[node name="HeaderAccent" type="ColorRect" parent="Margin/Main/Header"]
+custom_minimum_size = Vector2(5, 32)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.3, 0.68, 0.95, 1)
+
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Main/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 27
+text = "PLAKORO Battle"
+
+[node name="LanguageSelector" parent="Margin/Main/Header" instance=ExtResource("lang_selector")]
+layout_mode = 2
+
+[node name="TurnLabel" type="Label" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Turn"
+
+[node name="LayoutPrototypeButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Test Layout"
+
+[node name="BackToPreparationButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "← Back to Preparation"
+
+[node name="RestartButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Restart"
+
+[node name="SetupSourceLabel" type="Label" parent="Margin/Main"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Dice setup"
+
+[node name="Body" type="HSplitContainer" parent="Margin/Main"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 780
+
+[node name="LayoutPrototype" type="VBoxContainer" parent="Margin/Main/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+visible = false
+theme_override_constants/separation = 8
+
+[node name="PrototypeTopRow" type="HBoxContainer" parent="Margin/Main/Body/LayoutPrototype"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PrototypePlayerSlot" type="VBoxContainer" parent="Margin/Main/Body/LayoutPrototype/PrototypeTopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PrototypeCenterTop" type="VBoxContainer" parent="Margin/Main/Body/LayoutPrototype/PrototypeTopRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(430, 374)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+
+[node name="PrototypeTurnSlot" type="Control" parent="Margin/Main/Body/LayoutPrototype/PrototypeTopRow/PrototypeCenterTop"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="PrototypeRollSlot" type="Control" parent="Margin/Main/Body/LayoutPrototype/PrototypeTopRow/PrototypeCenterTop"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 314)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PrototypeEnemySlot" type="VBoxContainer" parent="Margin/Main/Body/LayoutPrototype/PrototypeTopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PrototypeBottomRow" type="HBoxContainer" parent="Margin/Main/Body/LayoutPrototype"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PrototypeMovesSlot" type="VBoxContainer" parent="Margin/Main/Body/LayoutPrototype/PrototypeBottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PrototypeMessageSlot" type="VBoxContainer" parent="Margin/Main/Body/LayoutPrototype/PrototypeBottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="PrototypeBattleMessagePanel" type="PanelContainer" parent="Margin/Main/Body/LayoutPrototype/PrototypeBottomRow/PrototypeMessageSlot"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PrototypeBattleMessageLabel" type="Label" parent="Margin/Main/Body/LayoutPrototype/PrototypeBottomRow/PrototypeMessageSlot/PrototypeBattleMessagePanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+vertical_alignment = 1
+horizontal_alignment = 1
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 22
+text = ""
+
+[node name="PrototypeTimelineSlot" type="VBoxContainer" parent="Margin/Main/Body/LayoutPrototype/PrototypeBottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BattleScroll" type="ScrollContainer" parent="Margin/Main/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="BattleColumn" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Combatants" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="PlayerPanel" type="PanelContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="PlayerHeader" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+layout_mode = 2
+text = "YOU"
+
+[node name="PlayerNameLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Pikachu"
+
+[node name="PlayerTypeLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Type: —"
+
+[node name="PlayerWeaknessLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Weakness: —"
+
+[node name="PlayerHpBar" type="ProgressBar" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+show_percentage = false
+
+[node name="PlayerHpLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 / 0"
+
+
+[node name="PlayerHeroContainer" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 212)
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="PlayerPendingEffectIndicator" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+visible = false
+script = ExtResource("5_pending_effect")
+
+[node name="EnemyPanel" type="PanelContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="EnemyHeader" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+layout_mode = 2
+text = "AI"
+
+[node name="EnemyNameLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Squirtle"
+
+[node name="EnemyTypeLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Type: —"
+
+[node name="EnemyWeaknessLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Weakness: —"
+
+[node name="EnemyHpBar" type="ProgressBar" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+show_percentage = false
+
+[node name="EnemyHpLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 / 0"
+
+
+[node name="EnemyHeroContainer" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 212)
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="EnemyPendingEffectIndicator" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+visible = false
+script = ExtResource("5_pending_effect")
+
+[node name="MessagePanel" type="PanelContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="MessageLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/MessagePanel"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 18
+text = "Choose a move."
+
+[node name="TurnBannerPanel" type="PanelContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+visible = false
+
+[node name="TurnBannerLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/TurnBannerPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 15
+text = "Turn 1 — YOUR TURN • Choose a Move"
+
+[node name="ResultPanel" type="PanelContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+visible = false
+
+[node name="ResultBox" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ResultTitleLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel/ResultBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 26
+text = "VICTORY"
+
+[node name="ResultSummaryLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel/ResultBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+text = "Turns: 0"
+
+[node name="ResultHpLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel/ResultBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+text = "YOU 0 / 0 HP   •   AI 0 / 0 HP"
+
+[node name="ResultActions" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel/ResultBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 12
+
+[node name="ResultRestartButton" type="Button" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel/ResultBox/ResultActions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 42)
+layout_mode = 2
+text = "Rematch"
+
+[node name="ResultPreparationButton" type="Button" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel/ResultBox/ResultActions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 42)
+layout_mode = 2
+text = "Back to Preparation"
+
+[node name="ActionRow" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="MovesPanel" type="PanelContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MovesBox" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/MovesPanel"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="MovesTitle" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/MovesPanel/MovesBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+text = "Moves"
+
+[node name="MoveGridMargins" type="MarginContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/MovesPanel/MovesBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_right = 36
+
+[node name="MoveButtonContainer" type="GridContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/MovesPanel/MovesBox/MoveGridMargins"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+
+[node name="RollResultPanel" type="PanelContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow"]
+custom_minimum_size = Vector2(430, 285)
+layout_mode = 2
+size_flags_horizontal = 3
+visible = false
+
+[node name="RollResultBox" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="RollResultTitle" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+text = "Roll Result"
+
+[node name="BattleDiceRollPresenter" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox" instance=ExtResource("4_roll")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+
+[node name="EnergyStatePanel" type="MarginContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+visible = false
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="EnergyPaymentLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox/EnergyStatePanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "能量 requirement"
+
+
+[node name="CharakoroFeedbackPanel" type="MarginContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+visible = false
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="FeedbackBox" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox/CharakoroFeedbackPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="CharakoroFeedbackTitle" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox/CharakoroFeedbackPanel/FeedbackBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Charakoro Effect Triggered"
+
+[node name="CharakoroFeedbackLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox/CharakoroFeedbackPanel/FeedbackBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "HEAD UP"
+
+[node name="TimelinePanel" type="PanelContainer" parent="Margin/Main/Body"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TimelineBox" type="VBoxContainer" parent="Margin/Main/Body/TimelinePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TimelineHeader" type="HBoxContainer" parent="Margin/Main/Body/TimelinePanel/TimelineBox"]
+layout_mode = 2
+
+[node name="TimelineTitle" type="Label" parent="Margin/Main/Body/TimelinePanel/TimelineBox/TimelineHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "Battle Timeline"
+
+[node name="TimelineTechnicalToggle" type="CheckButton" parent="Margin/Main/Body/TimelinePanel/TimelineBox/TimelineHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Technical"
+
+[node name="TimelineScroll" type="ScrollContainer" parent="Margin/Main/Body/TimelinePanel/TimelineBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="TimelineView" type="VBoxContainer" parent="Margin/Main/Body/TimelinePanel/TimelineBox/TimelineScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+script = ExtResource("3_timeline")
+
+[node name="QuitConfirmation" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Exit PLAKORO?"
+dialog_text = "Are you sure you want to quit the game?"
+ok_button_text = "Quit"
+cancel_button_text = "Cancel"
+initial_position = 2
+size = Vector2i(430, 170)

@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "pikachu_stl_custom",
+  "roll_mode": "weighted",
+  "orientation_weights": {
+    "FACE_DOWN": 1.1087,
+    "FACE_UP": 1.0097,
+    "HEAD_UP": 0.9461,
+    "HEAD_DOWN": 0.8088,
+    "HEAD_LEFT": 1.1276,
+    "HEAD_RIGHT": 0.9991
+  },
+  "scene_path": "",
+  "physics_profile": {}
+}

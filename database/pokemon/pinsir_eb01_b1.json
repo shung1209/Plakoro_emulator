@@ -1,0 +1,34 @@
+{
+  "available_move_card_ids": [
+    "pinsir_berserk_swing_ebw01_007",
+    "pinsir_brick_break_ebw01_005",
+    "pinsir_concentrate_ebw01_001",
+    "pinsir_deadly_scissors_ebw01_009",
+    "pinsir_endure_ebw01_002",
+    "pinsir_guillotine_ebw01_004",
+    "pinsir_horn_attack_ebw01_003",
+    "pinsir_reckless_charge_ebw01_008",
+    "pinsir_scissors_charge_ebw01_006",
+    "pinsir_submission_ebw01_010"
+  ],
+  "display_name": "Pinsir",
+  "id": "pinsir_eb01_b1",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "grass",
+  "review": {
+    "notes": [
+      "EB01.pdf page 1",
+      "HP 120 and the printed weakness +20 were transcribed from the supplied card."
+    ],
+    "status": "source_transcribed"
+  },
+  "schema_version": "2.0",
+  "species_id": "pinsir",
+  "weaknesses": [
+    {
+      "attack_type": "flying",
+      "bonus_damage": 20.0
+    }
+  ]
+}

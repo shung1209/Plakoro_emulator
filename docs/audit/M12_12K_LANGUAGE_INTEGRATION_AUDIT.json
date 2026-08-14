@@ -1,0 +1,100 @@
+{
+  "milestone": "12.12k",
+  "base_project": "plakorov-2_m12.12j-restart-r3.zip",
+  "language_source": "language(2).zip",
+  "integrated_locales": [
+    "en_US",
+    "zh_TW",
+    "es_ES",
+    "ja_JP"
+  ],
+  "ui_packs": {
+    "en_US": {
+      "display_name": "English",
+      "strings": 687,
+      "missing_vs_en_US": [],
+      "extra_vs_en_US": [],
+      "empty_values": []
+    },
+    "zh_TW": {
+      "display_name": "繁體中文",
+      "strings": 687,
+      "missing_vs_en_US": [],
+      "extra_vs_en_US": [],
+      "empty_values": []
+    },
+    "es_ES": {
+      "display_name": "Español (España)",
+      "strings": 687,
+      "missing_vs_en_US": [],
+      "extra_vs_en_US": [],
+      "empty_values": []
+    },
+    "ja_JP": {
+      "display_name": "日本語",
+      "strings": 687,
+      "missing_vs_en_US": [],
+      "extra_vs_en_US": [],
+      "empty_values": []
+    }
+  },
+  "game_content": {
+    "en_US": {
+      "files": [
+        "en_US.json"
+      ],
+      "merged_entries": 332,
+      "pokemon_names": 12,
+      "move_names": 100,
+      "move_descriptions": 100,
+      "generic_move_effects": 109,
+      "move_card_descriptions": 0,
+      "move_card_effects": 0
+    },
+    "zh_TW": {
+      "files": [
+        "zh_TW.json",
+        "zh_TW_moves.json"
+      ],
+      "merged_entries": 567,
+      "pokemon_names": 12,
+      "move_names": 100,
+      "move_descriptions": 100,
+      "generic_move_effects": 116,
+      "move_card_descriptions": 105,
+      "move_card_effects": 124
+    },
+    "es_ES": {
+      "files": [
+        "es_ES.json",
+        "es_ES_moves.json"
+      ],
+      "merged_entries": 332,
+      "pokemon_names": 12,
+      "move_names": 100,
+      "move_descriptions": 100,
+      "generic_move_effects": 109,
+      "move_card_descriptions": 0,
+      "move_card_effects": 0
+    },
+    "ja_JP": {
+      "files": [
+        "ja_JP.json",
+        "ja_JP_core.json",
+        "ja_JP_moves.json"
+      ],
+      "merged_entries": 568,
+      "pokemon_names": 12,
+      "move_names": 100,
+      "move_descriptions": 100,
+      "generic_move_effects": 116,
+      "move_card_descriptions": 105,
+      "move_card_effects": 124
+    }
+  },
+  "protected_production_ui_changed": [],
+  "notes": {
+    "es_ES_card_specific_content": "The supplied Spanish content has generic Move names/descriptions/effects but no move_card.* fragments. Runtime fallback remains available.",
+    "ja_JP_card_specific_content": "The supplied Japanese pack includes card-specific Move descriptions/effects."
+  }
+}

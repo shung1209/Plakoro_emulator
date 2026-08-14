@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "zapdos_die_1",
+      "fixed": [
+        "electric",
+        "water"
+      ],
+      "double": [
+        [
+          "electric",
+          "steel"
+        ],
+        [
+          "electric",
+          "psychic"
+        ]
+      ],
+      "single": [
+        "electric",
+        "electric"
+      ]
+    },
+    {
+      "die_id": "zapdos_die_2",
+      "fixed": [
+        "psychic",
+        "dark"
+      ],
+      "double": [
+        [
+          "electric",
+          "fighting"
+        ],
+        [
+          "electric",
+          "fire"
+        ]
+      ],
+      "single": [
+        "electric",
+        "fighting"
+      ]
+    },
+    {
+      "die_id": "zapdos_die_3",
+      "fixed": [
+        "grass",
+        "flying"
+      ],
+      "double": [
+        [
+          "electric",
+          "dark"
+        ],
+        [
+          "electric",
+          "grass"
+        ]
+      ],
+      "single": [
+        "electric",
+        "dark"
+      ]
+    }
+  ]
+}

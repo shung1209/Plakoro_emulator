@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/HeroPlakoroCard.gd" id="1_script"]
+
+[node name="HeroPlakoroCard" type="PanelContainer"]
+custom_minimum_size = Vector2(280, 250)
+script = ExtResource("1_script")
+
+[node name="Main" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Header" type="HBoxContainer" parent="Main"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "PLAKORO"
+
+[node name="HpLabel" type="Label" parent="Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "HP —"
+
+[node name="Meta" type="HBoxContainer" parent="Main"]
+layout_mode = 2
+
+[node name="IdLabel" type="Label" parent="Main/Meta"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "pokemon_id"
+
+[node name="TypeLabel" type="Label" parent="Main/Meta"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Type: —"
+
+[node name="VisualSlot" type="PanelContainer" parent="Main"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DiceTitle" type="Label" parent="Main"]
+layout_mode = 2
+text = "Enerkoro"
+
+[node name="DiceContainer" type="HBoxContainer" parent="Main"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SourceLabel" type="Label" parent="Main"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Presentation: placeholder"

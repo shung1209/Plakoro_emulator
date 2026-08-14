@@ -1,0 +1,89 @@
+在現有：
+
+res://scripts/team_builder/TeamBuilderService.gd
+
+頂部加入：
+
+const ENERGY_DIE_COMPATIBILITY_VALIDATOR: Script = preload(
+    "res://scripts/team_builder/EnergyDieCompatibilityValidator.gd"
+)
+
+然後找到目前的：
+
+func _validate_energy_dice(...)
+
+或任何會逐顆讀：
+
+die.id
+
+的 Energy Dice 驗證邏輯。
+
+把該函式內容改成：
+
+func _validate_energy_dice(
+    loadout: Variant
+) -> bool:
+    if loadout == null:
+        return false
+
+    var result: Dictionary = (
+        ENERGY_DIE_COMPATIBILITY_VALIDATOR
+        .validate_energy_dice(
+            loadout.energy_dice
+        )
+    )
+
+    if not bool(result["success"]):
+        for raw_message: Variant in result["errors"]:
+            push_error(
+                "TeamBuilderService: "
+                + String(raw_message)
+            )
+
+        return false
+
+    return true
+
+
+如果你的函式參數本來就是：
+
+func _validate_energy_dice(
+    energy_dice: Array
+) -> bool:
+
+則使用：
+
+func _validate_energy_dice(
+    energy_dice: Array
+) -> bool:
+    var result: Dictionary = (
+        ENERGY_DIE_COMPATIBILITY_VALIDATOR
+        .validate_energy_dice(
+            energy_dice
+        )
+    )
+
+    if not bool(result["success"]):
+        for raw_message: Variant in result["errors"]:
+            push_error(
+                "TeamBuilderService: "
+                + String(raw_message)
+            )
+
+        return false
+
+    return true
+
+
+重點：
+
+不要再直接使用：
+
+die.id
+die.energy_faces
+die.energy_type
+
+StructuredEnergyDieConfigData 的正式資料來源是：
+
+die.die_id
+die.faces_by_orientation

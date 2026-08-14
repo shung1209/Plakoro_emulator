@@ -1,0 +1,31 @@
+{
+  "available_move_card_ids": [
+    "squirtle_bubble_beam_stw03_005",
+    "squirtle_hard_shell_prw01_3_08",
+    "squirtle_hydro_rage_stw03_006",
+    "squirtle_mud_shot_stw03_007",
+    "squirtle_shell_attack_stw03_004",
+    "squirtle_water_gun_stw03_001",
+    "squirtle_water_pulse_stw03_003",
+    "squirtle_withdraw_stw03_002"
+  ],
+  "display_name": "Squirtle",
+  "id": "squirtle_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "water",
+  "review": {
+    "notes": [
+      "HP and weakness values should be rechecked against the final official source before release."
+    ],
+    "status": "draft"
+  },
+  "schema_version": "2.0",
+  "species_id": "squirtle",
+  "weaknesses": [
+    {
+      "attack_type": "electric",
+      "bonus_damage": 20.0
+    }
+  ]
+}

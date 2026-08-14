@@ -1,0 +1,89 @@
+{
+  "schema_version": "2.0",
+  "id": "grimer_toxic_heal_ebw01_053",
+  "move_name_id": "toxic_heal",
+  "owner_id": "grimer",
+  "display_name": "Toxic Heal",
+  "move_category": "attack",
+  "attack_type": "dark",
+  "energy_cost": [
+    {
+      "energy_type": "dark",
+      "count": 3
+    }
+  ],
+  "printed_damage": 30,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 30,
+        "damage_type": "dark",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "condition.if",
+          "args": {
+            "condition": {
+              "type": "previous_self_move_outcome_success",
+              "move_name_id": "poison_gas"
+            }
+          },
+          "then": [
+            {
+              "opcode": "hp.restore",
+              "args": {
+                "target": "self",
+                "amount": 30
+              }
+            }
+          ],
+          "else": []
+        }
+      ],
+      "raw_text": "During you last turn, if this Pokemon's \"Poison Gas\" attack was successful, heal 30 damage to this pokemon"
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 3,
+    "card_code": "EBW01-053",
+    "raw_text": "Kyokoro Effect: During you last turn, if this Pokemon's \"Poison Gas\" attack was successful, heal 30 damage to this pokemon",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "During you last turn, if this Pokemon's \"Poison Gas\" attack was successful, heal 30 damage to this pokemon"
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "The Poison Gas history dependency is structurally mapped. It becomes executable once Poison Gas's source icons are confirmed as Kyokoro orientations.",
+      "Poison Gas outcome dependency is executable because EBW01-051 orientations are confirmed."
+    ]
+  },
+  "special_effects": []
+}

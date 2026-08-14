@@ -1,0 +1,31 @@
+{
+  "content_pack": "ST + EB01 source transcription",
+  "pokemon_count": 12,
+  "move_count_transcribed": 105,
+  "source_documents": {
+    "ST.pdf": {
+      "pages": [
+        1,
+        2
+      ]
+    },
+    "EB01.pdf": {
+      "pages": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "scope": [
+    "All visible Pokémon cards in the supplied ST and EB01 PDFs",
+    "All visible Move cards in the supplied ST and EB01 PDFs",
+    "Move identity, type, printed energy cost, printed damage, and visible effect text",
+    "Pokémon HP/type/weakness and available_move_card_ids",
+    "Default dice files for newly added species to satisfy current database integrity rules"
+  ],
+  "deferred": [
+    "Exact Kyokoro orientation icon mapping for newly transcribed Move outcome_rules",
+    "Runtime encoding for special effects such as attack lock, opponent Charakoro rolls, reroll/repeat chains, and history-dependent effects"
+  ]
+}

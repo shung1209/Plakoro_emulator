@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "standard_equal",
+  "roll_mode": "weighted",
+  "orientation_weights": {
+    "FACE_DOWN": 1.0,
+    "FACE_UP": 1.0,
+    "HEAD_UP": 1.0,
+    "HEAD_DOWN": 1.0,
+    "HEAD_LEFT": 1.0,
+    "HEAD_RIGHT": 1.0
+  },
+  "scene_path": "",
+  "physics_profile": {}
+}

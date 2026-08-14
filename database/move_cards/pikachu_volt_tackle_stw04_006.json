@@ -1,0 +1,82 @@
+{
+  "schema_version": "2.0",
+  "id": "pikachu_volt_tackle_stw04_006",
+  "move_name_id": "volt_tackle",
+  "owner_id": "pikachu",
+  "display_name": "Volt Tackle",
+  "move_category": "attack",
+  "attack_type": "electric",
+  "energy_cost": [
+    {
+      "energy_type": "electric",
+      "count": 4
+    }
+  ],
+  "printed_damage": 40,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 40,
+        "damage_type": "electric",
+        "source": "printed_damage"
+      }
+    },
+    {
+      "opcode": "damage.recoil",
+      "args": {
+        "amount": 30
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 40
+          }
+        }
+      ],
+      "raw_text": "This attack does 40 more damage."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 2,
+    "card_code": "STW04-006",
+    "raw_text": "Move Effect: This Pokémon also does 30 damage to itself.\nKyokoro Effect: This attack does 40 more damage.",
+    "move_effect_text": [
+      "This Pokémon also does 30 damage to itself."
+    ],
+    "kyokoro_effect_text": [
+      "This attack does 40 more damage."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

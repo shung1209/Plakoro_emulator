@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://d2vhhysox6yyk"
+
+[deps]
+
+files=["res://database/milestone11_4f5a_move_data_normalization_review.classification.translation", "res://database/milestone11_4f5a_move_data_normalization_review.detail.translation"]
+
+source_file="res://database/milestone11_4f5a_move_data_normalization_review.csv"
+dest_files=["res://database/milestone11_4f5a_move_data_normalization_review.classification.translation", "res://database/milestone11_4f5a_move_data_normalization_review.detail.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

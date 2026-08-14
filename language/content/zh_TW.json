@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "locale": "zh_TW",
+  "display_name": "繁體中文遊戲內容",
+  "fallback": "en_US",
+  "entries": {
+    "type.fire.name": "火",
+    "type.water.name": "水",
+    "type.grass.name": "草",
+    "type.electric.name": "電",
+    "type.psychic.name": "超能力",
+    "type.fighting.name": "格鬥",
+    "type.dark.name": "惡",
+    "type.steel.name": "鋼",
+    "type.normal.name": "一般",
+    "type.flying.name": "飛行",
+    "pokemon.pikachu.name": "皮卡丘",
+    "pokemon.bulbasaur.name": "妙蛙種子",
+    "pokemon.charmander.name": "小火龍",
+    "pokemon.squirtle.name": "傑尼龜",
+    "pokemon.eevee.name": "伊布",
+    "pokemon.mew.name": "夢幻",
+    "pokemon.articuno.name": "急凍鳥",
+    "pokemon.zapdos.name": "閃電鳥",
+    "pokemon.moltres.name": "火焰鳥",
+    "pokemon.onix.name": "大岩蛇",
+    "pokemon.grimer.name": "臭泥",
+    "pokemon.pinsir.name": "凱羅斯"
+  }
+}

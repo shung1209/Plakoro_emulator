@@ -1,0 +1,91 @@
+這次不要再讓舊 validator 直接呼叫每顆骰子的舊 API。
+
+在：
+
+res://scripts/team_builder/TeamBuilderService.gd
+
+加入：
+
+const ENERGY_DIE_COMPATIBILITY_VALIDATOR: Script = preload(
+    "res://scripts/team_builder/EnergyDieCompatibilityValidator.gd"
+)
+
+然後找到目前報錯的：
+
+func validate_energy_dice(...)
+
+或：
+
+func _validate_energy_dice(...)
+
+把「逐顆呼叫：
+
+die.get_fixed_energies()
+die.fixed_energy_a
+die.fixed_energy_b
+die.id
+
+」的內容全部拿掉。
+
+如果函式收到的是 `loadout`：
+
+func validate_energy_dice(
+    loadout: Variant
+) -> bool:
+    if loadout == null:
+        return false
+
+    var result: Dictionary = (
+        ENERGY_DIE_COMPATIBILITY_VALIDATOR
+        .validate_energy_dice(
+            loadout.energy_dice
+        )
+    )
+
+    if not bool(result["success"]):
+        for raw_message: Variant in result["errors"]:
+            push_error(
+                "TeamBuilderService: "
+                + String(raw_message)
+            )
+
+        return false
+
+    return true
+
+
+如果函式收到的是 `energy_dice`：
+
+func validate_energy_dice(
+    energy_dice: Array
+) -> bool:
+    var result: Dictionary = (
+        ENERGY_DIE_COMPATIBILITY_VALIDATOR
+        .validate_energy_dice(
+            energy_dice
+        )
+    )
+
+    if not bool(result["success"]):
+        for raw_message: Variant in result["errors"]:
+            push_error(
+                "TeamBuilderService: "
+                + String(raw_message)
+            )
+
+        return false
+
+    return true
+
+
+若名稱是 `_validate_energy_dice()`，保留原名稱即可。
+
+目的：
+
+TeamBuilderService
+    ↓
+EnergyDieCompatibilityValidator
+    ↓
+StructuredEnergyDieConfigData.faces_by_orientation
+
+不要再由 TeamBuilderService 自己理解骰面的內部資料結構。

@@ -1,0 +1,34 @@
+{
+  "available_move_card_ids": [
+    "onix_gyro_ball_ebw01_045",
+    "onix_hard_impact_ebw01_044",
+    "onix_iron_tail_ebw01_050",
+    "onix_ram_ebw01_046",
+    "onix_rock_barrier_ebw01_049",
+    "onix_rock_slide_ebw01_047",
+    "onix_rock_throw_ebw01_042",
+    "onix_rock_wall_ebw01_043",
+    "onix_rocky_tackle_ebw01_041",
+    "onix_wild_tackle_ebw01_048"
+  ],
+  "display_name": "Onix",
+  "id": "onix_eb01_b1",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "fighting",
+  "review": {
+    "notes": [
+      "EB01.pdf pages 2-3",
+      "HP 120 and the printed weakness +20 were transcribed from the supplied card."
+    ],
+    "status": "source_transcribed"
+  },
+  "schema_version": "2.0",
+  "species_id": "onix",
+  "weaknesses": [
+    {
+      "attack_type": "grass",
+      "bonus_damage": 20.0
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "charmander_stl_custom",
+  "roll_mode": "weighted",
+  "orientation_weights": {
+    "FACE_DOWN": 0.8757,
+    "FACE_UP": 1.0506,
+    "HEAD_UP": 0.9207,
+    "HEAD_DOWN": 0.8755,
+    "HEAD_LEFT": 1.1223,
+    "HEAD_RIGHT": 1.1552
+  },
+  "scene_path": "",
+  "physics_profile": {}
+}

@@ -1,0 +1,5 @@
+kind,source,path,locale,success,missing,empty,unknown,placeholder_mismatch,warnings,errors
+ui,builtin,language/en_US.json,en_US,True,0,0,0,0,,
+ui,builtin,language/zh_TW.json,zh_TW,True,0,0,0,0,,
+content,builtin,language/content/en_US.json,en_US,True,0,0,0,0,,
+content,builtin,language/content/zh_TW.json,zh_TW,True,310,0,0,0,missing 310 keys resolved by fallback en_US,

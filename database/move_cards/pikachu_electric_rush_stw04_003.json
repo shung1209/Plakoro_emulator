@@ -1,0 +1,75 @@
+{
+  "schema_version": "2.0",
+  "id": "pikachu_electric_rush_stw04_003",
+  "move_name_id": "electric_rush",
+  "owner_id": "pikachu",
+  "display_name": "Electric Rush",
+  "move_category": "attack",
+  "attack_type": "electric",
+  "energy_cost": [
+    {
+      "energy_type": "electric",
+      "count": 2
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "electric",
+        "source": "printed_damage"
+      }
+    },
+    {
+      "opcode": "weakness.ignore_current",
+      "args": {}
+    }
+  ],
+  "outcome_rules": [],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 2,
+    "card_code": "STW04-003",
+    "raw_text": "Move Effect: Electric Rush damage is not affected by Weakness.\nKyokoro Effect: Use \"Eletric Rush\" one more time.[Can be repeated until it fails]",
+    "move_effect_text": [
+      "Electric Rush damage is not affected by Weakness."
+    ],
+    "kyokoro_effect_text": [
+      "Use \"Eletric Rush\" one more time.[Can be repeated until it fails]"
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "runtime_complete_10.8a",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Repeat-until-fail and weakness-ignore behavior require special runtime mapping.",
+      "Special card behavior is now explicitly represented in special_effects instead of being absent. Roll-sequence execution is intentionally pending.",
+      "10.7d: Electric Rush repeats the entire same Move after a successful Kyokoro result. Each repeated Move rolls Kyokoro again; a failed repeat Kyokoro still resolves that repeated Move and then stops the chain.",
+      "10.8a metadata cleanup: Electric Rush runtime is complete; the generic repeat_until_fail entry remains as inventory/reference metadata while repeat_same_move_until_fail is the executable semantic."
+    ]
+  },
+  "special_effects": [
+    {
+      "effect_type": "kyokoro.repeat_same_move_until_fail",
+      "runtime_status": "executable_10.7d",
+      "text": "Use \"Eletric Rush\" one more time.[Can be repeated until it fails]",
+      "trigger": "kyokoro_outcome",
+      "source_text": "Use \"Eletric Rush\" one more time.[Can be repeated until it fails]",
+      "confirmed_orientations": [
+        "HEAD_UP",
+        "FACE_UP"
+      ]
+    }
+  ]
+}

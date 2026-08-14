@@ -1,0 +1,154 @@
+{
+  "baseline": "12.12k Full Localization Final Gate PASS",
+  "language_bundle": "language(3).zip",
+  "language_files_copied": [
+    "_settings.json",
+    "content/en_US.json",
+    "content/es_ES.json",
+    "content/es_ES_moves.json",
+    "content/ja_JP.json",
+    "content/ja_JP_core.json",
+    "content/ja_JP_moves.json",
+    "content/zh_TW.json",
+    "content/zh_TW_moves.json",
+    "en_US.json",
+    "es_ES.json",
+    "ja_JP.json",
+    "zh_TW.json"
+  ],
+  "language_summary": {
+    "en_US": {
+      "strings": 687,
+      "missing_vs_en": 0,
+      "empty": 0
+    },
+    "zh_TW": {
+      "strings": 687,
+      "missing_vs_en": 0,
+      "empty": 0
+    },
+    "es_ES": {
+      "strings": 687,
+      "missing_vs_en": 0,
+      "empty": 0
+    },
+    "ja_JP": {
+      "strings": 687,
+      "missing_vs_en": 0,
+      "empty": 0
+    }
+  },
+  "tests_removed": {
+    "scripts/tests": 32,
+    "scenes/tests": 33
+  },
+  "root_markdown": [
+    "MILESTONE_12_COMPLETION.md",
+    "MILESTONE_ROADMAP.md",
+    "README.md"
+  ],
+  "markdown_moved": [
+    [
+      "MILESTONE_12_11D_LOCALIZATION_FOUNDATION.md",
+      "docs/milestones/12.11/MILESTONE_12_11D_LOCALIZATION_FOUNDATION.md"
+    ],
+    [
+      "MILESTONE_12_11B_ENERKORO_VISUAL_BUILDER_UX.md",
+      "docs/milestones/12.11/MILESTONE_12_11B_ENERKORO_VISUAL_BUILDER_UX.md"
+    ],
+    [
+      "MILESTONE_12_11E_LOCALIZATION_UI_INTEGRATION.md",
+      "docs/milestones/12.11/MILESTONE_12_11E_LOCALIZATION_UI_INTEGRATION.md"
+    ],
+    [
+      "MILESTONE_12_11C_MODEL_WEIGHT_GENERATOR_INTEGRATION.md",
+      "docs/milestones/12.11/MILESTONE_12_11C_MODEL_WEIGHT_GENERATOR_INTEGRATION.md"
+    ],
+    [
+      "MILESTONE_12_11A_USER_DATABASE_SHORTCUT.md",
+      "docs/milestones/12.11/MILESTONE_12_11A_USER_DATABASE_SHORTCUT.md"
+    ],
+    [
+      "MILESTONE_12_12A_LOCALIZATION_DATA_SOURCE_AUDIT.md",
+      "docs/milestones/12.12/MILESTONE_12_12A_LOCALIZATION_DATA_SOURCE_AUDIT.md"
+    ],
+    [
+      "MILESTONE_12_12J_RESPONSIVE_LOCALIZATION_REGRESSION_RESTART.md",
+      "docs/milestones/12.12/MILESTONE_12_12J_RESPONSIVE_LOCALIZATION_REGRESSION_RESTART.md"
+    ],
+    [
+      "MILESTONE_12_12H_LOCALE_AWARE_FORMATTING.md",
+      "docs/milestones/12.12/MILESTONE_12_12H_LOCALE_AWARE_FORMATTING.md"
+    ],
+    [
+      "MILESTONE_12_12I_FIX3_CONTENT_STUDIO_EDITOR_MOVE_LOCALIZATION.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_FIX3_CONTENT_STUDIO_EDITOR_MOVE_LOCALIZATION.md"
+    ],
+    [
+      "MILESTONE_12_12K_FULL_LOCALIZATION_FINAL_GATE.md",
+      "docs/milestones/12.12/MILESTONE_12_12K_FULL_LOCALIZATION_FINAL_GATE.md"
+    ],
+    [
+      "MILESTONE_12_12I_FIX3_R3_EDITOR_COMPLETE_MOVE_TRANSLATION.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_FIX3_R3_EDITOR_COMPLETE_MOVE_TRANSLATION.md"
+    ],
+    [
+      "MILESTONE_12_12G_GAME_CONTENT_LOCALIZATION_LAYER.md",
+      "docs/milestones/12.12/MILESTONE_12_12G_GAME_CONTENT_LOCALIZATION_LAYER.md"
+    ],
+    [
+      "MILESTONE_12_12I_CHARAKORO_EFFECT_LOCALIZATION_COVERAGE.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_CHARAKORO_EFFECT_LOCALIZATION_COVERAGE.md"
+    ],
+    [
+      "MILESTONE_12_12B_PREPARATION_DEEP_LOCALIZATION.md",
+      "docs/milestones/12.12/MILESTONE_12_12B_PREPARATION_DEEP_LOCALIZATION.md"
+    ],
+    [
+      "MILESTONE_12_12F_DYNAMIC_TEXT_PARAMETER_FORMATTING.md",
+      "docs/milestones/12.12/MILESTONE_12_12F_DYNAMIC_TEXT_PARAMETER_FORMATTING.md"
+    ],
+    [
+      "MILESTONE_12_12I_FIX2_RUNTIME_GAME_CONTENT_LOCALIZATION.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_FIX2_RUNTIME_GAME_CONTENT_LOCALIZATION.md"
+    ],
+    [
+      "MILESTONE_12_12I_TERMINOLOGY_BRAND_CLEANUP.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_TERMINOLOGY_BRAND_CLEANUP.md"
+    ],
+    [
+      "MILESTONE_12_12I_LANGUAGE_PACK_VALIDATION_TOOL.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_LANGUAGE_PACK_VALIDATION_TOOL.md"
+    ],
+    [
+      "MILESTONE_12_12I_MODEL_WEIGHT_WORDING_FIX.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_MODEL_WEIGHT_WORDING_FIX.md"
+    ],
+    [
+      "MILESTONE_12_12I_MOVE_EFFECT_DEDUP_FIX.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_MOVE_EFFECT_DEDUP_FIX.md"
+    ],
+    [
+      "MILESTONE_12_12E_ENERKORO_MODEL_WEIGHT_DEEP_LOCALIZATION.md",
+      "docs/milestones/12.12/MILESTONE_12_12E_ENERKORO_MODEL_WEIGHT_DEEP_LOCALIZATION.md"
+    ],
+    [
+      "MILESTONE_12_12I_PREPARATION_QUIT_AND_TEST_FIX.md",
+      "docs/milestones/12.12/MILESTONE_12_12I_PREPARATION_QUIT_AND_TEST_FIX.md"
+    ],
+    [
+      "MILESTONE_12_12C_BATTLE_DEEP_LOCALIZATION.md",
+      "docs/milestones/12.12/MILESTONE_12_12C_BATTLE_DEEP_LOCALIZATION.md"
+    ],
+    [
+      "MILESTONE_12_12D_CONTENT_STUDIO_DEEP_LOCALIZATION.md",
+      "docs/milestones/12.12/MILESTONE_12_12D_CONTENT_STUDIO_DEEP_LOCALIZATION.md"
+    ],
+    [
+      "TEST_CLEANUP.md",
+      "docs/maintenance/TEST_CLEANUP.md"
+    ]
+  ],
+  "production_ui_changed": [],
+  "stale_test_references_in_production": []
+}

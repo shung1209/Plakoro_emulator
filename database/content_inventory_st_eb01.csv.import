@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://ywybh8hivmgp"
+
+[deps]
+
+files=["res://database/content_inventory_st_eb01.source.translation", "res://database/content_inventory_st_eb01.card.translation", "res://database/content_inventory_st_eb01.pokemon.translation", "res://database/content_inventory_st_eb01.move.translation", "res://database/content_inventory_st_eb01.json.translation", "res://database/content_inventory_st_eb01.attack.translation", "res://database/content_inventory_st_eb01.energy.translation", "res://database/content_inventory_st_eb01.printed.translation", "res://database/content_inventory_st_eb01.raw.translation", "res://database/content_inventory_st_eb01.runtime.translation"]
+
+source_file="res://database/content_inventory_st_eb01.csv"
+dest_files=["res://database/content_inventory_st_eb01.source.translation", "res://database/content_inventory_st_eb01.card.translation", "res://database/content_inventory_st_eb01.pokemon.translation", "res://database/content_inventory_st_eb01.move.translation", "res://database/content_inventory_st_eb01.json.translation", "res://database/content_inventory_st_eb01.attack.translation", "res://database/content_inventory_st_eb01.energy.translation", "res://database/content_inventory_st_eb01.printed.translation", "res://database/content_inventory_st_eb01.raw.translation", "res://database/content_inventory_st_eb01.runtime.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

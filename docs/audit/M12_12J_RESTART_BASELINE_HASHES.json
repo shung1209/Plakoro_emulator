@@ -1,0 +1,17 @@
+{
+  "baseline": "plakorov-2_m12.12i-ui-cleanup-error-fix(1).zip",
+  "protected_files": {
+    "scenes/ui/EnergyDiceVisualBuilderUI.tscn": "ee1b612b30b3546bc198ad74b53f69cadc3e9985f9192a560aaf01da048cc8bf",
+    "scripts/ui/EnergyDiceVisualBuilderUI.gd": "30d5dc9d53433b3a6f62366621b685c043615ede12dbc500b07c45bca36e729d",
+    "scripts/ui/components/EnergyDieNetEditor.gd": "088bd758ae494a3ec31d9e8a8395a802394fb59e680f15aef5c4625cc4c26430",
+    "scripts/ui/components/EnergyFaceButton.gd": "e9bcee2acc791b20984d9323de932f823ee1b0768c5291318b7dc6b74975a662",
+    "scenes/ui/BattlePreparationUI.tscn": "fcba4a71bc28583918068831365f14fd54432c6cf9411367db08fc5720ceb108",
+    "scripts/ui/BattlePreparationUI.gd": "d9ed6bbc53fced592718ccbf48cb543d51b71d552c47d41b04d0ed7d996a45be",
+    "scenes/ui/BattleGameUI.tscn": "d3e03b4674cf746609501d2e9c5da3134b9fca7cbd9a92b57467fa1435e064c0",
+    "scripts/ui/BattleGameUI.gd": "5713519793f9db1e540b3e83a66f233f00f04bc8034ebef392bb43c24365ce5d",
+    "scenes/ui/PlakoroContentStudioUI.tscn": "a70204cddb21e670b7b55de0bca7569ae3fc1d28f95d43a9339c0423ee897baf",
+    "scripts/ui/PlakoroContentStudioUI.gd": "3cbf7019416feff567a16304da3b41aafa271a754ff0d807947dd0e1b3b344a2",
+    "scripts/model_weight/ModelWeightGeneratorPanel.gd": "ae02a5d99002f9352aca03eec2cf239ebb6cb54a1581405537c71cdbbc668ef5"
+  },
+  "production_files_changed_by_12_12j_restart_r1": []
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0",
+  "required_selected_move_cards": 4,
+  "same_move_name_allowed": false,
+  "base_energy_dice_count": 3,
+  "move_cooldown_turns": 1,
+  "default_weakness_bonus": 20,
+  "outcome_match_mode": "zero_or_one",
+  "outcome_action_execution": "sequential",
+  "damage_resolution_order": [
+    "create_base_damage",
+    "apply_move_damage_modifiers",
+    "apply_weakness",
+    "apply_defender_modifiers",
+    "deal_damage",
+    "resolve_after_attack_actions"
+  ]
+}

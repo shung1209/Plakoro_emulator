@@ -1,0 +1,288 @@
+{
+  "milestone": "10.6e",
+  "mapped_move_count": 14,
+  "runtime_ready": [
+    "battle history storage",
+    "previous self Energy-roll failure",
+    "previous opponent Energy-roll failure",
+    "previous self Move Kyokoro-outcome-success query",
+    "damage.copy_previous_opponent_move"
+  ],
+  "explicitly_mapped_but_pending": [
+    "Reflection Kyokoro x2 orientation map",
+    "Poison Gas outcome orientation dependency",
+    "Kyokoro multi-roll",
+    "Kyokoro reroll/repeat-until-fail",
+    "opponent Kyokoro roll",
+    "opponent Kyokoro disable",
+    "opponent Energy dice roll"
+  ],
+  "mapped_moves": [
+    {
+      "id": "articuno_frozen_blade_ebw01_022",
+      "display_name": "Frozen Blade",
+      "special_effects": [
+        {
+          "id": "frozen_blade_disable_opponent_kyokoro",
+          "trigger": "next_opponent_turn",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "kyokoro.opponent_disable",
+          "duration_turns": 1
+        }
+      ]
+    },
+    {
+      "id": "articuno_sheer_cold_ebw01_029",
+      "display_name": "Sheer Cold",
+      "special_effects": [
+        {
+          "id": "sheer_cold_disable_opponent_kyokoro",
+          "trigger": "next_opponent_turn",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "kyokoro.opponent_disable",
+          "duration_turns": 1
+        }
+      ]
+    },
+    {
+      "id": "grimer_harassment_venom_ebw01_059",
+      "display_name": "Harassment Venom",
+      "special_effects": [
+        {
+          "id": "grimer_harassment_venom_ebw01_059_history_bonus",
+          "trigger": "battle_history",
+          "runtime_status": "executable",
+          "condition": {
+            "type": "previous_opponent_energy_failed"
+          },
+          "effect": {
+            "opcode": "damage.add",
+            "args": {
+              "target": "opponent",
+              "amount": 50
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "grimer_toxic_blast_ebw01_057",
+      "display_name": "Toxic Blast",
+      "special_effects": [
+        {
+          "id": "grimer_toxic_blast_ebw01_057_poison_gas_history",
+          "trigger": "battle_history",
+          "runtime_status": "dependency_orientation_mapping_pending",
+          "condition": {
+            "type": "previous_self_move_outcome_success",
+            "move_name_id": "poison_gas"
+          },
+          "effect": {
+            "opcode": "damage.add",
+            "args": {
+              "target": "opponent",
+              "amount": 30
+            }
+          },
+          "description": "Apply only if Poison Gas's Kyokoro effect succeeded on this Pokémon's previous turn."
+        }
+      ]
+    },
+    {
+      "id": "grimer_toxic_heal_ebw01_053",
+      "display_name": "Toxic Heal",
+      "special_effects": [
+        {
+          "id": "grimer_toxic_heal_ebw01_053_poison_gas_history",
+          "trigger": "battle_history",
+          "runtime_status": "dependency_orientation_mapping_pending",
+          "condition": {
+            "type": "previous_self_move_outcome_success",
+            "move_name_id": "poison_gas"
+          },
+          "effect": {
+            "opcode": "hp.restore",
+            "args": {
+              "target": "self",
+              "amount": 30
+            }
+          },
+          "description": "Apply only if Poison Gas's Kyokoro effect succeeded on this Pokémon's previous turn."
+        }
+      ]
+    },
+    {
+      "id": "grimer_venom_slip_ebw01_056",
+      "display_name": "Venom Slip",
+      "special_effects": [
+        {
+          "id": "venom_slip_opponent_kyokoro",
+          "trigger": "move_resolution",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "kyokoro.opponent_roll",
+          "damage_bonus": 20
+        }
+      ]
+    },
+    {
+      "id": "mew_psychic_stw06_006",
+      "display_name": "Psychic",
+      "special_effects": [
+        {
+          "id": "psychic_opponent_energy_roll",
+          "trigger": "move_resolution",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "energy_dice.opponent_roll",
+          "roll_count": 3,
+          "damage_per_dominant_energy": 10
+        }
+      ]
+    },
+    {
+      "id": "mew_reflection_stw06_007",
+      "display_name": "Reflection",
+      "special_effects": [
+        {
+          "id": "reflection_copy_previous_attack",
+          "trigger": "base",
+          "runtime_status": "executable",
+          "opcode": "damage.copy_previous_opponent_move",
+          "description": "Copy the printed damage of the opponent's previous selected attack. Do not copy its Kyokoro effects."
+        },
+        {
+          "id": "reflection_kyokoro_double",
+          "trigger": "kyokoro_outcome",
+          "runtime_status": "orientation_mapping_pending",
+          "opcode": "damage.multiply",
+          "args": {
+            "factor": 2.0
+          },
+          "description": "On the four printed Kyokoro result icons, Reflection damage is doubled."
+        }
+      ]
+    },
+    {
+      "id": "onix_gyro_ball_ebw01_045",
+      "display_name": "Gyro Ball",
+      "special_effects": [
+        {
+          "id": "gyro_ball_opponent_kyokoro",
+          "trigger": "move_resolution",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "kyokoro.opponent_roll",
+          "damage_bonus": 60
+        }
+      ]
+    },
+    {
+      "id": "pikachu_electric_rush_stw04_003",
+      "display_name": "Electric Rush",
+      "special_effects": [
+        {
+          "id": "electric_rush_ignore_weakness",
+          "trigger": "current_attack",
+          "runtime_status": "primitive_available_mapping_pending",
+          "opcode": "weakness.disable",
+          "description": "Electric Rush damage is not affected by Weakness."
+        },
+        {
+          "id": "electric_rush_repeat_until_fail",
+          "trigger": "kyokoro_chain",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "kyokoro.repeat_until_fail",
+          "repeat_move_name_id": "electric_rush"
+        }
+      ]
+    },
+    {
+      "id": "pinsir_berserk_swing_ebw01_007",
+      "display_name": "Berserk Swing",
+      "special_effects": [
+        {
+          "id": "pinsir_berserk_swing_ebw01_007_history_bonus",
+          "trigger": "battle_history",
+          "runtime_status": "executable",
+          "condition": {
+            "type": "previous_self_energy_failed"
+          },
+          "effect": {
+            "opcode": "damage.add",
+            "args": {
+              "target": "opponent",
+              "amount": 40
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "zapdos_dual_thunder_ebw01_036",
+      "display_name": "Dual Thunder",
+      "special_effects": [
+        {
+          "id": "dual_thunder_double_roll",
+          "trigger": "move_resolution",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "kyokoro.multi_roll",
+          "roll_count": 2,
+          "damage_per_success": 20
+        }
+      ]
+    },
+    {
+      "id": "zapdos_thunder_chain_ebw01_039",
+      "display_name": "Thunder Chain",
+      "special_effects": [
+        {
+          "id": "thunder_chain_reroll_until_fail",
+          "trigger": "kyokoro_chain",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "kyokoro.repeat_until_fail",
+          "reroll": true,
+          "damage_per_success": 30
+        }
+      ]
+    },
+    {
+      "id": "zapdos_volt_rush_ebw01_033",
+      "display_name": "Volt Rush",
+      "special_effects": [
+        {
+          "id": "volt_rush_triple_roll",
+          "trigger": "move_resolution",
+          "runtime_status": "roll_orchestration_pending",
+          "effect_type": "kyokoro.multi_roll",
+          "roll_count": 3,
+          "damage_per_success": 30
+        }
+      ]
+    }
+  ],
+  "orientation_mapping_status": {
+    "canonical_orientation_ids": [
+      "FACE_UP",
+      "FACE_DOWN",
+      "HEAD_UP",
+      "HEAD_DOWN",
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "confirmed_moves": [
+      {
+        "move_id": "grimer_poison_gas_ebw01_051",
+        "card_code": "EBW01-051",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_RIGHT",
+          "HEAD_LEFT"
+        ]
+      }
+    ],
+    "mapping_file": "res://database/kyokoro_orientation_map.json"
+  },
+  "newly_runtime_ready": [
+    "grimer_poison_gas_ebw01_051",
+    "grimer_toxic_heal_ebw01_053",
+    "grimer_toxic_blast_ebw01_057"
+  ]
+}

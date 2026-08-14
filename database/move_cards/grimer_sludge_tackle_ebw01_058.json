@@ -1,0 +1,94 @@
+{
+  "schema_version": "2.0",
+  "id": "grimer_sludge_tackle_ebw01_058",
+  "move_name_id": "sludge_tackle",
+  "owner_id": "grimer",
+  "display_name": "Sludge Tackle",
+  "move_category": "attack",
+  "attack_type": "dark",
+  "energy_cost": [
+    {
+      "energy_type": "dark",
+      "count": 3
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "dark",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 40
+          }
+        }
+      ],
+      "raw_text": "This attack does 40 more damage."
+    },
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.recoil",
+          "args": {
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "This Pokémon also does 20 damage to itself."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 3,
+    "card_code": "EBW01-058",
+    "raw_text": "Kyokoro Effect: This attack does 40 more damage.\nKyokoro Effect: This Pokémon also does 20 damage to itself.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 40 more damage.",
+      "This Pokémon also does 20 damage to itself."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

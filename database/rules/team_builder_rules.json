@@ -1,0 +1,11 @@
+{
+  "schema_version": "2.0",
+  "required_selected_move_cards": 4,
+  "same_move_name_allowed": false,
+  "required_energy_dice_count": 3,
+  "fixed_energy_count_per_die": 2,
+  "fixed_energies_on_same_die_must_differ": true,
+  "fixed_energies_across_dice_must_be_unique": true,
+  "required_unique_fixed_energy_count": 6,
+  "ai_prioritize_selected_move_energy": true
+}

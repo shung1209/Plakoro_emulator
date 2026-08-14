@@ -1,0 +1,34 @@
+{
+  "available_move_card_ids": [
+    "zapdos_aerial_ace_ebw01_034",
+    "zapdos_crushing_wing_ebw01_035",
+    "zapdos_discharge_ebw01_038",
+    "zapdos_dual_thunder_ebw01_036",
+    "zapdos_electroarrow_ebw01_037",
+    "zapdos_fly_ebw01_040",
+    "zapdos_thunder_chain_ebw01_039",
+    "zapdos_thunder_flash_ebw01_031",
+    "zapdos_thunder_shock_ebw01_032",
+    "zapdos_volt_rush_ebw01_033"
+  ],
+  "display_name": "Zapdos",
+  "id": "zapdos_eb01_a1",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "electric",
+  "review": {
+    "notes": [
+      "EB01.pdf page 2",
+      "HP 120 and the printed weakness +20 were transcribed from the supplied card."
+    ],
+    "status": "source_transcribed"
+  },
+  "schema_version": "2.0",
+  "species_id": "zapdos",
+  "weaknesses": [
+    {
+      "attack_type": "fighting",
+      "bonus_damage": 20.0
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+Milestone 7 的 AI 已透過：
+
+die_config.create_profile()
+
+建立骰子 profile。因此只要 loadout.energy_dice 已換成
+StructuredEnergyDieConfigData，`AIDecisionEngine._create_energy_die_profiles()`
+本身不需改名。
+
+但 `AIMoveEvaluator.gd` 建立的 DiceEngine 必須已套用
+`DiceEngineStructuredPatch.gd.txt`，如此 Monte Carlo 模擬才會同時理解：
+
+electric + electric  -> electric ×2
+electric + steel     -> electric ×1, steel ×1

@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "moltres_die_1",
+      "fixed": [
+        "fire",
+        "grass"
+      ],
+      "double": [
+        [
+          "fire",
+          "steel"
+        ],
+        [
+          "fire",
+          "flying"
+        ]
+      ],
+      "single": [
+        "fire",
+        "fire"
+      ]
+    },
+    {
+      "die_id": "moltres_die_2",
+      "fixed": [
+        "water",
+        "steel"
+      ],
+      "double": [
+        [
+          "fire",
+          "fighting"
+        ],
+        [
+          "fire",
+          "electric"
+        ]
+      ],
+      "single": [
+        "fire",
+        "fighting"
+      ]
+    },
+    {
+      "die_id": "moltres_die_3",
+      "fixed": [
+        "flying",
+        "psychic"
+      ],
+      "double": [
+        [
+          "fire",
+          "dark"
+        ],
+        [
+          "fire",
+          "grass"
+        ]
+      ],
+      "single": [
+        "fire",
+        "dark"
+      ]
+    }
+  ]
+}

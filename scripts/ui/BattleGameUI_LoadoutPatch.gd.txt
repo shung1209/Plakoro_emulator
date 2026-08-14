@@ -1,0 +1,66 @@
+Milestone 9.6.3 removes the player Pokemon / Moves / Dice hardcoding from
+BattleGameUI.
+
+Add:
+
+const PLAYER_LOADOUT_PROVIDER: Script = preload(
+    "res://scripts/loadout/PlayerBattleLoadoutProvider.gd"
+)
+const RUNTIME_LOADOUT_BUILDER: Script = preload(
+    "res://scripts/loadout/RuntimePlayerLoadoutBuilder.gd"
+)
+
+Add variable:
+
+var player_loadout_data: Variant = null
+
+
+In `_start_new_battle()` replace the current player-side setup/loadout code
+with:
+
+player_loadout_data = (
+    PLAYER_LOADOUT_PROVIDER.load_player_loadout()
+)
+
+if player_loadout_data == null:
+    message_label.text = "Player loadout load failed."
+    return
+
+player_energy_setup = (
+    player_loadout_data.energy_dice_setup
+)
+
+player_loadout = (
+    RUNTIME_LOADOUT_BUILDER.build_runtime_loadout(
+        player_loadout_data,
+        database,
+        team_rules,
+        &"player"
+    )
+)
+
+if player_loadout == null:
+    message_label.text = "Player runtime loadout build failed."
+    return
+
+
+Delete / stop using the player-side constants:
+
+PLAYER_MOVE_IDS
+PLAYER_DEFAULT_SETUP_PATH
+
+and delete / stop using:
+
+_build_player_loadout()
+
+
+For the UI source label, use:
+
+setup_source_label.text = (
+    "Loadout: "
+    + String(player_loadout_data.loadout_id)
+)
+
+
+The enemy can remain on the current Squirtle hardcoded/default path until
+Milestone 9.6.5.

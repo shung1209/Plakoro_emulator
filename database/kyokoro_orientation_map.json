@@ -1,0 +1,1418 @@
+{
+  "schema_version": "2.2",
+  "description": "Canonical ST/EB01 Kyokoro effect/orientation mapping synced from the completed hand-reviewed Excel.",
+  "source_workbook": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx",
+  "orientations": [
+    {
+      "id": "FACE_UP",
+      "label": "Face Up"
+    },
+    {
+      "id": "FACE_DOWN",
+      "label": "Face Down"
+    },
+    {
+      "id": "HEAD_UP",
+      "label": "Head Up"
+    },
+    {
+      "id": "HEAD_DOWN",
+      "label": "Head Down"
+    },
+    {
+      "id": "HEAD_LEFT",
+      "label": "Head Left"
+    },
+    {
+      "id": "HEAD_RIGHT",
+      "label": "Head Right"
+    }
+  ],
+  "confirmed_effect_mappings": {
+    "articuno_blizzard_storm_ebw01_023": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pikachu_iron_tail_stw04_007": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon takes 10 less damage from attacks.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_discharge_ebw01_038": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "squirtle_water_gun_stw03_001": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "mew_confusion_stw06_001": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_thunder_flash_ebw01_031": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_toxic_heal_ebw01_053": [
+      {
+        "effect_text": "During you last turn, if this Pokemon's \"Poison Gas\" attack was successful, heal 30 damage to this pokemon",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "mew_reflection_stw06_007": [
+      {
+        "effect_text": "Reflection damage is doubled.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "articuno_air_cutter_ebw01_024": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "eevee_full_power_dash_stw05_005": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_sludge_toss_ebw01_052": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "mew_psybeam_stw06_002": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_deadly_scissors_ebw01_009": [
+      {
+        "effect_text": "This attack does 80 more damage.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_submission_ebw01_010": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_poison_gas_ebw01_051": [
+      {
+        "effect_text": "On the opponent's next turn, reduce the number of Enekoro roll by 1.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_burn_up_ebw01_018": [
+      {
+        "effect_text": "This attack does nothing.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "eevee_tail_slap_stw05_001": [
+      {
+        "effect_text": "This attack does 10 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_horn_attack_ebw01_003": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "bulbasaur_razor_leaf_stw01_002": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "articuno_fly_ebw01_030": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon doesn't take damage from attacks.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This attack does nothing.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pikachu_thunderbolt_stw04_004": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "On your next turn, reduce the number of Enekoro you roll by 2.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_concentrate_ebw01_001": [
+      {
+        "effect_text": "On your next turn, increase the number of Enekoro you roll by 2.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "eevee_flop_stw05_004": [
+      {
+        "effect_text": "This attack does 70 damage.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This attack does 40 damage.",
+        "orientations": [
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This attack does 20 damage.",
+        "orientations": [
+          "HEAD_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "bulbasaur_giga_drain_stw01_006": [
+      {
+        "effect_text": "Heal 40 damage from this Pokémon.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_iron_tail_ebw01_050": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon takes 10 less damage from attacks.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_electroarrow_ebw01_037": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_thunder_shock_ebw01_032": [
+      {
+        "effect_text": "This attack does 10 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "bulbasaur_vine_whip_stw01_001": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "squirtle_hydro_rage_stw03_006": [
+      {
+        "effect_text": "If this Pokémon has 40 or less HP remaining, this attack does 60 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "articuno_ice_shot_ebw01_027": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "mew_psyshot_stw06_005": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_rock_slide_ebw01_047": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_hurricane_ebw01_015": [
+      {
+        "effect_text": "This attack does 60 more damage.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pikachu_critical_bolt_stw04_000": [
+      {
+        "effect_text": "This attack does 60 more damage.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "squirtle_bubble_beam_stw03_005": [
+      {
+        "effect_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 1.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "mew_memory_skip_stw06_004": [
+      {
+        "effect_text": "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "selection_ui_pending"
+      }
+    ],
+    "onix_gyro_ball_ebw01_045": [
+      {
+        "effect_text": "Your opponent also rolls thier Kyokoro, On Head_down, face_down, this attack does 60 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "Your opponent also rolls thier Kyokoro, On Head_down, face_down, this attack does 60 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "roll_orchestration_pending"
+      }
+    ],
+    "bulbasaur_aroma_storm_stw01_000": [
+      {
+        "effect_text": "Heal 50 damage from this Pokémon.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_reckless_charge_ebw01_008": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This Pokémon also does 20 damage to itself.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_fly_ebw01_040": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon doesn't take damage from attacks.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This attack does nothing.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pikachu_electric_rush_stw04_003": [
+      {
+        "effect_text": "Use \"Eletric Rush\" one more time.[Can be repeated until it fails]",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "Use \"Eletric Rush\" one more time.[Can be repeated until it fails]",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "roll_orchestration_pending"
+      },
+      {
+        "effect_text": "Use \"Eletric Rush\" one more time.[Can be repeated until it fails]",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "roll_orchestration_pending"
+      }
+    ],
+    "charmander_flare_storm_stw02_005": [
+      {
+        "effect_text": "This attack does 10 damage for each Fire energy produced.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_venom_punch_ebw01_055": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_dual_thunder_ebw01_036": [
+      {
+        "effect_text": "Each time the Kyokoro roll succeeds with this attack, this attack does 20 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_thunder_chain_ebw01_039": [
+      {
+        "effect_text": "This attack does 30 more damage. Reroll your Kyokoro[CAn be repeated until it fails]",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "This attack does 30 more damage. Reroll your Kyokoro[CAn be repeated until it fails]",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "roll_orchestration_pending"
+      }
+    ],
+    "charmander_heat_up_stw02_002": [
+      {
+        "effect_text": "On your next turn, increase the number of Enekoro you roll by 2.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "charmander_flamethrower_stw02_003": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "On your next turn, reduce the number of Enekoro you roll by 1.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_ram_ebw01_046": [
+      {
+        "effect_text": "This attack does 10 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "charmander_metal_claw_stw02_007": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_fire_spin_ebw01_016": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "On your next turn, reduce the number of Enekoro you roll by 2.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_flare_blitz_ebw01_014": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This Pokémon also does 40 damage to itself.",
+        "orientations": [
+          "HEAD_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_hard_impact_ebw01_044": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "On your next turn, reduce the number of Enekoro you roll by 1.",
+        "orientations": [
+          "HEAD_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "eevee_take_down_stw05_003": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This Pokémon also does 20 damage to itself.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "articuno_sheer_cold_ebw01_029": [
+      {
+        "effect_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 2. They cannot roll thier kyokoro",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 2. They cannot roll thier kyokoro",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "roll_orchestration_pending"
+      }
+    ],
+    "articuno_ice_wing_ebw01_021": [
+      {
+        "effect_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 1.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_venom_slip_ebw01_056": [
+      {
+        "effect_text": "Your opponent also rolls thier Kyokoro, On Head_down, face_down, face_right, face_left, this attack does 20 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "Your opponent also rolls thier Kyokoro, On Head_down, face_down, face_right, face_left, this attack does 20 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "roll_orchestration_pending"
+      }
+    ],
+    "pikachu_volt_tackle_stw04_006": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_volt_rush_ebw01_033": [
+      {
+        "effect_text": "Each time the Kyokoro roll succeeds with this attack, this attack does 30 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pikachu_gnaw_stw04_001": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "charmander_flame_up_stw02_000": [
+      {
+        "effect_text": "On your next turn, increase the number of Enekoro you roll by 2.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "On your next turn, reduce the number of Enekoro you roll by 2.",
+        "orientations": [
+          "HEAD_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "charmander_thunder_punch_stw02_006": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_rocky_tackle_ebw01_041": [
+      {
+        "effect_text": "Reduce damage taken by an additional 20.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "squirtle_water_pulse_stw03_003": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_guillotine_ebw01_004": [
+      {
+        "effect_text": "This attack does 150 damage.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_fly_ebw01_020": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon doesn't take damage from attacks.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This attack does nothing.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_rock_barrier_ebw01_049": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon takes 50 less damage from attacks.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "articuno_cold_breath_ebw01_028": [
+      {
+        "effect_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 2.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "squirtle_shell_attack_stw03_004": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon takes 20 less damage from attacks.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "eevee_charm_stw05_006": [
+      {
+        "effect_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 2.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "bulbasaur_assault_stw01_005": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This Pokémon also does 30 damage to itself.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_wild_tackle_ebw01_048": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This Pokémon also does 20 damage to itself.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_rock_wall_ebw01_043": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pikachu_thunder_shock_stw04_002": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "eevee_tackle_stw05_002": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "squirtle_withdraw_stw03_002": [
+      {
+        "effect_text": "Heal 30 damage from this Pokémon.",
+        "orientations": [
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_endure_ebw01_002": [
+      {
+        "effect_text": "Reduce damage taken by an additional 20.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "zapdos_crushing_wing_ebw01_035": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_flamethrower_ebw01_013": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "On your next turn, reduce the number of Enekoro you roll by 2.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "bulbasaur_grass_knot_stw01_004": [
+      {
+        "effect_text": "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "selection_ui_pending"
+      }
+    ],
+    "mew_barrier_stw06_003": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon takes 20 less damage from attacks.\nReduce damage taken by an additional 30.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "eevee_bite_stw05_007": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_berserk_swing_ebw01_007": [
+      {
+        "effect_text": "During your last turn, if your Enekoro roll failed, this attack does 40 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "onix_rock_throw_ebw01_042": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "articuno_roost_ebw01_025": [
+      {
+        "effect_text": "Heal 20 damage from this Pokémon.\nHeal 20 more damage from this Pokémon.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_fire_wing_ebw01_011": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This Pokémon also does 20 damage to itself.",
+        "orientations": [
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "bulbasaur_acid_spray_stw01_007": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "charmander_fire_fang_stw02_004": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_harassment_venom_ebw01_059": [
+      {
+        "effect_text": "During your opponent's last turn, if their Enekoro roll failed, this attack does 50 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "articuno_freeze_dive_ebw01_026": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "squirtle_mud_shot_stw03_007": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_wing_rush_ebw01_019": [
+      {
+        "effect_text": "This attack does 10 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_sludge_tackle_ebw01_058": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This Pokémon also does 20 damage to itself.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_brick_break_ebw01_005": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "bulbasaur_leech_seed_stw01_003": [
+      {
+        "effect_text": "On the opponent's next turn, reduce the number of Enekoro they roll by 1.\nOn your next turn, increase the number of Enekoro you roll by 1.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "moltres_heat_wave_ebw01_012": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_toxic_blast_ebw01_057": [
+      {
+        "effect_text": "During you last turn, if this Pokemon's \"Poison Gas\" attack was successful, this attack does 30 more damage",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pikachu_thunder_stw04_005": [
+      {
+        "effect_text": "This attack does 60 more damage.",
+        "orientations": [
+          "HEAD_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "charmander_ember_stw02_001": [
+      {
+        "effect_text": "This attack does 30 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "mew_psychic_stw06_006": [
+      {
+        "effect_text": "The opppnent rolls 3 enekoro. Add 10 damage for each energy of the type that was rolled the most.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "The opppnent rolls 3 enekoro. Add 10 damage for each energy of the type that was rolled the most.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "roll_orchestration_pending"
+      }
+    ],
+    "moltres_heat_breath_ebw01_017": [
+      {
+        "effect_text": "This attack does 40 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      },
+      {
+        "effect_text": "This Pokémon also does 30 damage to itself.",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "squirtle_hard_shell_prw01_3_08": [
+      {
+        "effect_text": "During your opponent's next turn, this Pokémon takes 50 less damage from attacks.",
+        "orientations": [
+          "HEAD_DOWN"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "pinsir_scissors_charge_ebw01_006": [
+      {
+        "effect_text": "On your next turn, increase the number of Enekoro you roll by 1.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "grimer_sludge_ring_ebw01_054": [
+      {
+        "effect_text": "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ],
+        "runtime_status": "selection_ui_pending"
+      }
+    ],
+    "zapdos_aerial_ace_ebw01_034": [
+      {
+        "effect_text": "This attack does 20 more damage.",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ],
+        "runtime_status": "executable"
+      }
+    ],
+    "articuno_frozen_blade_ebw01_022": [
+      {
+        "effect_text": "kyokoro.opponent_disable",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "partially_executable"
+      },
+      {
+        "effect_text": "kyokoro.opponent_disable",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ],
+        "runtime_status": "roll_orchestration_pending"
+      }
+    ]
+  }
+}

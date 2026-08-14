@@ -1,0 +1,73 @@
+{
+  "schema_version": "2.0",
+  "id": "mew_psychic_stw06_006",
+  "move_name_id": "psychic",
+  "owner_id": "mew",
+  "display_name": "Psychic",
+  "move_category": "attack",
+  "attack_type": "psychic",
+  "energy_cost": [
+    {
+      "energy_type": "psychic",
+      "count": 3
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "psychic",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 2,
+    "card_code": "STW06-006",
+    "raw_text": "Kyokoro Effect: The opppnent rolls 3 enekoro. Add 10 damage for each energy of the type that was rolled the most.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "The opppnent rolls 3 enekoro. Add 10 damage for each energy of the type that was rolled the most."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "psychic_official_tie_rule_10.7f1",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Opponent-dice dynamic damage requires special runtime mapping.",
+      "Special card behavior is now explicitly represented in special_effects instead of being absent. Roll-sequence execution is intentionally pending.",
+      "10.7f: Psychic now rolls exactly 3 of the opponent's configured Enerkoro when the Kyokoro trigger succeeds. The most frequent energy count is multiplied by 10 and added to attack damage before Weakness.",
+      "10.7f1 official tie rule: all Energy types tied for the highest count contribute their full counts. Example Fire 1 / Grass 1 / Water 1 = 3 counted Energy = +30 damage."
+    ]
+  },
+  "special_effects": [
+    {
+      "effect_type": "energy_dice.opponent_roll",
+      "roll_count": 3,
+      "runtime_status": "executable_10.7f1",
+      "text": "The opppnent rolls 3 enekoro. Add 10 damage for each energy of the type that was rolled the most.",
+      "trigger": "kyokoro_outcome",
+      "source_text": "The opppnent rolls 3 enekoro. Add 10 damage for each energy of the type that was rolled the most.",
+      "confirmed_orientations": [
+        "HEAD_UP",
+        "FACE_UP",
+        "FACE_DOWN"
+      ],
+      "damage_per_most_common_energy": 10,
+      "tie_rule": "sum_counts_of_all_energy_types_tied_for_highest_count"
+    }
+  ]
+}

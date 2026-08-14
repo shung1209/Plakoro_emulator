@@ -1,0 +1,11 @@
+{
+  "changed_test_files": [
+    "scripts/tests/Milestone1211eLocalizationUIRegressionTest.gd",
+    "scripts/tests/Milestone1211eModelWeightUnsavedGuardRegressionTest.gd",
+    "scripts/tests/Milestone1212dContentStudioDeepLocalizationRegressionTest.gd",
+    "scripts/tests/Milestone1212iFix2R5EnerkoroLocalizationAndContentStudioRegressionTest.gd",
+    "scripts/tests/Milestone1212iFix3ContentStudioEditorAndMoveLocalizationRegressionTest.gd",
+    "scripts/tests/Milestone1212iFix3R2ContentStudioExplanationLocalizationRegressionTest.gd"
+  ],
+  "remaining_missing_test_res_paths": []
+}

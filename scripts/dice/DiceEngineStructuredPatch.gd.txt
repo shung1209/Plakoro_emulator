@@ -1,0 +1,37 @@
+在現有 `scripts/dice/DiceEngine.gd` 頂部加入：
+
+const STRUCTURED_ENERGY_ROLLER: Script = preload(
+    "res://scripts/dice/StructuredEnergyDiceRoller.gd"
+)
+
+在 `roll_battle_dice(...)` 中，原本處理 energy die profiles 的迴圈，
+改成以下邏輯：
+
+var all_structured: bool = true
+
+for profile: Variant in energy_die_profiles:
+    if (
+        profile == null
+        or not profile.has_method("roll_face")
+    ):
+        all_structured = false
+        break
+
+if all_structured:
+    if not STRUCTURED_ENERGY_ROLLER.roll_energy_profiles(
+        energy_die_profiles,
+        _random_number_generator,
+        result,
+        energy_dice_modifier
+    ):
+        return null
+else:
+    # 保留你目前 Milestone 4 的舊版 energy dice 擲骰程式，
+    # 以便舊測試與舊 loadout 仍可運作。
+    _roll_legacy_energy_dice(
+        energy_die_profiles,
+        result,
+        energy_dice_modifier
+    )
+
+Kyokoro 的擲骰邏輯保持不變。

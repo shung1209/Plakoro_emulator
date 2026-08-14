@@ -1,0 +1,68 @@
+{
+  "dice": [
+    {
+      "die_id": "eevee_die_1",
+      "double": [
+        [
+          "fighting",
+          "water"
+        ],
+        [
+          "steel",
+          "grass"
+        ]
+      ],
+      "fixed": [
+        "fire",
+        "fighting"
+      ],
+      "single": [
+        "flying",
+        "electric"
+      ]
+    },
+    {
+      "die_id": "eevee_die_2",
+      "double": [
+        [
+          "dark",
+          "fire"
+        ],
+        [
+          "psychic",
+          "psychic"
+        ]
+      ],
+      "fixed": [
+        "steel",
+        "grass"
+      ],
+      "single": [
+        "fire",
+        "electric"
+      ]
+    },
+    {
+      "die_id": "eevee_die_3",
+      "double": [
+        [
+          "steel",
+          "grass"
+        ],
+        [
+          "dark",
+          "water"
+        ]
+      ],
+      "fixed": [
+        "flying",
+        "water"
+      ],
+      "single": [
+        "fighting",
+        "flying"
+      ]
+    }
+  ],
+  "schema_version": "1.0"
+}

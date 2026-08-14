@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bqx274lp7bt70"
+
+[deps]
+
+files=["res://docs/audit/M12_12H_LOCALE_FORMAT_REMAINING.line.translation", "res://docs/audit/M12_12H_LOCALE_FORMAT_REMAINING.context.translation"]
+
+source_file="res://docs/audit/M12_12H_LOCALE_FORMAT_REMAINING.csv"
+dest_files=["res://docs/audit/M12_12H_LOCALE_FORMAT_REMAINING.line.translation", "res://docs/audit/M12_12H_LOCALE_FORMAT_REMAINING.context.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

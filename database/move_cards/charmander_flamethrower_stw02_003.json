@@ -1,0 +1,95 @@
+{
+  "schema_version": "2.0",
+  "id": "charmander_flamethrower_stw02_003",
+  "move_name_id": "flamethrower",
+  "owner_id": "charmander",
+  "display_name": "Flamethrower",
+  "move_category": "attack",
+  "attack_type": "fire",
+  "energy_cost": [
+    {
+      "energy_type": "fire",
+      "count": 3
+    }
+  ],
+  "printed_damage": 40,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 40,
+        "damage_type": "fire",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "This attack does 20 more damage."
+    },
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "energy_dice.modify",
+          "args": {
+            "target": "self",
+            "amount": -1
+          }
+        }
+      ],
+      "raw_text": "On your next turn, reduce the number of Enekoro you roll by 1."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 1,
+    "card_code": "STW02-003",
+    "raw_text": "Kyokoro Effect: This attack does 20 more damage.\nKyokoro Effect: On your next turn, reduce the number of Enekoro you roll by 1.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 20 more damage.",
+      "On your next turn, reduce the number of Enekoro you roll by 1."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

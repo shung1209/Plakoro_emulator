@@ -1,0 +1,77 @@
+{
+  "schema_version": "2.0",
+  "id": "zapdos_dual_thunder_ebw01_036",
+  "move_name_id": "dual_thunder",
+  "owner_id": "zapdos",
+  "display_name": "Dual Thunder",
+  "move_category": "support",
+  "attack_type": "electric",
+  "energy_cost": [
+    {
+      "energy_type": "electric",
+      "count": 1
+    }
+  ],
+  "printed_damage": null,
+  "base_actions": [],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "Each time the Kyokoro roll succeeds with this attack, this attack does 20 more damage"
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 2,
+    "card_code": "EBW01-036",
+    "raw_text": "Move Effect: Roll your Kyokoro 2 times\nKyokoro Effect: Each time the Kyokoro roll succeeds with this attack, this attack does 20 more damage",
+    "move_effect_text": [
+      "Roll your Kyokoro 2 times"
+    ],
+    "kyokoro_effect_text": [
+      "Each time the Kyokoro roll succeeds with this attack, this attack does 20 more damage"
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Special card behavior is now explicitly represented in special_effects instead of being absent. Roll-sequence execution is intentionally pending.",
+      "Special Kyokoro multi-roll/reroll sequence runtime implemented in 10.7a."
+    ]
+  },
+  "special_effects": [
+    {
+      "effect_type": "kyokoro.multi_roll",
+      "roll_count": 2,
+      "runtime_status": "executable_10.7a",
+      "text": "Roll your Kyokoro 2 times",
+      "trigger": "base",
+      "source_text": "Roll your Kyokoro 2 times"
+    }
+  ]
+}

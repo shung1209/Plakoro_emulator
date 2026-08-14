@@ -1,0 +1,68 @@
+{
+  "dice": [
+    {
+      "die_id": "squirtle_die_1",
+      "double": [
+        [
+          "water",
+          "water"
+        ],
+        [
+          "water",
+          "electric"
+        ]
+      ],
+      "fixed": [
+        "water",
+        "electric"
+      ],
+      "single": [
+        "water",
+        "water"
+      ]
+    },
+    {
+      "die_id": "squirtle_die_2",
+      "double": [
+        [
+          "water",
+          "fire"
+        ],
+        [
+          "water",
+          "grass"
+        ]
+      ],
+      "fixed": [
+        "fire",
+        "grass"
+      ],
+      "single": [
+        "water",
+        "water"
+      ]
+    },
+    {
+      "die_id": "squirtle_die_3",
+      "double": [
+        [
+          "water",
+          "psychic"
+        ],
+        [
+          "water",
+          "fighting"
+        ]
+      ],
+      "fixed": [
+        "psychic",
+        "fighting"
+      ],
+      "single": [
+        "water",
+        "water"
+      ]
+    }
+  ],
+  "schema_version": "1.0"
+}

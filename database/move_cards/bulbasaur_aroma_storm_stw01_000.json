@@ -1,0 +1,72 @@
+{
+  "schema_version": "2.0",
+  "id": "bulbasaur_aroma_storm_stw01_000",
+  "move_name_id": "aroma_storm",
+  "owner_id": "bulbasaur",
+  "display_name": "Aroma Storm",
+  "move_category": "attack",
+  "attack_type": "grass",
+  "energy_cost": [
+    {
+      "energy_type": "grass",
+      "count": 4
+    }
+  ],
+  "printed_damage": 30,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 30,
+        "damage_type": "grass",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "hp.restore",
+          "args": {
+            "target": "self",
+            "amount": 50
+          }
+        }
+      ],
+      "raw_text": "Heal 50 damage from this Pokémon."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 1,
+    "card_code": "STW01-000",
+    "raw_text": "Kyokoro Effect: Heal 50 damage from this Pokémon.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "Heal 50 damage from this Pokémon."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cvrd46sd6q45a"
+
+[deps]
+
+files=["res://docs/audit/M12_12I_TERMINOLOGY_BRAND_REMAINING.line.translation", "res://docs/audit/M12_12I_TERMINOLOGY_BRAND_REMAINING.kind.translation", "res://docs/audit/M12_12I_TERMINOLOGY_BRAND_REMAINING.context.translation"]
+
+source_file="res://docs/audit/M12_12I_TERMINOLOGY_BRAND_REMAINING.csv"
+dest_files=["res://docs/audit/M12_12I_TERMINOLOGY_BRAND_REMAINING.line.translation", "res://docs/audit/M12_12I_TERMINOLOGY_BRAND_REMAINING.kind.translation", "res://docs/audit/M12_12I_TERMINOLOGY_BRAND_REMAINING.context.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

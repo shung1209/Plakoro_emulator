@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "squirtle_stl_custom",
+  "roll_mode": "weighted",
+  "orientation_weights": {
+    "FACE_DOWN": 1.0026,
+    "FACE_UP": 0.9346,
+    "HEAD_UP": 1.0407,
+    "HEAD_DOWN": 0.7945,
+    "HEAD_LEFT": 1.1153,
+    "HEAD_RIGHT": 1.1122
+  },
+  "scene_path": "",
+  "physics_profile": {}
+}

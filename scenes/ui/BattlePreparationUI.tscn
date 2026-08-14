@@ -1,0 +1,529 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/BattlePreparationUI.gd" id="1_ui"]
+[ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
+
+[ext_resource type="Script" path="res://scripts/ui/GlobalQuitConfirmation.gd" id="quit_guard"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="lang_selector"]
+
+[node name="BattlePreparationUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ui")
+
+[node name="QuitGuard" type="Node" parent="."]
+script = ExtResource("quit_guard")
+
+[node name="Database" type="Node" parent="."]
+script = ExtResource("2_database")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.027, 0.034, 0.05, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Header" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 42)
+
+[node name="HeaderAccent" type="ColorRect" parent="Margin/Main/Header"]
+custom_minimum_size = Vector2(5, 32)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.3, 0.68, 0.95, 1)
+
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Main/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "Battle Preparation"
+
+[node name="LanguageSelector" parent="Margin/Main/Header" instance=ExtResource("lang_selector")]
+layout_mode = 2
+
+[node name="LoadoutIdLabel" type="Label" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Loadout"
+
+[node name="ContentStudioButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Content Studio"
+
+[node name="ContentScroll" type="ScrollContainer" parent="Margin/Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="Content" type="VBoxContainer" parent="Margin/Main/ContentScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Body" type="HSplitContainer" parent="Margin/Main/ContentScroll/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 620
+
+[node name="LeftColumn" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TopSummaryRow" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PokemonPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PokemonBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PokemonTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox"]
+layout_mode = 2
+text = "Pokémon"
+
+[node name="PokemonHeroRow" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="HeroPlakoroContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 190)
+layout_mode = 2
+alignment = 1
+
+[node name="PokemonInfoBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="PokemonNameLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Pokémon"
+
+[node name="PokemonIdLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "pokemon_id"
+
+[node name="PokemonTypeLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Type: —"
+
+[node name="PokemonHpLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "HP: —"
+
+[node name="PokemonWeaknessLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Weakness: —"
+
+[node name="BattleReadyPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BattleReadyBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BattleReadyTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Battle Setup"
+
+[node name="OpponentBox" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OpponentPortraitContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(105, 105)
+layout_mode = 2
+alignment = 1
+
+[node name="OpponentInfoBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 3
+
+[node name="OpponentTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox/OpponentInfoBox"]
+layout_mode = 2
+text = "Opponent"
+
+[node name="OpponentNameLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox/OpponentInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "Squirtle"
+
+[node name="OpponentLoadoutLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox/OpponentInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Loadout"
+
+[node name="OpponentDifficultyLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox/OpponentInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Difficulty"
+
+[node name="OpponentWeaknessLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox/OpponentInfoBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Weakness: —"
+
+[node name="ResolutionModeBox" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ResolutionModeLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/ResolutionModeBox"]
+layout_mode = 2
+text = "Resolution"
+
+[node name="ResolutionModeOption" type="OptionButton" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/ResolutionModeBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ValidationLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Validation"
+
+[node name="MovesPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MovesBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/MovesPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MovesTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/MovesPanel/MovesBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Selected Moves"
+
+[node name="MoveContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/MovesPanel/MovesBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="RightColumn" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DicePanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn"]
+layout_mode = 2
+
+[node name="DiceBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/DicePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DiceTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/DicePanel/DiceBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Enerkoro"
+
+[node name="DiceIconSummaryContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/DicePanel/DiceBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="CoveragePanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn"]
+layout_mode = 2
+
+[node name="CoverageBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CoverageTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Loadout Analysis"
+
+[node name="OverallRatingLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "☆☆☆☆☆  No Analysis"
+
+[node name="OverallProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Overall coverage: —"
+
+[node name="SeparatorA" type="HSeparator" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+layout_mode = 2
+
+[node name="MoveCoverageTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+layout_mode = 2
+text = "Move Coverage"
+
+[node name="CoverageSummaryLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Coverage"
+
+[node name="SeparatorB" type="HSeparator" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+layout_mode = 2
+
+[node name="EnergyUsageLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "能量 Usage"
+
+[node name="EnergyIconContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LoadoutStatusLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Loadout Status: Saved"
+
+[node name="LoadoutSignatureLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Loadout Signature: —"
+
+
+[node name="MoveDraftStatusPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MoveDraftStatusLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/MoveDraftStatusPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Move Configuration: ✓ Saved Loadout"
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RefreshButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(132, 46)
+layout_mode = 2
+text = "Refresh"
+
+[node name="EditDiceButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(132, 46)
+layout_mode = 2
+text = "Edit Enerkoro"
+
+[node name="ConfigureBattleButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 46)
+layout_mode = 2
+text = "Configure Battle / Moves"
+
+[node name="Spacer" type="Control" parent="Margin/Main/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StartBattleButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "Start Battle"
+
+[node name="BattleSetupDialog" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Battle Loadout Setup"
+initial_position = 2
+size = Vector2i(1180, 720)
+min_size = Vector2i(1180, 720)
+max_size = Vector2i(1180, 720)
+unresizable = true
+ok_button_text = "Apply Battle Setup"
+cancel_button_text = "Cancel"
+
+[node name="SetupRoot" type="VBoxContainer" parent="BattleSetupDialog"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SetupHint" type="Label" parent="BattleSetupDialog/SetupRoot"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Configure Player and AI battle loadouts here. Select Pokémon, exactly four different move_name_id Moves, Player Enerkoro source, and AI difficulty. Hover a Move to open its detail card with Charakoro trigger/effect information. Move content editing remains in Content Studio."
+
+[node name="SetupStatusLabel" type="Label" parent="BattleSetupDialog/SetupRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player: 0 / 4 Moves | AI: 0 / 4 Moves"
+
+[node name="SetupColumns" type="HBoxContainer" parent="BattleSetupDialog/SetupRoot"]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="PlayerSetupPanel" type="PanelContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PlayerSetupBox" type="VBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PlayerSetupTitle" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Player"
+
+[node name="SetupPlayerPokemonOption" type="OptionButton" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PlayerDiceSourceLabel" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
+layout_mode = 2
+text = "Enerkoro Source"
+
+[node name="SetupPlayerDiceSourceOption" type="OptionButton" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SetupPlayerDiceStatus" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Using Pokémon Default"
+
+[node name="PlayerMoveHeader" type="HBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
+layout_mode = 2
+
+[node name="PlayerMoveHint" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerMoveHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Select 4 Moves"
+
+[node name="SetupPlayerMoveCountLabel" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerMoveHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 / 4"
+
+[node name="SetupPlayerMoveScroll" type="ScrollContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(530, 0)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+follow_focus = true
+
+[node name="SetupPlayerMoveRows" type="VBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/SetupPlayerMoveScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="AISetupPanel" type="PanelContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AISetupBox" type="VBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AISetupTitle" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "AI"
+
+[node name="SetupAIPokemonOption" type="OptionButton" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SetupAIDifficultyOption" type="OptionButton" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AIMoveHeader" type="HBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox"]
+layout_mode = 2
+
+[node name="AIMoveHint" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox/AIMoveHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Select 4 Moves"
+
+[node name="SetupAIMoveCountLabel" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox/AIMoveHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 / 4"
+
+[node name="SetupAIMoveScroll" type="ScrollContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(530, 0)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+follow_focus = true
+
+[node name="SetupAIMoveRows" type="VBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox/SetupAIMoveScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5

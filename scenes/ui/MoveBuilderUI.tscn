@@ -1,0 +1,287 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/MoveBuilderUI.gd" id="1_ui"]
+[ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
+
+[ext_resource type="Script" path="res://scripts/ui/GlobalQuitConfirmation.gd" id="quit_guard"]
+
+[node name="MoveBuilderUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ui")
+
+[node name="QuitGuard" type="Node" parent="."]
+script = ExtResource("quit_guard")
+
+[node name="Database" type="Node" parent="."]
+script = ExtResource("2_database")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.027, 0.034, 0.05, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 42)
+
+[node name="HeaderAccent" type="ColorRect" parent="Margin/Main/Header"]
+custom_minimum_size = Vector2(5, 32)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.3, 0.68, 0.95, 1)
+
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Main/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "Move Builder"
+
+[node name="DraftModeLabel" type="Label" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Draft Mode"
+
+[node name="DiscardDraftButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Discard Draft"
+
+[node name="BackButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "← Back to Preparation"
+
+[node name="ContentScroll" type="ScrollContainer" parent="Margin/Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="Content" type="VBoxContainer" parent="Margin/Main/ContentScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="PokemonPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content"]
+layout_mode = 2
+
+[node name="PokemonBox" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/PokemonPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PokemonTitle" type="Label" parent="Margin/Main/ContentScroll/Content/PokemonPanel/PokemonBox"]
+layout_mode = 2
+text = "Pokémon"
+
+[node name="PokemonNameLabel" type="Label" parent="Margin/Main/ContentScroll/Content/PokemonPanel/PokemonBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "Pikachu"
+
+[node name="PokemonIdLabel" type="Label" parent="Margin/Main/ContentScroll/Content/PokemonPanel/PokemonBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "pikachu_standard"
+
+[node name="Body" type="HSplitContainer" parent="Margin/Main/ContentScroll/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 650
+
+[node name="AvailablePanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AvailableBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/AvailablePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AvailableTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/AvailablePanel/AvailableBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "Available Moves from Database"
+
+[node name="AvailableDescription" type="Label" parent="Margin/Main/ContentScroll/Content/Body/AvailablePanel/AvailableBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Select up to four legal moves. Same-name alternate cards are disabled automatically."
+
+[node name="AvailableScroll" type="ScrollContainer" parent="Margin/Main/ContentScroll/Content/Body/AvailablePanel/AvailableBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="AvailableMovesContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/AvailablePanel/AvailableBox/AvailableScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 7
+
+[node name="RightScroll" type="ScrollContainer" parent="Margin/Main/ContentScroll/Content/Body"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="RightColumn" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="SelectedPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn"]
+layout_mode = 2
+
+[node name="SelectedBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/SelectedPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SelectedHeader" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/SelectedPanel/SelectedBox"]
+layout_mode = 2
+
+[node name="SelectedTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/SelectedPanel/SelectedBox/SelectedHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 21
+text = "Selected Moves"
+
+[node name="SelectionCountLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/SelectedPanel/SelectedBox/SelectedHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Selected 4 / 4"
+
+[node name="SelectedMovesContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/SelectedPanel/SelectedBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="DiffPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn"]
+layout_mode = 2
+
+[node name="DiffLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/DiffPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Draft matches saved loadout."
+
+[node name="CoveragePanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn"]
+layout_mode = 2
+
+[node name="CoverageBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/CoveragePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CoverageTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/CoveragePanel/CoverageBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "Live Move Coverage"
+
+[node name="CoverageContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="OverallPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn"]
+layout_mode = 2
+
+[node name="OverallBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/OverallPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="OverallRatingLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/OverallPanel/OverallBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "☆☆☆☆☆ No Analysis"
+
+[node name="OverallProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/OverallPanel/OverallBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Overall coverage: —"
+
+[node name="EnergyUsageLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/OverallPanel/OverallBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "能量 Usage"
+
+[node name="ValidationPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content"]
+layout_mode = 2
+
+[node name="ValidationBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/ValidationPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ValidationTitle" type="Label" parent="Margin/Main/ContentScroll/Content/ValidationPanel/ValidationBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Selection Validation"
+
+[node name="ValidationLabel" type="Label" parent="Margin/Main/ContentScroll/Content/ValidationPanel/ValidationBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "NOT READY"
+
+[node name="StatusPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content"]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="Margin/Main/ContentScroll/Content/StatusPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Status"
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+
+[node name="ActionSpacer" type="Control" parent="Margin/Main/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ApplyButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 46)
+layout_mode = 2
+text = "Apply Changes"
+disabled = true
+
+[node name="ContinueButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 46)
+layout_mode = 2
+text = "Continue"
+disabled = true

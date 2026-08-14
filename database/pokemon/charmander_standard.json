@@ -1,0 +1,32 @@
+{
+  "available_move_card_ids": [
+    "charmander_ember_stw02_001",
+    "charmander_fire_fang_stw02_004",
+    "charmander_flame_up_stw02_000",
+    "charmander_flamethrower_stw02_003",
+    "charmander_flare_storm_stw02_005",
+    "charmander_heat_up_stw02_002",
+    "charmander_metal_claw_stw02_007",
+    "charmander_thunder_punch_stw02_006"
+  ],
+  "display_name": "Charmander",
+  "id": "charmander_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "fire",
+  "review": {
+    "notes": [
+      "ST.pdf page 1",
+      "HP 120 and the printed weakness +20 were transcribed from the supplied card."
+    ],
+    "status": "source_transcribed"
+  },
+  "schema_version": "2.0",
+  "species_id": "charmander",
+  "weaknesses": [
+    {
+      "attack_type": "water",
+      "bonus_damage": 20.0
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": "2.0",
+  "id": "zapdos_thunder_chain_ebw01_039",
+  "move_name_id": "thunder_chain",
+  "owner_id": "zapdos",
+  "display_name": "Thunder Chain",
+  "move_category": "attack",
+  "attack_type": "electric",
+  "energy_cost": [
+    {
+      "energy_type": "electric",
+      "count": 4
+    }
+  ],
+  "printed_damage": 30,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 30,
+        "damage_type": "electric",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 30
+          }
+        }
+      ],
+      "raw_text": "This attack does 30 more damage. Reroll your Kyokoro[CAn be repeated until it fails]"
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 2,
+    "card_code": "EBW01-039",
+    "raw_text": "Kyokoro Effect: This attack does 30 more damage. Reroll your Kyokoro[CAn be repeated until it fails]",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 30 more damage. Reroll your Kyokoro[CAn be repeated until it fails]"
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "runtime_complete_10.8a",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "Special card behavior is now explicitly represented in special_effects instead of being absent. Roll-sequence execution is intentionally pending.",
+      "Special Kyokoro multi-roll/reroll sequence runtime implemented in 10.7a.",
+      "10.8a metadata cleanup: Thunder Chain repeat-until-fail runtime was implemented in 10.7a and is no longer partially executable."
+    ]
+  },
+  "special_effects": [
+    {
+      "effect_type": "kyokoro.repeat_until_fail",
+      "runtime_status": "executable_10.7a",
+      "text": "This attack does 30 more damage. Reroll your Kyokoro[CAn be repeated until it fails]",
+      "trigger": "kyokoro_outcome",
+      "source_text": "This attack does 30 more damage. Reroll your Kyokoro[CAn be repeated until it fails]",
+      "confirmed_orientations": [
+        "HEAD_UP",
+        "FACE_UP",
+        "FACE_DOWN"
+      ]
+    }
+  ]
+}

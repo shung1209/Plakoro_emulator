@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "charmander_die_1",
+      "fixed": [
+        "fire",
+        "steel"
+      ],
+      "double": [
+        [
+          "fire",
+          "psychic"
+        ],
+        [
+          "fire",
+          "fighting"
+        ]
+      ],
+      "single": [
+        "fire",
+        "fire"
+      ]
+    },
+    {
+      "die_id": "charmander_die_2",
+      "fixed": [
+        "grass",
+        "dark"
+      ],
+      "double": [
+        [
+          "fire",
+          "electric"
+        ],
+        [
+          "fire",
+          "water"
+        ]
+      ],
+      "single": [
+        "fire",
+        "electric"
+      ]
+    },
+    {
+      "die_id": "charmander_die_3",
+      "fixed": [
+        "water",
+        "psychic"
+      ],
+      "double": [
+        [
+          "fire",
+          "flying"
+        ],
+        [
+          "fire",
+          "steel"
+        ]
+      ],
+      "single": [
+        "fire",
+        "flying"
+      ]
+    }
+  ]
+}

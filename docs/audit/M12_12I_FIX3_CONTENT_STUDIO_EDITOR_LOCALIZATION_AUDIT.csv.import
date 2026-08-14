@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dlf2o6m7f8lgc"
+
+[deps]
+
+files=["res://docs/audit/M12_12I_FIX3_CONTENT_STUDIO_EDITOR_LOCALIZATION_AUDIT.line.translation", "res://docs/audit/M12_12I_FIX3_CONTENT_STUDIO_EDITOR_LOCALIZATION_AUDIT.classification.translation", "res://docs/audit/M12_12I_FIX3_CONTENT_STUDIO_EDITOR_LOCALIZATION_AUDIT.context.translation"]
+
+source_file="res://docs/audit/M12_12I_FIX3_CONTENT_STUDIO_EDITOR_LOCALIZATION_AUDIT.csv"
+dest_files=["res://docs/audit/M12_12I_FIX3_CONTENT_STUDIO_EDITOR_LOCALIZATION_AUDIT.line.translation", "res://docs/audit/M12_12I_FIX3_CONTENT_STUDIO_EDITOR_LOCALIZATION_AUDIT.classification.translation", "res://docs/audit/M12_12I_FIX3_CONTENT_STUDIO_EDITOR_LOCALIZATION_AUDIT.context.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

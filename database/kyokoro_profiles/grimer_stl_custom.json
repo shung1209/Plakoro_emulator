@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "grimer_stl_custom",
+  "roll_mode": "weighted",
+  "orientation_weights": {
+    "FACE_DOWN": 1.0777,
+    "FACE_UP": 1.148,
+    "HEAD_UP": 1.279,
+    "HEAD_DOWN": 0.6054,
+    "HEAD_LEFT": 0.8967,
+    "HEAD_RIGHT": 0.9932
+  },
+  "scene_path": "",
+  "physics_profile": {}
+}

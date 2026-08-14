@@ -1,0 +1,34 @@
+{
+  "available_move_card_ids": [
+    "articuno_air_cutter_ebw01_024",
+    "articuno_blizzard_storm_ebw01_023",
+    "articuno_cold_breath_ebw01_028",
+    "articuno_fly_ebw01_030",
+    "articuno_freeze_dive_ebw01_026",
+    "articuno_frozen_blade_ebw01_022",
+    "articuno_ice_shot_ebw01_027",
+    "articuno_ice_wing_ebw01_021",
+    "articuno_roost_ebw01_025",
+    "articuno_sheer_cold_ebw01_029"
+  ],
+  "display_name": "Articuno",
+  "id": "articuno_eb01_b1",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "water",
+  "review": {
+    "notes": [
+      "EB01.pdf pages 1-2",
+      "HP 120 and the printed weakness +20 were transcribed from the supplied card."
+    ],
+    "status": "source_transcribed"
+  },
+  "schema_version": "2.0",
+  "species_id": "articuno",
+  "weaknesses": [
+    {
+      "attack_type": "steel",
+      "bonus_damage": 20.0
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "available_move_card_ids": [
+    "bulbasaur_acid_spray_stw01_007",
+    "bulbasaur_aroma_storm_stw01_000",
+    "bulbasaur_assault_stw01_005",
+    "bulbasaur_giga_drain_stw01_006",
+    "bulbasaur_grass_knot_stw01_004",
+    "bulbasaur_leech_seed_stw01_003",
+    "bulbasaur_razor_leaf_stw01_002",
+    "bulbasaur_vine_whip_stw01_001"
+  ],
+  "display_name": "Bulbasaur",
+  "id": "bulbasaur_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "grass",
+  "schema_version": "2.0",
+  "species_id": "bulbasaur",
+  "weaknesses": [
+    {
+      "attack_type": "fire",
+      "bonus_damage": 20
+    }
+  ]
+}

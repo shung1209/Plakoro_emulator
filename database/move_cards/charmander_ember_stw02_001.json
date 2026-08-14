@@ -1,0 +1,73 @@
+{
+  "schema_version": "2.0",
+  "id": "charmander_ember_stw02_001",
+  "move_name_id": "ember",
+  "owner_id": "charmander",
+  "display_name": "Ember",
+  "move_category": "attack",
+  "attack_type": "fire",
+  "energy_cost": [
+    {
+      "energy_type": "fire",
+      "count": 2
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "fire",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 30
+          }
+        }
+      ],
+      "raw_text": "This attack does 30 more damage."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 1,
+    "card_code": "STW02-001",
+    "raw_text": "Kyokoro Effect: This attack does 30 more damage.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 30 more damage."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

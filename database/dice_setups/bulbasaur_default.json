@@ -1,0 +1,68 @@
+{
+  "dice": [
+    {
+      "die_id": "bulbasaur_die_1",
+      "double": [
+        [
+          "grass",
+          "flying"
+        ],
+        [
+          "grass",
+          "fire"
+        ]
+      ],
+      "fixed": [
+        "grass",
+        "steel"
+      ],
+      "single": [
+        "grass",
+        "grass"
+      ]
+    },
+    {
+      "die_id": "bulbasaur_die_2",
+      "double": [
+        [
+          "grass",
+          "fighting"
+        ],
+        [
+          "grass",
+          "electric"
+        ]
+      ],
+      "fixed": [
+        "water",
+        "fighting"
+      ],
+      "single": [
+        "grass",
+        "fighting"
+      ]
+    },
+    {
+      "die_id": "bulbasaur_die_3",
+      "double": [
+        [
+          "grass",
+          "dark"
+        ],
+        [
+          "grass",
+          "steel"
+        ]
+      ],
+      "fixed": [
+        "flying",
+        "psychic"
+      ],
+      "single": [
+        "grass",
+        "dark"
+      ]
+    }
+  ],
+  "schema_version": "1.0"
+}

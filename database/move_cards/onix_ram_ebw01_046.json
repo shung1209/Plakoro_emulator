@@ -1,0 +1,74 @@
+{
+  "schema_version": "2.0",
+  "id": "onix_ram_ebw01_046",
+  "move_name_id": "ram",
+  "owner_id": "onix",
+  "display_name": "Ram",
+  "move_category": "attack",
+  "attack_type": "fighting",
+  "energy_cost": [
+    {
+      "energy_type": "fighting",
+      "count": 1
+    }
+  ],
+  "printed_damage": 10,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 10,
+        "damage_type": "fighting",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 10
+          }
+        }
+      ],
+      "raw_text": "This attack does 10 more damage."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "EB01.pdf",
+    "page": 2,
+    "card_code": "EBW01-046",
+    "raw_text": "Kyokoro Effect: This attack does 10 more damage.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 10 more damage."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "excel_final_mapping_sync_10.6e4",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass."
+    ]
+  },
+  "special_effects": []
+}

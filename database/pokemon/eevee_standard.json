@@ -1,0 +1,24 @@
+{
+  "available_move_card_ids": [
+    "eevee_bite_stw05_007",
+    "eevee_charm_stw05_006",
+    "eevee_flop_stw05_004",
+    "eevee_full_power_dash_stw05_005",
+    "eevee_tackle_stw05_002",
+    "eevee_tail_slap_stw05_001",
+    "eevee_take_down_stw05_003"
+  ],
+  "display_name": "Eevee",
+  "id": "eevee_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "normal",
+  "schema_version": "2.0",
+  "species_id": "eevee",
+  "weaknesses": [
+    {
+      "attack_type": "fighting",
+      "bonus_damage": 20
+    }
+  ]
+}

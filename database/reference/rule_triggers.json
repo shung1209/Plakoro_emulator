@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "triggers": [
+    {
+      "id": "start_turn"
+    },
+    {
+      "id": "on_move"
+    },
+    {
+      "id": "before_attack"
+    },
+    {
+      "id": "before_damage"
+    },
+    {
+      "id": "after_damage"
+    },
+    {
+      "id": "after_attack"
+    },
+    {
+      "id": "before_ko"
+    },
+    {
+      "id": "after_ko"
+    },
+    {
+      "id": "end_turn"
+    },
+    {
+      "id": "passive"
+    }
+  ]
+}

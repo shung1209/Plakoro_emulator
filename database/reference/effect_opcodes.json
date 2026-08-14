@@ -1,0 +1,68 @@
+{
+  "schema_version": "2.3",
+  "opcodes": {
+    "damage.create": {
+      "description": "Create base damage."
+    },
+    "damage.add": {
+      "description": "Add damage."
+    },
+    "damage.set": {
+      "description": "Set damage."
+    },
+    "damage.deal": {
+      "description": "Deal direct damage."
+    },
+    "hp.restore": {
+      "description": "Restore HP."
+    },
+    "incoming_damage.modify": {
+      "description": "Create an incoming-damage modifier status."
+    },
+    "status.add": {
+      "description": "Add a generic status to a participant.",
+      "required_args": [
+        "status_type"
+      ]
+    },
+    "energy_dice.modify": {
+      "description": "Create an energy-dice modifier status."
+    },
+    "move.repeat_permission": {
+      "description": "Create a repeat-move permission status."
+    },
+    "weakness.disable": {
+      "description": "Create a weakness-disable status."
+    },
+    "turn.end": {
+      "description": "End turn."
+    },
+    "condition.if": {
+      "description": "Compile then or else actions.",
+      "required_args": [
+        "condition"
+      ]
+    },
+    "damage.add_per_energy": {
+      "description": "Add damage based on generated Enerkoro Energy count."
+    },
+    "damage.copy_previous_opponent_move": {
+      "description": "Copy printed damage from the opponent's previous selected Move."
+    },
+    "damage.multiply": {
+      "description": "Multiply the current attack damage subtotal."
+    },
+    "damage.recoil": {
+      "description": "Deal recoil damage to the acting Pokémon."
+    },
+    "incoming_damage.immunity": {
+      "description": "Create a temporary incoming attack-damage immunity status."
+    },
+    "move.lock": {
+      "description": "Runtime opcode implemented by MoveLockHandler.gd."
+    },
+    "weakness.ignore_current": {
+      "description": "Ignore Weakness for the current attack only."
+    }
+  }
+}

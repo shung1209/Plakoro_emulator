@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bhl1t058k0i3v"
+
+[deps]
+
+files=["res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.source.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.path.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.locale.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.success.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.missing.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.empty.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.unknown.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.placeholder.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.warnings.translation"]
+
+source_file="res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.csv"
+dest_files=["res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.source.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.path.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.locale.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.success.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.missing.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.empty.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.unknown.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.placeholder.translation", "res://docs/audit/M12_12I_LANGUAGE_PACK_VALIDATION.warnings.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

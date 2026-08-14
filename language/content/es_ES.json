@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "locale": "es_ES",
+  "display_name": "Contenido del juego en español (España)",
+  "fallback": "en_US",
+  "entries": {
+    "type.fire.name": "Fuego",
+    "type.water.name": "Agua",
+    "type.grass.name": "Planta",
+    "type.electric.name": "Eléctrico",
+    "type.psychic.name": "Psíquico",
+    "type.fighting.name": "Lucha",
+    "type.dark.name": "Siniestro",
+    "type.steel.name": "Acero",
+    "type.normal.name": "Normal",
+    "type.flying.name": "Volador",
+    "pokemon.pikachu.name": "Pikachu",
+    "pokemon.bulbasaur.name": "Bulbasaur",
+    "pokemon.charmander.name": "Charmander",
+    "pokemon.squirtle.name": "Squirtle",
+    "pokemon.eevee.name": "Eevee",
+    "pokemon.mew.name": "Mew",
+    "pokemon.articuno.name": "Articuno",
+    "pokemon.zapdos.name": "Zapdos",
+    "pokemon.moltres.name": "Moltres",
+    "pokemon.onix.name": "Onix",
+    "pokemon.grimer.name": "Grimer",
+    "pokemon.pinsir.name": "Pinsir"
+  }
+}

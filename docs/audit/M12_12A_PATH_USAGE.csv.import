@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://d1cwe8c7eok84"
+
+[deps]
+
+files=["res://docs/audit/M12_12A_PATH_USAGE.line.translation", "res://docs/audit/M12_12A_PATH_USAGE.path.translation", "res://docs/audit/M12_12A_PATH_USAGE.scheme.translation", "res://docs/audit/M12_12A_PATH_USAGE.context.translation"]
+
+source_file="res://docs/audit/M12_12A_PATH_USAGE.csv"
+dest_files=["res://docs/audit/M12_12A_PATH_USAGE.line.translation", "res://docs/audit/M12_12A_PATH_USAGE.path.translation", "res://docs/audit/M12_12A_PATH_USAGE.scheme.translation", "res://docs/audit/M12_12A_PATH_USAGE.context.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

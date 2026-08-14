@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cbhlsryplnmwb"
+
+[deps]
+
+files=["res://docs/audit/M12_12A_HARDCODED_STRINGS.line.translation", "res://docs/audit/M12_12A_HARDCODED_STRINGS.property.translation", "res://docs/audit/M12_12A_HARDCODED_STRINGS.text.translation", "res://docs/audit/M12_12A_HARDCODED_STRINGS.category.translation", "res://docs/audit/M12_12A_HARDCODED_STRINGS.context.translation"]
+
+source_file="res://docs/audit/M12_12A_HARDCODED_STRINGS.csv"
+dest_files=["res://docs/audit/M12_12A_HARDCODED_STRINGS.line.translation", "res://docs/audit/M12_12A_HARDCODED_STRINGS.property.translation", "res://docs/audit/M12_12A_HARDCODED_STRINGS.text.translation", "res://docs/audit/M12_12A_HARDCODED_STRINGS.category.translation", "res://docs/audit/M12_12A_HARDCODED_STRINGS.context.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

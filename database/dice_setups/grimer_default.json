@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "grimer_die_1",
+      "fixed": [
+        "dark",
+        "flying"
+      ],
+      "double": [
+        [
+          "dark",
+          "psychic"
+        ],
+        [
+          "dark",
+          "water"
+        ]
+      ],
+      "single": [
+        "dark",
+        "dark"
+      ]
+    },
+    {
+      "die_id": "grimer_die_2",
+      "fixed": [
+        "electric",
+        "psychic"
+      ],
+      "double": [
+        [
+          "dark",
+          "grass"
+        ],
+        [
+          "dark",
+          "steel"
+        ]
+      ],
+      "single": [
+        "dark",
+        "grass"
+      ]
+    },
+    {
+      "die_id": "grimer_die_3",
+      "fixed": [
+        "grass",
+        "fighting"
+      ],
+      "double": [
+        [
+          "dark",
+          "electric"
+        ],
+        [
+          "dark",
+          "fire"
+        ]
+      ],
+      "single": [
+        "dark",
+        "electric"
+      ]
+    }
+  ]
+}

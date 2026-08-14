@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "pinsir_die_1",
+      "fixed": [
+        "grass",
+        "electric"
+      ],
+      "double": [
+        [
+          "grass",
+          "fighting"
+        ],
+        [
+          "grass",
+          "psychic"
+        ]
+      ],
+      "single": [
+        "grass",
+        "grass"
+      ]
+    },
+    {
+      "die_id": "pinsir_die_2",
+      "fixed": [
+        "psychic",
+        "flying"
+      ],
+      "double": [
+        [
+          "grass",
+          "steel"
+        ],
+        [
+          "grass",
+          "electric"
+        ]
+      ],
+      "single": [
+        "grass",
+        "steel"
+      ]
+    },
+    {
+      "die_id": "pinsir_die_3",
+      "fixed": [
+        "fire",
+        "fighting"
+      ],
+      "double": [
+        [
+          "grass",
+          "fire"
+        ],
+        [
+          "grass",
+          "dark"
+        ]
+      ],
+      "single": [
+        "grass",
+        "fire"
+      ]
+    }
+  ]
+}

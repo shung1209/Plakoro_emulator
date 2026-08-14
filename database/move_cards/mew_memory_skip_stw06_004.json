@@ -1,0 +1,68 @@
+{
+  "schema_version": "2.0",
+  "id": "mew_memory_skip_stw06_004",
+  "move_name_id": "memory_skip",
+  "owner_id": "mew",
+  "display_name": "Memory Skip",
+  "move_category": "attack",
+  "attack_type": "psychic",
+  "energy_cost": [
+    {
+      "energy_type": "psychic",
+      "count": 2
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "psychic",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST.pdf",
+    "page": 2,
+    "card_code": "STW06-004",
+    "raw_text": "Kyokoro Effect: Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx"
+  },
+  "review": {
+    "status": "move_selection_lock_runtime_10.7e",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Card identity, cost, printed damage, and visible effect text were transcribed from the supplied source.",
+      "Kyokoro outcome-orientation mapping and special-effect runtime encoding are intentionally deferred to the effect inventory / runtime pass.",
+      "10.7e: on confirmed Kyokoro trigger, Player selects one opponent Move; AI selects the opponent Move with highest printed damage. That move_name_id is locked for the opponent's next turn."
+    ]
+  },
+  "special_effects": [
+    {
+      "effect_type": "move.select_and_lock",
+      "runtime_status": "executable_10.7e",
+      "text": "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+      "trigger": "kyokoro_outcome",
+      "source_text": "Choose 1 of your opponent's attacks. During their next turn, they can't use this attack.",
+      "confirmed_orientations": [
+        "HEAD_UP",
+        "HEAD_LEFT",
+        "HEAD_RIGHT"
+      ],
+      "duration_turns": 1
+    }
+  ]
+}

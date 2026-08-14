@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dj2alx8a2ggpp"
+
+[deps]
+
+files=["res://database/move_json_effect_audit.id.translation", "res://database/move_json_effect_audit.move.translation", "res://database/move_json_effect_audit.owner.translation", "res://database/move_json_effect_audit.status.translation", "res://database/move_json_effect_audit.outcome.translation", "res://database/move_json_effect_audit.kyokoro.translation", "res://database/move_json_effect_audit.structural.translation", "res://database/move_json_effect_audit.source.translation"]
+
+source_file="res://database/move_json_effect_audit.csv"
+dest_files=["res://database/move_json_effect_audit.id.translation", "res://database/move_json_effect_audit.move.translation", "res://database/move_json_effect_audit.owner.translation", "res://database/move_json_effect_audit.status.translation", "res://database/move_json_effect_audit.outcome.translation", "res://database/move_json_effect_audit.kyokoro.translation", "res://database/move_json_effect_audit.structural.translation", "res://database/move_json_effect_audit.source.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

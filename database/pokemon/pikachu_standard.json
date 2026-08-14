@@ -1,0 +1,31 @@
+{
+  "available_move_card_ids": [
+    "pikachu_critical_bolt_stw04_000",
+    "pikachu_electric_rush_stw04_003",
+    "pikachu_gnaw_stw04_001",
+    "pikachu_iron_tail_stw04_007",
+    "pikachu_thunder_shock_stw04_002",
+    "pikachu_thunder_stw04_005",
+    "pikachu_thunderbolt_stw04_004",
+    "pikachu_volt_tackle_stw04_006"
+  ],
+  "display_name": "Pikachu",
+  "id": "pikachu_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "electric",
+  "review": {
+    "notes": [
+      "HP and weakness values should be rechecked against the final official source before release."
+    ],
+    "status": "user_confirmed_format"
+  },
+  "schema_version": "2.0",
+  "species_id": "pikachu",
+  "weaknesses": [
+    {
+      "attack_type": "fighting",
+      "bonus_damage": 20.0
+    }
+  ]
+}

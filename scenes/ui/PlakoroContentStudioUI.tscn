@@ -1,0 +1,1246 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/PlakoroContentStudioUI.gd" id="1_ui"]
+
+[ext_resource type="Script" path="res://scripts/ui/GlobalQuitConfirmation.gd" id="quit_guard"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/components/ModelWeightGeneratorPanel.tscn" id="model_weight_panel"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="lang_selector"]
+
+[node name="PlakoroContentStudioUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ui")
+
+[node name="QuitGuard" type="Node" parent="."]
+script = ExtResource("quit_guard")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.027, 0.034, 0.05, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+
+[node name="Accent" type="ColorRect" parent="Margin/Main/Header"]
+custom_minimum_size = Vector2(5, 32)
+layout_mode = 2
+color = Color(0.3, 0.68, 0.95, 1)
+
+[node name="Title" type="Label" parent="Margin/Main/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "PLAKORO Content Studio"
+
+[node name="LanguageSelector" parent="Margin/Main/Header" instance=ExtResource("lang_selector")]
+layout_mode = 2
+
+[node name="ValidateDatabaseButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+text = "Validate Database"
+
+[node name="BackButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "← Back to Preparation"
+
+[node name="Tabs" type="HBoxContainer" parent="Margin/Main"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PokemonTab" type="Button" parent="Margin/Main/Tabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Pokémon Editor"
+
+[node name="KyokoroTab" type="Button" parent="Margin/Main/Tabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Charakoro Profile Editor"
+
+[node name="MoveTab" type="Button" parent="Margin/Main/Tabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Move Editor"
+
+[node name="ModelWeightTab" type="Button" parent="Margin/Main/Tabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Model Weight Generator"
+
+[node name="TabSpacer" type="Control" parent="Margin/Main/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TechnicalDetailsToggle" type="CheckButton" parent="Margin/Main/Tabs"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Advanced / Technical Details"
+tooltip_text = "Show schema, runtime compatibility, legacy JSON, and technical previews."
+button_pressed = false
+
+[node name="Body" type="HSplitContainer" parent="Margin/Main"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 430
+
+[node name="LibraryPanel" type="PanelContainer" parent="Margin/Main/Body"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+
+[node name="LibraryBox" type="VBoxContainer" parent="Margin/Main/Body/LibraryPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LibraryTitle" type="Label" parent="Margin/Main/Body/LibraryPanel/LibraryBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "res://database/pokemon"
+
+[node name="LibrarySourceRow" type="HBoxContainer" parent="Margin/Main/Body/LibraryPanel/LibraryBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LibrarySourceStatus" type="Label" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibrarySourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Source: New Content"
+
+[node name="RestoreBuiltinButton" type="Button" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibrarySourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Restore Built-in"
+visible = false
+tooltip_text = "Remove the user override and return to the built-in version."
+
+[node name="LibrarySearchRow" type="HBoxContainer" parent="Margin/Main/Body/LibraryPanel/LibraryBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LibrarySearchEdit" type="LineEdit" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibrarySearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search ID, name, owner, type..."
+
+[node name="LibrarySearchClearButton" type="Button" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibrarySearchRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 0)
+layout_mode = 2
+text = "×"
+tooltip_text = "Clear search"
+
+[node name="LibraryFilterRow" type="HBoxContainer" parent="Margin/Main/Body/LibraryPanel/LibraryBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LibrarySourceFilter" type="OptionButton" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibraryFilterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Filter by content source"
+
+[node name="LibraryTypeFilter" type="OptionButton" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibraryFilterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Filter by Pokémon or Move type"
+
+[node name="LibraryFilterStatus" type="Label" parent="Margin/Main/Body/LibraryPanel/LibraryBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 / 0 shown"
+
+[node name="SavedContentList" type="ItemList" parent="Margin/Main/Body/LibraryPanel/LibraryBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+select_mode = 0
+
+[node name="LibraryActions" type="HBoxContainer" parent="Margin/Main/Body/LibraryPanel/LibraryBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NewButton" type="Button" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibraryActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "New"
+
+[node name="LoadButton" type="Button" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibraryActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Load"
+
+[node name="DuplicateButton" type="Button" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibraryActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Duplicate"
+tooltip_text = "Create a new user-owned copy of the selected content."
+
+[node name="DeleteButton" type="Button" parent="Margin/Main/Body/LibraryPanel/LibraryBox/LibraryActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Delete"
+tooltip_text = "Delete the selected database JSON"
+
+[node name="EditorScroll" type="ScrollContainer" parent="Margin/Main/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="EditorRoot" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AuthoringSessionPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot"]
+layout_mode = 2
+
+[node name="AuthoringSessionBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/AuthoringSessionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="AuthoringSessionTopRow" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/AuthoringSessionPanel/AuthoringSessionBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AuthoringSessionTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/AuthoringSessionPanel/AuthoringSessionBox/AuthoringSessionTopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "New Pokémon"
+
+[node name="AuthoringSessionState" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/AuthoringSessionPanel/AuthoringSessionBox/AuthoringSessionTopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 2
+text = "New Content · ✓ Saved"
+
+[node name="AuthoringDependencySummary" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/AuthoringSessionPanel/AuthoringSessionBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "No dependency information yet."
+
+[node name="AuthoringImpactWarning" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/AuthoringSessionPanel/AuthoringSessionBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = ""
+visible = false
+
+[node name="NewContentGuidePanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="NewContentGuideBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/NewContentGuidePanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NewContentGuideTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/NewContentGuidePanel/NewContentGuideBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Create New Content"
+
+[node name="NewContentGuideHint" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/NewContentGuidePanel/NewContentGuideBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Complete the required information, then create the content."
+
+[node name="NewContentGuideChecklist" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/NewContentGuidePanel/NewContentGuideBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Required fields will appear here."
+
+[node name="PokemonEditor" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot"]
+theme_override_constants/separation = 12
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="SchemaPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor"]
+visible = false
+layout_mode = 2
+
+[node name="SchemaLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/SchemaPanel"]
+layout_mode = 2
+autowrap_mode = 2
+text = "V2 schema: schema_version / id / species_id / display_name / pokemon_type / max_hp / weaknesses[] / available_move_card_ids[] / kyokoro_profile_id"
+
+[node name="BasicPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor"]
+layout_mode = 2
+
+[node name="BasicRow" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BasicBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BasicTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Basic Information"
+
+[node name="IdentityGrid" type="GridContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 8
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 8
+
+[node name="IdLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "id"
+
+[node name="IdEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "pikachu_standard"
+
+[node name="SpeciesIdLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "species_id"
+
+[node name="SpeciesIdEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "pikachu"
+
+[node name="NameLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "display_name"
+
+[node name="NameEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Pikachu"
+
+[node name="TypeLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "pokemon_type"
+
+[node name="TypeOption" type="OptionButton" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HpLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "max_hp"
+
+[node name="HpSpin" type="SpinBox" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/BasicBox/IdentityGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+min_value = 1.0
+max_value = 9999.0
+value = 100.0
+
+[node name="PokemonCharakoroPreviewPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+
+[node name="PreviewBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/PokemonCharakoroPreviewPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PreviewTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/PokemonCharakoroPreviewPanel/PreviewBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Charakoro PNG"
+
+[node name="PokemonCharakoroPreview" type="TextureRect" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/PokemonCharakoroPreviewPanel/PreviewBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 240)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PokemonCharakoroPreviewStatus" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/BasicPanel/BasicRow/PokemonCharakoroPreviewPanel/PreviewBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+text = "No PNG"
+
+[node name="WeaknessPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor"]
+layout_mode = 2
+
+[node name="WeaknessBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/WeaknessPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WeaknessTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/WeaknessPanel/WeaknessBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Battle Weakness"
+
+[node name="WeaknessRow" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/WeaknessPanel/WeaknessBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="WeaknessTypeLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/WeaknessPanel/WeaknessBox/WeaknessRow"]
+layout_mode = 2
+text = "attack_type"
+
+[node name="WeaknessTypeOption" type="OptionButton" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/WeaknessPanel/WeaknessBox/WeaknessRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+
+[node name="WeaknessBonusLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/WeaknessPanel/WeaknessBox/WeaknessRow"]
+layout_mode = 2
+text = "bonus_damage"
+
+[node name="WeaknessBonusSpin" type="SpinBox" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/WeaknessPanel/WeaknessBox/WeaknessRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+min_value = 0.0
+max_value = 999.0
+value = 20.0
+
+[node name="KyokoroPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor"]
+layout_mode = 2
+
+[node name="KyokoroBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/KyokoroPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="KyokoroTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/KyokoroPanel/KyokoroBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Charakoro Profile"
+
+[node name="KyokoroProfileOption" type="OptionButton" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/KyokoroPanel/KyokoroBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="KyokoroProfileStatus" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/KyokoroPanel/KyokoroBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Profile source: res://database/kyokoro_profiles/"
+
+[node name="OpenKyokoroProfileButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/KyokoroPanel/KyokoroBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Open Charakoro Profile"
+tooltip_text = "Open this profile in Charakoro Profile Editor."
+
+[node name="DefaultDicePanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor"]
+layout_mode = 2
+
+[node name="DefaultDiceBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/DefaultDicePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DefaultDiceTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/DefaultDicePanel/DefaultDiceBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Default Enerkoro"
+
+[node name="DefaultDiceHint" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/DefaultDicePanel/DefaultDiceBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Species default used when Battle Preparation selects Pokémon Default. If missing, Save Pokémon automatically generates a valid default from the Pokémon type."
+
+[node name="DefaultDicePathLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/DefaultDicePanel/DefaultDiceBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "user://user_database/dice_setups/<species>_default.json"
+
+[node name="DefaultDiceStatusLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/DefaultDicePanel/DefaultDiceBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Default Dice: Missing"
+
+[node name="EditDefaultDiceButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/DefaultDicePanel/DefaultDiceBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 42)
+layout_mode = 2
+text = "Edit Default Dice"
+
+[node name="RegenerateDefaultDiceButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/DefaultDicePanel/DefaultDiceBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 42)
+layout_mode = 2
+text = "Regenerate Default Dice"
+
+[node name="MovesPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor"]
+layout_mode = 2
+
+[node name="MovesBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MovesTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Move Loadout"
+
+[node name="MoveLists" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AvailableMoveList" type="ItemList" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox/MoveLists"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 180)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MoveActions" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox/MoveLists"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="AddMoveButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox/MoveLists/MoveActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add →"
+
+[node name="RemoveMoveButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox/MoveLists/MoveActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "← Remove"
+
+[node name="SelectedMoveList" type="ItemList" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox/MoveLists"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 180)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OpenSelectedMoveButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Open Selected Move"
+tooltip_text = "Open the selected Move in Move Editor."
+
+[node name="KyokoroEditor" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot"]
+theme_override_constants/separation = 12
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+visible = false
+
+[node name="ProfileSchemaPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor"]
+visible = false
+layout_mode = 2
+
+[node name="ProfileSchemaLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileSchemaPanel"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Profile settings control how this Charakoro behaves when rolled."
+
+[node name="ProfileDataPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor"]
+layout_mode = 2
+
+[node name="ProfileDataGrid" type="GridContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileDataPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 8
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 8
+
+[node name="ProfileIdLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileDataPanel/ProfileDataGrid"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "id"
+
+[node name="ProfileIdEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileDataPanel/ProfileDataGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "standard_equal"
+
+[node name="RollModeLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileDataPanel/ProfileDataGrid"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "roll_mode"
+
+[node name="RollModeOption" type="OptionButton" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileDataPanel/ProfileDataGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScenePathLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileDataPanel/ProfileDataGrid"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "scene_path"
+
+[node name="ScenePathEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileDataPanel/ProfileDataGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = ""
+
+[node name="WeightsPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor"]
+layout_mode = 2
+
+[node name="WeightsBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/WeightsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WeightsTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/WeightsPanel/WeightsBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Landing Orientation Weights"
+
+[node name="WeightsHint" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/WeightsPanel/WeightsBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Edit the six Charakoro orientation weights. Probability is normalized automatically."
+
+[node name="KyokoroOrientationMap" type="GridContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/WeightsPanel/WeightsBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 10
+
+[node name="TotalWeightLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/WeightsPanel/WeightsBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+text = "Total Weight: 6.0"
+
+[node name="ProfileReferencesPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor"]
+layout_mode = 2
+
+[node name="ProfileReferencesBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileReferencesPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ProfileReferencesTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileReferencesPanel/ProfileReferencesBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Used by Pokémon"
+
+[node name="ProfileReferencesHint" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileReferencesPanel/ProfileReferencesBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Pokémon currently using this Charakoro Profile."
+
+[node name="ProfileReferenceRows" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileReferencesPanel/ProfileReferencesBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ProfileReferenceStatus" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/ProfileReferencesPanel/ProfileReferencesBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Used by 0 Pokémon."
+
+[node name="PhysicsPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor"]
+visible = false
+layout_mode = 2
+
+[node name="PhysicsLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/KyokoroEditor/PhysicsPanel"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Physics profile is preserved automatically when this profile is saved."
+
+
+[node name="MoveEditor" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot"]
+theme_override_constants/separation = 12
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+visible = false
+
+[node name="MoveRuntimeStatus" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor"]
+visible = false
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Runtime Effects: Supported"
+
+[node name="MoveSchemaPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor"]
+visible = false
+layout_mode = 2
+
+[node name="MoveSchemaLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveSchemaPanel"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Move Card V2: schema_version / id / move_name_id / owner_id / display_name / move_category / attack_type / energy_cost[] / printed_damage / base_actions[] / outcome_rules[] / resolution / source / review"
+
+[node name="MoveBasicPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor"]
+layout_mode = 2
+
+[node name="MoveBasicBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MoveBasicTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Basic Information"
+
+[node name="MoveBasicGrid" type="GridContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 8
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 8
+
+[node name="MoveIdLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "id"
+
+[node name="MoveIdEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "pikachu_iron_tail_stw04_007"
+
+[node name="MoveNameIdLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "move_name_id"
+
+[node name="MoveNameIdEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "iron_tail"
+
+[node name="OwnerIdLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "owner_id"
+
+[node name="OwnerIdEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "pikachu"
+
+[node name="MoveDisplayNameLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "display_name"
+
+[node name="MoveDisplayNameEdit" type="LineEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Iron Tail"
+
+[node name="MoveCategoryLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "move_category"
+
+[node name="MoveCategoryOption" type="OptionButton" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AttackTypeLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "attack_type"
+
+[node name="AttackTypeOption" type="OptionButton" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PrintedDamageLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "printed_damage"
+
+[node name="PrintedDamageRow" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PrintedDamageSpin" type="SpinBox" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid/PrintedDamageRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+min_value = 0.0
+max_value = 9999.0
+value = 0.0
+
+[node name="PrintedDamageNone" type="CheckBox" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveBasicPanel/MoveBasicBox/MoveBasicGrid/PrintedDamageRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "None / null"
+
+[node name="ComplexPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor"]
+layout_mode = 2
+
+[node name="ComplexBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ComplexTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Gameplay & Effects"
+
+[node name="EnergyCostHeader" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EnergyCostTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/EnergyCostHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "energy_cost[]"
+
+[node name="AddAttackTypeCostButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/EnergyCostHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+text = "+ Attack Type"
+
+[node name="ClearEnergyCostButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/EnergyCostHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Clear"
+
+[node name="AddEnergyCostButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/EnergyCostHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "+ Add 能量"
+
+[node name="EnergyCostRows" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="EnergyCostPreviewTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+layout_mode = 2
+text = "Visual Cost Preview"
+
+[node name="EnergyCostVisualPreview" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="EnergyCostTotalLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Total 能量 Required: 0"
+
+[node name="BaseActionsHeader" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BaseActionsTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/BaseActionsHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "base_actions[]"
+
+[node name="AddBaseActionButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/BaseActionsHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "+ Add Action"
+
+[node name="BaseActionsRows" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="OutcomeRulesHeader" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="OutcomeRulesTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/OutcomeRulesHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "outcome_rules[]"
+
+[node name="AddOutcomeRuleButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/OutcomeRulesHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+text = "+ Add Outcome Rule"
+
+[node name="OutcomeRuleRows" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="EffectBuilderHint" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "10.1c supports the current runtime opcodes damage.create and incoming_damage.modify. Unknown existing opcodes load as Custom JSON so they are not lost."
+
+[node name="ComplexCounts" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="BaseActionsCountLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/ComplexCounts"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "base_actions: 0"
+
+[node name="OutcomeRulesCountLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox/ComplexCounts"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "outcome_rules: 0"
+
+[node name="MoveAdvancedPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor"]
+visible = false
+layout_mode = 2
+
+[node name="MoveAdvancedBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveAdvancedPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MoveAdvancedTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveAdvancedPanel/MoveAdvancedBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Advanced Data"
+
+[node name="MoveAdvancedHint" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveAdvancedPanel/MoveAdvancedBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Shows special_effects / resolution / source / review exactly as stored. outcome_rules above are the authoritative normal Charakoro effects. special_effects may contain legacy mirrors plus structural mechanics such as multi-roll/repeat/opponent-roll."
+
+[node name="MoveAdvancedJsonText" type="TextEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MoveAdvancedPanel/MoveAdvancedBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+wrap_mode = 1
+
+[node name="PokemonReferencePanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor"]
+layout_mode = 2
+
+[node name="PokemonReferenceBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/PokemonReferencePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PokemonReferenceTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/PokemonReferencePanel/PokemonReferenceBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Pokémon Assignment"
+
+[node name="PokemonReferenceHint" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/PokemonReferencePanel/PokemonReferenceBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Only Pokémon whose species_id matches this Move owner_id are assignable. Checked Pokémon receive the Move ID in available_move_card_ids[]."
+
+[node name="PokemonAssignmentScroll" type="ScrollContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/PokemonReferencePanel/PokemonReferenceBox"]
+custom_minimum_size = Vector2(0, 170)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="PokemonAssignmentRows" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/PokemonReferencePanel/PokemonReferenceBox/PokemonAssignmentScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="PokemonAssignmentStatus" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/PokemonReferencePanel/PokemonReferenceBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Referenced by 0 Pokémon."
+
+[node name="MovePresentationPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor"]
+layout_mode = 2
+
+[node name="MovePresentationBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MovePresentationTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Preview"
+
+[node name="MovePresentationHint" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Live presentation preview. This does not change the Move Card JSON schema."
+
+[node name="PreviewMainRow" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="MovePreviewOwnerIcon" type="TextureRect" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviewInfo" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="MovePreviewName" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Unnamed Move"
+
+[node name="MovePreviewMeta" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Normal • Attack"
+
+[node name="MovePreviewDamage" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Damage: —"
+
+[node name="EnergyLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
+layout_mode = 2
+text = "能量 Cost"
+
+[node name="MovePreviewEnergy" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="EffectsLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Effects"
+
+[node name="MovePreviewEffects" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="RawPreviewPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor"]
+visible = false
+layout_mode = 2
+
+[node name="RawPreviewBox" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/RawPreviewPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RawPreviewTitle" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/RawPreviewPanel/RawPreviewBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Technical JSON Preview"
+
+[node name="MoveJsonPreview" type="TextEdit" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/RawPreviewPanel/RawPreviewBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+wrap_mode = 0
+
+[node name="UnsavedStatusLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 2
+text = "Saved"
+
+[node name="ModelWeightGeneratorPanel" parent="Margin/Main/Body/EditorScroll/EditorRoot" instance=ExtResource("model_weight_panel")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ValidationPanel" type="PanelContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+
+[node name="ValidationLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/ValidationPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Ready — select content or create a new entry."
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Status" type="Label" parent="Margin/Main/Actions"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Milestone 12.8g — Full Creation Workflow Regression"
+
+[node name="SaveButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save"
+
+[node name="UnsavedChangesDialog" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Unsaved Changes"
+initial_position = 2
+size = Vector2i(680, 300)
+min_size = Vector2i(680, 300)
+max_size = Vector2i(680, 300)
+unresizable = true
+ok_button_text = "Save Changes"
+cancel_button_text = "Cancel"
+
+[node name="UnsavedChangesMessage" type="Label" parent="UnsavedChangesDialog"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "You have unsaved changes. Save them before continuing?"
+
+[node name="RestoreBuiltinDialog" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Restore Built-in Content?"
+initial_position = 2
+size = Vector2i(680, 300)
+min_size = Vector2i(680, 300)
+max_size = Vector2i(680, 300)
+unresizable = true
+ok_button_text = "Restore Built-in"
+cancel_button_text = "Cancel"
+
+[node name="RestoreBuiltinMessageLabel" type="Label" parent="RestoreBuiltinDialog"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "The user override will be removed. The built-in content will remain unchanged."
+
+[node name="DeleteDialog" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Delete Content?"
+initial_position = 2
+size = Vector2i(760, 460)
+min_size = Vector2i(760, 460)
+max_size = Vector2i(760, 460)
+unresizable = true
+ok_button_text = "Delete"
+cancel_button_text = "Cancel"
+
+[node name="DeleteMessageLabel" type="Label" parent="DeleteDialog"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Select a database entry."
+
+[node name="RegenerateDefaultDiceDialog" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Regenerate Default Enerkoro?"
+initial_position = 2
+size = Vector2i(720, 360)
+min_size = Vector2i(720, 360)
+max_size = Vector2i(720, 360)
+unresizable = true
+ok_button_text = "Regenerate"
+cancel_button_text = "Cancel"
+
+[node name="RegenerateDefaultDiceMessage" type="Label" parent="RegenerateDefaultDiceDialog"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "This will replace the Pokémon Default Dice file."
+
+[node name="DatabaseIntegrityDialog" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+title = "Database Integrity"
+initial_position = 2
+size = Vector2i(980, 700)
+ok_button_text = "Close"
+
+[node name="DatabaseIntegrityReport" type="TextEdit" parent="DatabaseIntegrityDialog"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(930, 610)
+layout_mode = 2
+editable = false
+wrap_mode = 1

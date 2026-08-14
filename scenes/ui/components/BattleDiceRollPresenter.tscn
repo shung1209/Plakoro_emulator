@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/BattleDiceRollPresenter.gd" id="1_script"]
+
+[node name="BattleDiceRollPresenter" type="HBoxContainer"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 14
+script = ExtResource("1_script")

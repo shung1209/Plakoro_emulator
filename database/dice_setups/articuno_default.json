@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "articuno_die_1",
+      "fixed": [
+        "water",
+        "flying"
+      ],
+      "double": [
+        [
+          "water",
+          "steel"
+        ],
+        [
+          "water",
+          "fire"
+        ]
+      ],
+      "single": [
+        "water",
+        "water"
+      ]
+    },
+    {
+      "die_id": "articuno_die_2",
+      "fixed": [
+        "fire",
+        "electric"
+      ],
+      "double": [
+        [
+          "water",
+          "psychic"
+        ],
+        [
+          "water",
+          "flying"
+        ]
+      ],
+      "single": [
+        "water",
+        "psychic"
+      ]
+    },
+    {
+      "die_id": "articuno_die_3",
+      "fixed": [
+        "grass",
+        "fighting"
+      ],
+      "double": [
+        [
+          "water",
+          "fighting"
+        ],
+        [
+          "water",
+          "dark"
+        ]
+      ],
+      "single": [
+        "water",
+        "fighting"
+      ]
+    }
+  ]
+}

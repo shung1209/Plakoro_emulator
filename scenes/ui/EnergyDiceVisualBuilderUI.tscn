@@ -1,0 +1,287 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/EnergyDiceVisualBuilderUI.gd" id="1_ui"]
+[ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
+
+[ext_resource type="Script" path="res://scripts/ui/GlobalQuitConfirmation.gd" id="quit_guard"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="lang_selector"]
+
+[node name="EnergyDiceVisualBuilderUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ui")
+
+[node name="QuitGuard" type="Node" parent="."]
+script = ExtResource("quit_guard")
+
+[node name="Database" type="Node" parent="."]
+script = ExtResource("2_database")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.027, 0.034, 0.05, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 42)
+
+[node name="HeaderAccent" type="ColorRect" parent="Margin/Main/Header"]
+custom_minimum_size = Vector2(5, 32)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.3, 0.68, 0.95, 1)
+
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Main/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "Enerkoro Builder"
+
+[node name="LanguageSelector" parent="Margin/Main/Header" instance=ExtResource("lang_selector")]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "← Back to Preparation"
+
+[node name="ContentScroll" type="ScrollContainer" parent="Margin/Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="Margin/Main/ContentScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="ContextPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content"]
+layout_mode = 2
+
+[node name="ContextRow" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/ContextPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ContextBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/ContextPanel/ContextRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ContextTitle" type="Label" parent="Margin/Main/ContentScroll/Content/ContextPanel/ContextRow/ContextBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "CURRENT SETUP"
+modulate = Color(1, 1, 1, 0.65)
+
+[node name="EditingContextLabel" type="Label" parent="Margin/Main/ContentScroll/Content/ContextPanel/ContextRow/ContextBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Editing: Player Custom"
+
+[node name="TopValidationPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/ContextPanel/ContextRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(250, 0)
+
+[node name="TopValidationLabel" type="Label" parent="Margin/Main/ContentScroll/Content/ContextPanel/ContextRow/TopValidationPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "✓ Valid"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BuilderHint" type="Label" parent="Margin/Main/ContentScroll/Content"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Select a face to change its 能量. Fixed faces must use unique 能量 types across all three Enerkoro."
+modulate = Color(1, 1, 1, 0.72)
+
+[node name="DiceSectionHeader" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 38)
+
+[node name="DiceSectionAccent" type="ColorRect" parent="Margin/Main/ContentScroll/Content/DiceSectionHeader"]
+layout_mode = 2
+custom_minimum_size = Vector2(4, 26)
+mouse_filter = 2
+color = Color(0.3, 0.68, 0.95, 1)
+
+[node name="DiceSectionTitle" type="Label" parent="Margin/Main/ContentScroll/Content/DiceSectionHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Enerkoro Faces"
+vertical_alignment = 1
+
+[node name="DiceSectionSpacer" type="Control" parent="Margin/Main/ContentScroll/Content/DiceSectionHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DiceSectionHint" type="Label" parent="Margin/Main/ContentScroll/Content/DiceSectionHeader"]
+layout_mode = 2
+text = "3 Enerkoro • 6 faces each"
+modulate = Color(1, 1, 1, 0.58)
+vertical_alignment = 1
+
+[node name="DiceScroll" type="ScrollContainer" parent="Margin/Main/ContentScroll/Content"]
+custom_minimum_size = Vector2(0, 560)
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 2
+vertical_scroll_mode = 0
+
+[node name="DiceContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/DiceScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 18
+
+[node name="AdvancedToggle" type="Button" parent="Margin/Main/ContentScroll/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Advanced ▸"
+toggle_mode = true
+
+[node name="PreviewCoverageRow" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+visible = false
+
+[node name="PreviewPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow"]
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DiceIconPreviewTitle" type="Label" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel/PreviewBox"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "能量 Preview"
+vertical_alignment = 2
+
+[node name="DiceIconPreviewContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel/PreviewBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="CoveragePanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CoverageBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/CoveragePanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AnalysisTitle" type="Label" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/CoveragePanel/CoverageBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Move Readiness"
+vertical_alignment = 2
+
+[node name="CoverageDescription" type="Label" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/CoveragePanel/CoverageBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Availability based on the four Moves in the current Player Loadout."
+
+[node name="CoverageContainer" type="GridContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="SummarySplit" type="HSplitContainer" parent="Margin/Main/ContentScroll/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 210)
+split_offset = 560
+visible = false
+
+[node name="ValidationPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/SummarySplit"]
+layout_mode = 2
+
+[node name="ValidationLabel" type="Label" parent="Margin/Main/ContentScroll/Content/SummarySplit/ValidationPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "Setup Validation"
+
+[node name="ProbabilityPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/SummarySplit"]
+layout_mode = 2
+
+[node name="ProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/SummarySplit/ProbabilityPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+text = "能量 Probability"
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LoadDefaultButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reset to Default"
+
+[node name="SavePathEdit" type="LineEdit" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="SaveButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save"
+
+[node name="ConfirmButton" type="Button" parent="Margin/Main/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save & Use"
