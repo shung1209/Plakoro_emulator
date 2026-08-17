@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/Battle3DArena.gd" id="1_arena"]
+
+[node name="Battle3DArena" type="SubViewportContainer"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+stretch = true
+script = ExtResource("1_arena")
+
+[node name="ArenaViewport" type="SubViewport" parent="."]
+unique_name_in_owner = true
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="ArenaViewport"]
+unique_name_in_owner = true
+
+[node name="ArenaRoot" type="Node3D" parent="ArenaViewport"]
+unique_name_in_owner = true
+
+[node name="DiceGroup" type="Node3D" parent="ArenaViewport/ArenaRoot"]
+unique_name_in_owner = true
+position = Vector3(0, 0.08, 0.35)
+
+[node name="CardGroup" type="Node3D" parent="ArenaViewport/ArenaRoot"]
+unique_name_in_owner = true
+
+[node name="Camera3D" type="Camera3D" parent="ArenaViewport"]
+unique_name_in_owner = true
+position = Vector3(0, 13.8, 8.2)
+rotation_degrees = Vector3(-59.3, 0, 0)
+current = true
+fov = 46.0
+
+[node name="InteractionLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="MoveHitTargets" type="Control" parent="InteractionLayer"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

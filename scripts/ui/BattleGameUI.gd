@@ -134,6 +134,7 @@ const RESOLUTION_STEP_QUEUE_BUILDER: Script = preload(
 
 
 @onready var database: Node = $Database
+@onready var battle_3d_arena: SubViewportContainer = %Battle3DArena
 @onready var page_title: Label = $Margin/Main/Header/Title
 @onready var margin: MarginContainer = $Margin
 @onready var main: VBoxContainer = $Margin/Main
@@ -303,6 +304,7 @@ func _ready() -> void:
 	)
 	enemy_charakoro_button.pressed.connect(_open_enemy_move_window)
 	enemy_move_window_close_button.pressed.connect(enemy_move_window.hide)
+	battle_3d_arena.move_card_selected.connect(_on_move_pressed)
 
 	# Prevent the OS close button from quitting immediately. The close request
 	# is handled by _notification() so the player can confirm first.
@@ -338,6 +340,22 @@ func _ready() -> void:
 
 	_start_new_battle()
 	_set_layout_prototype_enabled(true)
+	_apply_3d_table_ui_visibility()
+
+
+func _apply_3d_table_ui_visibility() -> void:
+	# The play surface now owns combatant profiles, move cards and dice. Keep
+	# only navigation, the compact turn banner and battle narration as 2D UI.
+	player_panel.visible = false
+	enemy_panel.visible = false
+	moves_panel.visible = false
+	roll_result_panel.visible = false
+	timeline_panel.visible = false
+	var narration_panel: PanelContainer = prototype_battle_message_label.get_parent()
+	narration_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	narration_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	prototype_battle_message_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	prototype_battle_message_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 
 
 
@@ -1466,6 +1484,13 @@ func _refresh_plakoro_presentations() -> void:
 		enemy_hero_container,
 		ai_loadout_data
 	)
+	if player_loadout_data != null and ai_loadout_data != null:
+		battle_3d_arena.setup_battle(
+			database.get_pokemon(player_loadout_data.pokemon_id),
+			database.get_pokemon(ai_loadout_data.pokemon_id),
+			player_loadout.selected_move_cards,
+			enemy_loadout.selected_move_cards
+		)
 
 
 func _refresh_single_portrait(
@@ -1869,7 +1894,18 @@ func _on_move_pressed(
 		&"rolling",
 		1.0
 	)
-	roll_result_panel.visible = true
+	roll_result_panel.visible = false
+	battle_3d_arena.play_roll(
+		dice_result,
+		profiles,
+		roll_record,
+		false,
+		battle_dice_roll_presenter.resolve_final_energy_dice(
+			dice_result,
+			profiles,
+			roll_record
+		)
+	)
 	await battle_dice_roll_presenter.play_result(
 		dice_result,
 		profiles,
@@ -2130,7 +2166,18 @@ func _execute_ai_turn() -> void:
 	)
 
 	_clear_charakoro_feedback()
-	roll_result_panel.visible = true
+	roll_result_panel.visible = false
+	battle_3d_arena.play_roll(
+		dice_result,
+		ai_energy_profiles,
+		ai_roll_record,
+		true,
+		battle_dice_roll_presenter.resolve_final_energy_dice(
+			dice_result,
+			ai_energy_profiles,
+			ai_roll_record
+		)
+	)
 	await battle_dice_roll_presenter.play_result(
 		dice_result,
 		ai_energy_profiles,
@@ -2553,12 +2600,6 @@ func _present_turn_damage(
 	var actual_damage: int = max(0, target_hp_before - final_target_hp)
 
 	if not RESOLUTION_PRESENTATION_CONFIG.is_step_by_step():
-		if actual_damage > 0:
-			FLOATING_TEXT.show_damage(
-				self,
-				target_hero,
-				actual_damage
-			)
 		await _animate_hp_bars()
 		return
 
@@ -2660,11 +2701,6 @@ func _present_turn_damage(
 				},
 				"{label}: {amount}"
 			)
-		)
-		FLOATING_TEXT.show_damage(
-			self,
-			target_hero,
-			amount
 		)
 
 	var actor_bar: ProgressBar = (
@@ -2810,21 +2846,14 @@ func _present_turn_damage(
 				"{label}: {amount}"
 			)
 		)
-		FLOATING_TEXT.show_damage(
-			self,
-			actor_hero,
-			amount
-		)
 func _show_hp_delta_feedback(
-	anchor: Control,
-	hp_before: int,
-	hp_after: int
+	_anchor: Control,
+	_hp_before: int,
+	_hp_after: int
 ) -> void:
-	var delta: int = hp_after - hp_before
-	if delta < 0:
-		FLOATING_TEXT.show_damage(self, anchor, abs(delta))
-	elif delta > 0:
-		FLOATING_TEXT.show_heal(self, anchor, delta)
+	# HP is now presented directly on the 3D Profile cards. The former floating
+	# Control-based numbers had no valid anchor after removing the 2D portraits.
+	pass
 
 
 func _animate_hp_bars() -> void:
@@ -3019,6 +3048,10 @@ func _refresh_ui() -> void:
 		int(state.enemy.current_hp),
 		int(state.enemy.max_hp)
 	)
+	battle_3d_arena.update_health(
+		float(state.player.current_hp) / maxf(float(state.player.max_hp), 1.0),
+		float(state.enemy.current_hp) / maxf(float(state.enemy.max_hp), 1.0)
+	)
 
 	turn_label.text = LocalizationService.tr_format(
 		"battle.turn_header",
@@ -3134,6 +3167,10 @@ func _refresh_move_button_states() -> void:
 			input_locked
 			or not usable
 			or battle.state.is_finished
+		)
+		battle_3d_arena.set_move_card_enabled(
+			index,
+			not button.disabled
 		)
 
 

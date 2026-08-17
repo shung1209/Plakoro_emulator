@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/BattleGameUI.gd" id="1_ui"]
 [ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/components/BattleDiceRollPresenter.tscn" id="4_roll"]
 [ext_resource type="Script" path="res://scripts/ui/components/BattlePendingEffectIndicator.gd" id="5_pending_effect"]
 [ext_resource type="Script" path="res://scripts/ui/components/BattleArenaBackdrop.gd" id="6_backdrop"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/Battle3DArena.tscn" id="7_arena_3d"]
 
 [ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="lang_selector"]
 
@@ -30,7 +31,11 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.027, 0.034, 0.05, 1)
 
+[node name="Battle3DArena" parent="." instance=ExtResource("7_arena_3d")]
+layout_mode = 1
+
 [node name="ArenaBackdrop" type="Control" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

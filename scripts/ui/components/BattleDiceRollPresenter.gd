@@ -590,6 +590,18 @@ func _resolve_final_energy_dice(
     )
 
 
+func resolve_final_energy_dice(
+    dice_result: Variant,
+    energy_profiles: Array,
+    roll_record: Variant
+) -> Array[Array]:
+    return _resolve_final_energy_dice(
+        dice_result,
+        energy_profiles,
+        roll_record
+    )
+
+
 func _extract_from_roll_record(
     energy_profiles: Array,
     roll_record: Variant
