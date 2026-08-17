@@ -139,22 +139,6 @@ emulator safer.
 
 ------------------------------------------------------------------------
 
-## Content Studio
-
-**Content Studio** is the main interface for editing supported PLAKORO
-content.
-
-You can use it to work with Pokémon / Charakoro information, Moves,
-effects, profiles, and other editable database content without manually
-editing JSON files.
-
-Game V2 intentionally seals Content Studio during normal play so the
-adventure remains the focus. Advanced users can still unlock it through
-the hidden access sequence and can inspect the JSON data inside the user
-database directly.
-
-------------------------------------------------------------------------
-
 ## Enerkoro Builder
 
 The **Enerkoro Builder** modifies the player's active three-die setup.
@@ -162,21 +146,6 @@ Energy faces may be replaced or removed, but the final setup must fill
 all required faces without exceeding the player's inventory. The Move
 readiness analysis helps show how a distribution changes the chance of
 using each selected Move.
-
-------------------------------------------------------------------------
-
-## Model Weight Generator
-
-The **Model Weight Generator** is provided for users experimenting with
-custom Charakoro / Pokémon 3D models.
-
-It can analyze supported model information and assist with generating
-model-weight data for use by the project.
-
-Because custom models may come from unofficial sources and may differ in
-geometry, scale, mesh quality, or watertightness, generated values
-should be treated as an aid for experimentation rather than an exact
-recreation of a physical manufactured die.
 
 ------------------------------------------------------------------------
 
