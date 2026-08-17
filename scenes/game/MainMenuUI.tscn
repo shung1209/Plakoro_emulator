@@ -1,0 +1,205 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/MainMenuUI.gd" id="1_menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="2_language"]
+[ext_resource type="Script" path="res://scripts/ui/GlobalQuitConfirmation.gd" id="3_quit_guard"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_menu_panel"]
+bg_color = Color(0.035, 0.055, 0.078, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.68, 0.92, 0.75)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 18
+
+[node name="MainMenuUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="QuitGuard" type="Node" parent="."]
+script = ExtResource("3_quit_guard")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.018, 0.031, 0.047, 1)
+
+[node name="ArenaGlow" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -460.0
+offset_top = -300.0
+offset_right = 460.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.025, 0.17, 0.24, 0.42)
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = -28.0
+offset_bottom = 70.0
+grow_horizontal = 2
+
+[node name="Brand" type="Label" parent="TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.32, 0.82, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "PLAKORO"
+
+[node name="LanguageSelector" parent="TopBar" instance=ExtResource("2_language")]
+layout_mode = 2
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 82.0
+offset_right = -24.0
+offset_bottom = -58.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuPanel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(560, 560)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_menu_panel")
+
+[node name="Margin" type="MarginContainer" parent="Center/MenuPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 58
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 58
+theme_override_constants/margin_bottom = 50
+
+[node name="Menu" type="VBoxContainer" parent="Center/MenuPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Accent" type="ColorRect" parent="Center/MenuPanel/Margin/Menu"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.14, 0.75, 1, 1)
+
+[node name="TitleLabel" type="Label" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.97, 1, 1)
+theme_override_font_sizes/font_size = 54
+text = "PLAKORO"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.75, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "Build your dice. Choose your moves. Enter the arena."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Spacer" type="Control" parent="Center/MenuPanel/Margin/Menu"]
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+
+[node name="PlayButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "PLAY"
+
+[node name="ContentStudioButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+visible = false
+theme_override_font_sizes/font_size = 18
+text = "Content Studio"
+
+[node name="DeleteSaveButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.52, 0.48, 1)
+theme_override_font_sizes/font_size = 16
+text = "Delete Save File"
+
+[node name="DeleteStatusLabel" type="Label" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.72, 0.34, 1)
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="UnsealedLabel" type="Label" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+theme_override_colors/font_color = Color(1, 0.78, 0.24, 1)
+theme_override_font_sizes/font_size = 15
+text = "CONTENT STUDIO UNSEALED"
+horizontal_alignment = 1
+
+[node name="QuitButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Quit"
+
+[node name="FooterSpacer" type="Control" parent="Center/MenuPanel/Margin/Menu"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VersionLabel" type="Label" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.55, 0.64, 1)
+theme_override_font_sizes/font_size = 13
+text = "V2 FOUNDATION"
+horizontal_alignment = 1
+
+[node name="QuitConfirmation" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Exit PLAKORO?"
+dialog_text = "Are you sure you want to close the game?"
+exclusive = true
+
+[node name="DeleteSaveConfirmation" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Delete Save File?"
+dialog_text = "All battle progress, unlocked Plakoro, levels, Moves, Energy, and the player loadout will be permanently deleted. Content Studio data will be kept."
+exclusive = true

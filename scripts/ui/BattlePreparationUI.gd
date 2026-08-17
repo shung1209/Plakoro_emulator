@@ -85,14 +85,6 @@ const RESOLUTION_PRESENTATION_CONFIG: Script = preload(
 )
 
 
-const BATTLE_SCENE_PATH: String = (
-    "res://scenes/ui/BattleGameUI.tscn"
-)
-
-const CONTENT_STUDIO_SCENE_PATH: String = (
-    "res://scenes/ui/PlakoroContentStudioUI.tscn"
-)
-
 const ENERGY_DICE_BUILDER_SCENE_PATH: String = (
     "res://scenes/ui/EnergyDiceVisualBuilderUI.tscn"
 )
@@ -124,8 +116,8 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var move_coverage_title: Label = $Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/MoveCoverageTitle
 @onready var setup_hint: Label = $BattleSetupDialog/SetupRoot/SetupHint
 @onready var player_setup_title: Label = $BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerSetupTitle
-@onready var player_dice_source_label: Label = $BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerDiceSourceLabel
 @onready var player_move_hint: Label = $BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerMoveHeader/PlayerMoveHint
+@onready var ai_setup_panel: PanelContainer = $BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel
 @onready var ai_setup_title: Label = $BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox/AISetupTitle
 @onready var ai_move_hint: Label = $BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox/AIMoveHeader/AIMoveHint
 @onready var page_title: Label = $Margin/Main/Header/Title
@@ -138,7 +130,7 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var pokemon_weakness_label: Label = %PokemonWeaknessLabel
 @onready var hero_plakoro_container: VBoxContainer = %HeroPlakoroContainer
 
-@onready var move_container: VBoxContainer = %MoveContainer
+@onready var move_container: GridContainer = %MoveContainer
 @onready var dice_icon_summary_container: HBoxContainer = %DiceIconSummaryContainer
 @onready var coverage_summary_label: Label = %CoverageSummaryLabel
 @onready var overall_rating_label: Label = %OverallRatingLabel
@@ -160,6 +152,7 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var refresh_button: Button = %RefreshButton
 @onready var edit_dice_button: Button = %EditDiceButton
 @onready var start_battle_button: Button = %StartBattleButton
+@onready var main_menu_button: Button = %MainMenuButton
 @onready var content_studio_button: Button = %ContentStudioButton
 @onready var configure_battle_button: Button = %ConfigureBattleButton
 @onready var battle_setup_dialog: ConfirmationDialog = %BattleSetupDialog
@@ -173,8 +166,6 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var setup_player_move_scroll: ScrollContainer = %SetupPlayerMoveScroll
 @onready var setup_ai_move_scroll: ScrollContainer = %SetupAIMoveScroll
 @onready var setup_status_label: Label = %SetupStatusLabel
-@onready var setup_player_dice_source_option: OptionButton = %SetupPlayerDiceSourceOption
-@onready var setup_player_dice_status: Label = %SetupPlayerDiceStatus
 
 
 var player_loadout_data: Variant = null
@@ -199,7 +190,11 @@ func _ready() -> void:
 	LocalizationService.locale_changed.connect(
 		_on_locale_changed
 	)
+	ContentStudioAccess.content_studio_unsealed.connect(
+		_refresh_content_studio_access
+	)
 	_apply_localized_text()
+	_refresh_content_studio_access()
 	get_viewport().size_changed.connect(
 		_apply_responsive_layout
 	)
@@ -219,6 +214,9 @@ func _ready() -> void:
 	start_battle_button.pressed.connect(
 		_start_battle
 	)
+	main_menu_button.pressed.connect(
+		GameFlow.open_main_menu
+	)
 	content_studio_button.pressed.connect(
 		_open_content_studio
 	)
@@ -235,18 +233,12 @@ func _ready() -> void:
 	setup_player_pokemon_option.item_selected.connect(
 		func(_index: int) -> void:
 			_rebuild_setup_moves(false)
-			_refresh_player_dice_source_status()
 	)
 	setup_ai_pokemon_option.item_selected.connect(
 		func(_index: int) -> void:
 			_rebuild_setup_moves(
 				true
 			)
-	)
-	setup_player_dice_source_option.item_selected.connect(
-		func(_index: int) -> void:
-			_refresh_player_dice_source_status()
-			_refresh_battle_setup_state()
 	)
 	setup_player_move_scroll.gui_input.connect(
 		_on_setup_move_scroll_input
@@ -282,19 +274,10 @@ func _on_locale_changed(
 				)
 			)
 
-		var current_dice_source: String = (
-			_selected_player_dice_source()
-		)
-
 		_populate_setup_difficulties()
 		_select_setup_difficulty(
 			current_difficulty
 		)
-		_populate_player_dice_sources()
-		_select_player_dice_source(
-			current_dice_source
-		)
-		_refresh_player_dice_source_status()
 		_refresh_battle_setup_state()
 
 	if player_loadout_data != null:
@@ -304,10 +287,18 @@ func _on_locale_changed(
 		_refresh_validation()
 
 
+func _refresh_content_studio_access() -> void:
+	content_studio_button.visible = ContentStudioAccess.is_unsealed()
+
+
 func _apply_localized_text() -> void:
 	page_title.text = LocalizationService.tr_key(
 		"preparation.title",
         "Battle Preparation"
+	)
+	main_menu_button.text = LocalizationService.tr_key(
+		"common.main_menu",
+		"Main Menu"
 	)
 	content_studio_button.text = LocalizationService.tr_key(
 		"preparation.content_studio",
@@ -326,8 +317,12 @@ func _apply_localized_text() -> void:
         "Configure Battle / Moves"
 	)
 	start_battle_button.text = LocalizationService.tr_key(
-		"preparation.start_battle",
-        "Start Battle"
+		"encounter_select.return"
+		if GameFlow.collection_mode
+		else "preparation.start_battle",
+		"Return to Encounters"
+		if GameFlow.collection_mode
+		else "Start Battle"
 	)
 
 	pokemon_title.text = LocalizationService.tr_key(
@@ -377,15 +372,11 @@ func _apply_localized_text() -> void:
 	)
 	setup_hint.text = LocalizationService.tr_key(
 		"preparation.setup_hint",
-        "Configure Player and AI battle loadouts here."
+		"Choose your Pokémon and four Moves. Your current Enerkoro setup is used automatically. Opponent Loadout stays hidden until battle."
 	)
 	player_setup_title.text = LocalizationService.tr_key(
 		"preparation.player",
         "Player"
-	)
-	player_dice_source_label.text = LocalizationService.tr_key(
-		"preparation.enerkoro_source",
-        "Enerkoro Source"
 	)
 	player_move_hint.text = LocalizationService.tr_key(
 		"preparation.select_four_moves",
@@ -432,6 +423,12 @@ func _populate_resolution_modes() -> void:
 		1,
         "step_by_step"
 	)
+	if EncounterSession.has_active_encounter():
+		resolution_mode_option.select(1)
+		resolution_mode_option.disabled = true
+		RESOLUTION_PRESENTATION_CONFIG.set_mode(&"step_by_step")
+		return
+	resolution_mode_option.disabled = false
 	if selected_mode == "quick":
 		resolution_mode_option.select(0)
 	elif selected_mode == "step_by_step":
@@ -518,14 +515,6 @@ func _open_battle_setup() -> void:
 	_clear_setup_move_hover_preview()
 	_populate_setup_pokemon_options()
 	_populate_setup_difficulties()
-	_populate_player_dice_sources()
-
-	if player_loadout_data != null:
-		_select_player_dice_source(
-			String(
-				player_loadout_data.energy_dice_source
-			)
-		)
 
 	_select_setup_pokemon(
 		setup_player_pokemon_option,
@@ -543,10 +532,6 @@ func _open_battle_setup() -> void:
 		if ai_loadout_data != null
 		else ""
 	)
-
-	# OptionButton.select() does not emit item_selected. Refresh the displayed
-	# Dice path explicitly so the status always matches the selected Pokémon.
-	_refresh_player_dice_source_status()
 
 	_rebuild_setup_moves(
 		false
@@ -566,6 +551,7 @@ func _open_battle_setup() -> void:
 		)
 
 	_refresh_battle_setup_state()
+	_apply_encounter_setup_lock()
 
 	battle_setup_dialog.popup_centered(
 		Vector2i(
@@ -575,9 +561,22 @@ func _open_battle_setup() -> void:
 	)
 
 
+func _apply_encounter_setup_lock() -> void:
+	var locked: bool = (
+		EncounterSession.has_active_encounter()
+		or GameFlow.collection_mode
+	)
+	setup_ai_pokemon_option.disabled = locked
+	setup_ai_difficulty_option.disabled = locked
+	for check: CheckBox in setup_ai_move_checks:
+		check.disabled = locked
+
+
 func _populate_setup_pokemon_options() -> void:
 	setup_player_pokemon_option.clear()
 	setup_ai_pokemon_option.clear()
+	var progress: Variant = PlayerProgress.get_progress()
+	var collection_active: bool = progress.has_profile()
 
 	for pokemon_id: String in (
 		POKEMON_AUTHORING.list_saved()
@@ -650,17 +649,27 @@ func _populate_setup_pokemon_options() -> void:
 			setup_player_pokemon_option,
 			setup_ai_pokemon_option
 		]:
-			var index: int = option.item_count
-			option.add_item(
-				display_text
+			var collection_locked: bool = (
+				option == setup_player_pokemon_option
+				and collection_active
+				and not progress.unlocked_pokemon_ids.has(pokemon_id)
 			)
+			var index: int = option.item_count
+			var option_text: String = display_text
+			if option == setup_player_pokemon_option and collection_active:
+				option_text += LocalizationService.tr_format(
+					"preparation.pokemon_level",
+					{"level": int(progress.pokemon_levels.get(pokemon_id, 1))},
+					"  •  LV{level}"
+				)
+			option.add_item(option_text)
 			option.set_item_metadata(
 				index,
 				pokemon_id
 			)
 			option.set_item_disabled(
 				index,
-				not playable
+				not playable or collection_locked
 			)
 			option.set_item_tooltip(
 				index,
@@ -669,8 +678,15 @@ func _populate_setup_pokemon_options() -> void:
 						"preparation.ready_for_battle",
                         "Ready for battle."
 					)
-					if playable
-					else reason
+					if playable and not collection_locked
+					else (
+						LocalizationService.tr_key(
+							"preparation.collection_locked",
+							"Defeat this Plakoro to unlock it."
+						)
+						if collection_locked
+						else reason
+					)
 				)
 			)
 
@@ -679,99 +695,6 @@ func _populate_setup_pokemon_options() -> void:
 	)
 	_select_first_enabled(
 		setup_ai_pokemon_option
-	)
-
-
-func _populate_player_dice_sources() -> void:
-	setup_player_dice_source_option.clear()
-	setup_player_dice_source_option.add_item(
-		LocalizationService.tr_key(
-			"preparation.dice_source.default",
-            "Pokémon Default"
-		)
-	)
-	setup_player_dice_source_option.set_item_metadata(0, "pokemon_default")
-	setup_player_dice_source_option.add_item(
-		LocalizationService.tr_key(
-			"preparation.dice_source.custom",
-            "Player Custom"
-		)
-	)
-	setup_player_dice_source_option.set_item_metadata(1, "player_custom")
-	setup_player_dice_source_option.set_item_disabled(
-		1,
-		not CONTENT_PLAYTEST.has_player_custom_dice()
-	)
-	setup_player_dice_source_option.select(0)
-	_refresh_player_dice_source_status()
-
-
-func _select_player_dice_source(
-	source: String
-) -> void:
-	for index: int in range(
-		setup_player_dice_source_option.item_count
-	):
-		if (
-			String(
-				setup_player_dice_source_option.get_item_metadata(
-					index
-				)
-			) == source
-			and not setup_player_dice_source_option.is_item_disabled(
-				index
-			)
-		):
-			setup_player_dice_source_option.select(
-				index
-			)
-			return
-
-	setup_player_dice_source_option.select(
-		0
-	)
-
-
-func _selected_player_dice_source() -> String:
-	if setup_player_dice_source_option.item_count == 0:
-		return "pokemon_default"
-	return String(
-		setup_player_dice_source_option.get_item_metadata(
-			setup_player_dice_source_option.selected
-		)
-	)
-
-
-func _refresh_player_dice_source_status() -> void:
-	var source: String = _selected_player_dice_source()
-
-	if source == "player_custom":
-		setup_player_dice_status.text = LocalizationService.tr_format(
-			"preparation.dice_using_custom",
-			{
-				"path": CONTENT_PLAYTEST.PLAYER_CUSTOM_DICE_PATH
-			},
-            "Using Player Custom: {path}"
-		)
-		return
-
-	var pokemon_id: String = _selected_setup_pokemon_id(
-		setup_player_pokemon_option
-	)
-	if pokemon_id.is_empty():
-		setup_player_dice_status.text = LocalizationService.tr_key(
-			"preparation.select_player_pokemon",
-            "Select Player Pokémon."
-		)
-		return
-
-	var pokemon: Dictionary = POKEMON_AUTHORING.load_by_id(pokemon_id)
-	setup_player_dice_status.text = LocalizationService.tr_format(
-		"preparation.dice_using_default",
-		{
-			"path": CONTENT_PLAYTEST.get_pokemon_default_dice_path(pokemon)
-		},
-        "Using Pokémon Default: {path}"
 	)
 
 
@@ -951,6 +874,12 @@ func _rebuild_setup_moves(
 
 			if move_id.is_empty():
 				continue
+			if (
+				not for_ai
+				and PlayerProgress.has_profile()
+				and not PlayerProgress.get_progress().unlocked_move_card_ids.has(move_id)
+			):
+				continue
 
 			var move_data: Dictionary = (
 				MOVE_AUTHORING.load_by_id(
@@ -1042,44 +971,83 @@ func _rebuild_setup_moves(
 				Control.MOUSE_FILTER_PASS
 			)
 
-			var hover_row: MarginContainer = MarginContainer.new()
-			hover_row.size_flags_horizontal = (
-				Control.SIZE_EXPAND_FILL
-			)
-			hover_row.mouse_filter = (
-				Control.MOUSE_FILTER_PASS
-			)
-			hover_row.set_meta(
-				"move_id",
-				move_id
-			)
-
-			hover_row.mouse_entered.connect(
-				func() -> void:
-					_request_setup_move_hover_preview(
-						hover_row,
-						move_id,
-						move_data
-					)
-			)
-			hover_row.mouse_exited.connect(
-				func() -> void:
-					_cancel_setup_move_hover_request(
-						hover_row
-					)
-			)
-
-			hover_row.add_child(
-				check
-			)
 			rows.add_child(
-				hover_row
+				_build_inline_setup_move_card(check, move_id, move_data)
 			)
 			checks.append(
 				check
 			)
 
 	_refresh_battle_setup_state()
+
+
+func _build_inline_setup_move_card(
+	check: CheckBox,
+	move_id: String,
+	_move_data: Dictionary
+) -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var box: VBoxContainer = VBoxContainer.new()
+	box.add_theme_constant_override("separation", 5)
+	panel.add_child(box)
+	box.add_child(check)
+
+	var move_card: Variant = database.get_move_card(StringName(move_id))
+	if move_card == null:
+		return panel
+
+	var stats: HBoxContainer = HBoxContainer.new()
+	stats.add_theme_constant_override("separation", 12)
+	box.add_child(stats)
+	var cost_row: HBoxContainer = HBoxContainer.new()
+	cost_row.set_script(MOVE_ENERGY_COST_ROW)
+	cost_row.setup(move_card, 20)
+	stats.add_child(cost_row)
+	var damage: Label = Label.new()
+	damage.text = "DMG " + _format_damage(move_card)
+	damage.modulate.a = 0.88
+	stats.add_child(damage)
+
+	var detail_lines: Array[String] = []
+	var description: String = (
+		GameContentLocalizationService.localize_move_description(move_card)
+	)
+	if not description.is_empty():
+		detail_lines.append(description)
+	var preview: Dictionary = MOVE_EFFECT_PRESENTATION.build_preview(move_card)
+	var groups: Array = preview.get("trigger_groups", [])
+	for group_index: int in range(groups.size()):
+		var raw_group: Variant = groups[group_index]
+		if not raw_group is Dictionary:
+			continue
+		var group: Dictionary = raw_group
+		var orientation_names: Array[String] = []
+		for raw_orientation: Variant in group.get("orientations", []):
+			orientation_names.append(
+				LocalizationService.tr_key(
+					"orientation." + String(raw_orientation),
+					String(raw_orientation).replace("_", " ").capitalize()
+				)
+			)
+		var effect_text: String = (
+			GameContentLocalizationService.localize_effect_text(
+				move_card,
+				group_index,
+				String(group.get("effect_text", ""))
+			)
+		)
+		detail_lines.append(
+			"Charakoro %s → %s" % [" / ".join(orientation_names), effect_text]
+		)
+	if detail_lines.is_empty():
+		detail_lines.append(String(preview.get("summary", "—")))
+	var details: Label = Label.new()
+	details.text = "\n".join(detail_lines)
+	details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	details.modulate.a = 0.78
+	box.add_child(details)
+	return panel
 
 
 func _process(
@@ -1714,18 +1682,7 @@ func _refresh_battle_setup_state() -> void:
         "{count} / 4"
 	)
 
-	var dice_source: String = (
-		_selected_player_dice_source()
-	)
-	var dice_ready: bool = (
-		CONTENT_PLAYTEST.has_player_custom_dice()
-		if dice_source == "player_custom"
-		else CONTENT_PLAYTEST.has_pokemon_default_dice(
-			POKEMON_AUTHORING.load_by_id(
-				player_id
-			)
-		)
-	)
+	var dice_ready: bool = CONTENT_PLAYTEST.has_player_custom_dice()
 
 	var ready: bool = (
 		not player_id.is_empty()
@@ -1738,8 +1695,8 @@ func _refresh_battle_setup_state() -> void:
 	if ready:
 		setup_status_label.text = (
 			LocalizationService.tr_key(
-				"preparation.ready_setup",
-                "READY — Player and AI loadouts are valid."
+				"preparation.ready_player_setup",
+				"READY — Player Loadout is valid. Opponent Loadout is hidden."
 			)
 			+ (
 				LocalizationService.tr_key(
@@ -1758,13 +1715,17 @@ func _refresh_battle_setup_state() -> void:
 			)
 		)
 	else:
-		setup_status_label.text = LocalizationService.tr_format(
-			"preparation.not_ready_counts",
-			{
-				"player": player_count,
-				"ai": ai_count
-			},
-            "NOT READY — Player {player}/4 Moves | AI {ai}/4 Moves"
+		setup_status_label.text = (
+			LocalizationService.tr_format(
+				"preparation.not_ready_player_count",
+				{"player": player_count},
+				"NOT READY — Player {player}/4 Moves"
+			)
+			if player_count != 4
+			else LocalizationService.tr_key(
+				"preparation.opponent_setup_unavailable",
+				"Opponent setup is unavailable."
+			)
 		)
 
 	var ok_button: Button = (
@@ -1773,6 +1734,8 @@ func _refresh_battle_setup_state() -> void:
 
 	if ok_button != null:
 		ok_button.disabled = not ready
+
+	_apply_encounter_setup_lock()
 
 
 func _collect_setup_move_ids(
@@ -1839,7 +1802,7 @@ func _apply_battle_setup() -> void:
 		CONTENT_PLAYTEST.create_playtest_loadout(
 			player_pokemon,
 			player_moves,
-			_selected_player_dice_source()
+			"player_custom"
 		)
 	)
 
@@ -1869,13 +1832,16 @@ func _apply_battle_setup() -> void:
 		)
 	)
 
-	var ai_result: Dictionary = (
-		CONTENT_PLAYTEST.create_playtest_opponent_loadout(
+	var ai_result: Dictionary = {"success": true}
+	if (
+		not EncounterSession.has_active_encounter()
+		and not GameFlow.collection_mode
+	):
+		ai_result = CONTENT_PLAYTEST.create_playtest_opponent_loadout(
 			ai_id,
 			difficulty,
 			ai_moves
 		)
-	)
 
 	if not bool(
 		ai_result.get(
@@ -2169,6 +2135,7 @@ func _refresh_moves() -> void:
 		)
 
 		var panel: PanelContainer = PanelContainer.new()
+		panel.custom_minimum_size = Vector2(0, 190)
 		panel.size_flags_horizontal = (
 			Control.SIZE_EXPAND_FILL
 		)
@@ -2356,6 +2323,7 @@ func _refresh_moves() -> void:
 
 			if trigger_groups.is_empty():
 				var fallback_effect: Label = Label.new()
+				fallback_effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 				var fallback_summary: String = String(
 					effect_preview["summary"]
 				)
@@ -2912,16 +2880,15 @@ func _start_battle() -> void:
 		)
 		return
 
-	get_tree().change_scene_to_file(
-		BATTLE_SCENE_PATH
-	)
+	if GameFlow.collection_mode:
+		GameFlow.open_encounter_select()
+	else:
+		GameFlow.open_battle()
 
 
 
 func _open_content_studio() -> void:
-	get_tree().change_scene_to_file(
-		CONTENT_STUDIO_SCENE_PATH
-	)
+	GameFlow.open_content_studio()
 
 
 func _open_move_builder() -> void:
@@ -2939,10 +2906,7 @@ func _open_energy_dice_builder() -> void:
 		)
 		return
 
-	var source: String = String(
-		player_loadout_data.energy_dice_source
-	)
-	var target_path: String = ""
+	var target_path: String = CONTENT_PLAYTEST.PLAYER_CUSTOM_DICE_PATH
 	var mode: String = "player_custom"
 	var pokemon_id: String = String(
 		player_loadout_data.pokemon_id
@@ -2961,19 +2925,6 @@ func _open_energy_dice_builder() -> void:
 				"species_id",
                 ""
 			)
-		)
-
-	if source == "pokemon_default":
-		mode = "pokemon_default"
-		target_path = (
-			CONTENT_PLAYTEST.get_pokemon_default_dice_path(
-				pokemon
-			)
-		)
-	else:
-		mode = "player_custom"
-		target_path = (
-			CONTENT_PLAYTEST.PLAYER_CUSTOM_DICE_PATH
 		)
 
 	if (

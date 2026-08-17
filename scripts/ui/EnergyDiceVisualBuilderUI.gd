@@ -62,6 +62,9 @@ const BUILDER_CONTEXT: Script = preload(
 const USER_DATABASE: Script = preload(
     "res://scripts/content/UserDatabasePathService.gd"
 )
+const ENERGY_CATALOG: Script = preload(
+    "res://scripts/game/EnergyProgressionCatalog.gd"
+)
 
 
 const VALID_ENERGY_TYPES: Array[StringName] = [
@@ -134,8 +137,6 @@ const PREPARATION_SCENE_PATH: String = (
 @onready var editing_context_label: Label = %EditingContextLabel
 @onready var confirm_button: Button = %ConfirmButton
 @onready var back_button: Button = %BackButton
-@onready var load_default_button: Button = %LoadDefaultButton
-@onready var save_button: Button = %SaveButton
 
 
 var setup: Variant = null
@@ -163,12 +164,6 @@ func _ready() -> void:
     _apply_responsive_layout()
     content_scroll.scroll_vertical = 0
 
-    %LoadDefaultButton.pressed.connect(
-        _load_factory_default
-    )
-    %SaveButton.pressed.connect(
-        _save_setup
-    )
     confirm_button.pressed.connect(
         _confirm_setup
     )
@@ -249,14 +244,6 @@ func _apply_localized_text() -> void:
         "enerkoro_builder.move_readiness_hint",
         "Availability based on the four Moves in the current Player Loadout."
     )
-    load_default_button.text = LocalizationService.tr_key(
-        "enerkoro_builder.reset_default",
-        "Reset to Default"
-    )
-    save_button.text = LocalizationService.tr_key(
-        "common.save",
-        "Save"
-    )
     confirm_button.text = LocalizationService.tr_key(
         "enerkoro_builder.save_use",
         "Save & Use"
@@ -328,6 +315,26 @@ func _refresh_editing_context_label() -> void:
             {"path": active_setup_path},
             "Save target  •  {path}"
         )
+        + _format_inventory_summary()
+    )
+
+
+func _format_inventory_summary() -> String:
+    var inventory: Dictionary = _get_player_energy_inventory()
+    if inventory.is_empty():
+        return ""
+    var parts: Array[String] = []
+    for energy_type: StringName in VALID_ENERGY_TYPES:
+        parts.append(
+            "%s ×%d" % [
+                GameContentLocalizationService.localize_type(energy_type),
+                int(inventory.get(String(energy_type), 0))
+            ]
+        )
+    return "\n" + LocalizationService.tr_format(
+        "enerkoro_builder.inventory_summary",
+        {"inventory": "  •  ".join(parts)},
+        "Energy Pool  •  {inventory}"
     )
 
 
@@ -383,16 +390,6 @@ func _apply_responsive_layout() -> void:
         profile
     )
 
-    RESPONSIVE_UI.apply_button(
-        %LoadDefaultButton,
-        profile,
-        170
-    )
-    RESPONSIVE_UI.apply_button(
-        %SaveButton,
-        profile,
-        100
-    )
     RESPONSIVE_UI.apply_button(
         confirm_button,
         profile,
@@ -619,8 +616,11 @@ func _load_startup_setup() -> void:
 
 
 func _load_factory_default() -> void:
-    setup = SETUP_LOADER.load_setup(
-        DEFAULT_SETUP_PATH
+    var inventory_mode: bool = not _get_player_energy_inventory().is_empty()
+    setup = (
+        ENERGY_CATALOG.create_balanced_setup(_get_player_energy_inventory())
+        if inventory_mode
+        else SETUP_LOADER.load_setup(DEFAULT_SETUP_PATH)
     )
 
     if setup == null:
@@ -632,7 +632,14 @@ func _load_factory_default() -> void:
     _refresh_all_analysis()
 
     validation_label.text = (
-        LocalizationService.tr_key("enerkoro_builder.loaded_default", "Loaded Pikachu default setup.")
+        LocalizationService.tr_key(
+            "enerkoro_builder.loaded_balanced_default"
+            if inventory_mode
+            else "enerkoro_builder.loaded_default",
+            "Loaded balanced starting setup."
+            if inventory_mode
+            else "Loaded Pikachu default setup."
+        )
     )
 
 
@@ -674,7 +681,8 @@ func _build_die_editors() -> void:
         editor.initialize(
             setup,
             index,
-            EDITOR_SERVICE
+            EDITOR_SERVICE,
+            _get_player_energy_inventory()
         )
 
         _polish_die_editor_layout(
@@ -836,6 +844,7 @@ func _refresh_validation() -> void:
             valid_energy_types
         )
     )
+    _merge_inventory_validation(validation)
 
     if bool(validation["success"]):
         top_validation_label.text = LocalizationService.tr_key("enerkoro_builder.valid", "✓ Valid")
@@ -945,27 +954,22 @@ func _refresh_move_coverage() -> void:
         card.display_result(result)
 
 
-func _save_setup() -> void:
-    if _save_setup_and_sync_loadout():
-        save_path_edit.text = active_setup_path
-        validation_label.text = (
-            LocalizationService.tr_format("enerkoro_builder.saved", {"path": active_setup_path}, "Saved Enerkoro to {path}")
-        )
-    else:
-        validation_label.text = (
-            LocalizationService.tr_key("enerkoro_builder.save_failed", "Save failed.")
-        )
-
-
 func _confirm_setup() -> void:
     if confirm_button.disabled:
         return
 
     if _save_setup_and_sync_loadout():
         save_path_edit.text = active_setup_path
-        validation_label.text = (
-            LocalizationService.tr_format("enerkoro_builder.confirmed", {"path": active_setup_path}, "Setup confirmed: {path}")
+        var error: Error = get_tree().change_scene_to_file(
+            return_scene_path
         )
+        if error != OK:
+            validation_label.text = LocalizationService.tr_key(
+                "enerkoro_builder.return_failed",
+                "Enerkoro was saved, but Battle Preparation could not be opened."
+            )
+            return
+        BUILDER_CONTEXT.clear_context()
     else:
         validation_label.text = (
             LocalizationService.tr_key("enerkoro_builder.confirm_save_failed", "Valid setup, but save failed.")
@@ -1154,7 +1158,30 @@ func _validate_current_setup() -> Dictionary:
     ):
         valid_energy_types.append(energy_type)
 
-    return VALIDATOR.validate(
+    var result: Dictionary = VALIDATOR.validate(
         setup,
         valid_energy_types
     )
+    _merge_inventory_validation(result)
+    return result
+
+
+func _get_player_energy_inventory() -> Dictionary:
+    if not sync_player_loadout or not PlayerProgress.has_profile():
+        return {}
+    return PlayerProgress.get_progress().energy_inventory.duplicate(true)
+
+
+func _merge_inventory_validation(validation: Dictionary) -> void:
+    var inventory: Dictionary = _get_player_energy_inventory()
+    if inventory.is_empty():
+        return
+    var inventory_result: Dictionary = ENERGY_CATALOG.validate_inventory(
+        setup,
+        inventory
+    )
+    if not bool(inventory_result.get("success", false)):
+        validation["success"] = false
+        var errors: Array = validation.get("errors", [])
+        errors.append_array(inventory_result.get("errors", []))
+        validation["errors"] = errors

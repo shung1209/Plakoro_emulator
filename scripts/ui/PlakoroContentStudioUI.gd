@@ -72,9 +72,6 @@ const MOVE_OUTCOME_RULE_EDITOR: Script = preload(
     "res://scripts/ui/components/MoveOutcomeRuleEditor.gd"
 )
 
-const PREPARATION_SCENE: String = (
-    "res://scenes/ui/BattlePreparationUI.tscn"
-)
 const ENERGY_DICE_BUILDER_SCENE: String = (
     "res://scenes/ui/EnergyDiceVisualBuilderUI.tscn"
 )
@@ -4827,6 +4824,4 @@ func _select_option_metadata(
 
 
 func _back_to_preparation() -> void:
-	get_tree().change_scene_to_file(
-		PREPARATION_SCENE
-	)
+	GameFlow.return_from_content_studio()

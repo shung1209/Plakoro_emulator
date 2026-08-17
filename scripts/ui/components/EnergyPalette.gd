@@ -10,6 +10,7 @@ signal energy_selected(
     energy_type: StringName,
     slot_index: int
 )
+signal energy_cleared(slot_index: int)
 signal cancelled
 
 
@@ -29,10 +30,12 @@ const ENERGY_TYPES: Array[StringName] = [
 var slot_index: int = 0
 var disabled_reasons: Dictionary = {}
 var selected_energy: StringName = &""
+var allow_clear: bool = false
 
 var _title_label: Label = null
 var _grid: GridContainer = null
 var _buttons: Dictionary = {}
+var _clear_button: Button = null
 
 
 func _ready() -> void:
@@ -43,16 +46,20 @@ func configure(
     title_text: String,
     source_slot_index: int,
     current_energy: StringName,
-    unavailable: Dictionary = {}
+    unavailable: Dictionary = {},
+    can_clear: bool = false
 ) -> void:
     slot_index = source_slot_index
     selected_energy = current_energy
     disabled_reasons = unavailable.duplicate(true)
+    allow_clear = can_clear
 
     if not is_node_ready():
         await ready
 
     _title_label.text = title_text
+    _clear_button.visible = allow_clear
+    _clear_button.disabled = selected_energy == &""
     _refresh_buttons()
 
 
@@ -70,6 +77,15 @@ func _build_ui() -> void:
     _title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     _title_label.add_theme_font_size_override("font_size", 18)
     header.add_child(_title_label)
+
+    _clear_button = Button.new()
+    _clear_button.text = LocalizationService.tr_key(
+        "enerkoro_builder.remove_energy",
+        "Remove Energy"
+    )
+    _clear_button.visible = false
+    _clear_button.pressed.connect(_on_clear_pressed)
+    header.add_child(_clear_button)
 
     var cancel_button: Button = Button.new()
     cancel_button.text = LocalizationService.tr_key("common.close", "Close")
@@ -152,6 +168,25 @@ func _on_energy_pressed(
         energy_type,
         slot_index
     )
+
+
+func _on_clear_pressed() -> void:
+    if not allow_clear or _clear_button.disabled:
+        return
+    selected_energy = &""
+    energy_cleared.emit(slot_index)
+
+
+func set_clear_button_text(value: String) -> void:
+    if not is_node_ready():
+        await ready
+    _clear_button.text = value
+
+
+func set_clear_enabled(value: bool) -> void:
+    if not is_node_ready():
+        await ready
+    _clear_button.disabled = not value
 
 
 

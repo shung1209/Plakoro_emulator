@@ -67,6 +67,11 @@ text = "Battle Preparation"
 [node name="LanguageSelector" parent="Margin/Main/Header" instance=ExtResource("lang_selector")]
 layout_mode = 2
 
+[node name="MainMenuButton" type="Button" parent="Margin/Main/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Main Menu"
+
 [node name="LoadoutIdLabel" type="Label" parent="Margin/Main/Header"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -75,6 +80,7 @@ text = "Loadout"
 [node name="ContentStudioButton" type="Button" parent="Margin/Main/Header"]
 unique_name_in_owner = true
 layout_mode = 2
+visible = false
 text = "Content Studio"
 
 [node name="ContentScroll" type="ScrollContainer" parent="Margin/Main"]
@@ -248,10 +254,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Selected Moves"
 
-[node name="MoveContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/MovesPanel/MovesBox"]
+[node name="MoveContainer" type="GridContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/MovesPanel/MovesBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 7
+columns = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 
 [node name="RightColumn" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body"]
 layout_mode = 2
@@ -402,7 +410,7 @@ theme_override_constants/separation = 10
 [node name="SetupHint" type="Label" parent="BattleSetupDialog/SetupRoot"]
 layout_mode = 2
 autowrap_mode = 2
-text = "Configure Player and AI battle loadouts here. Select Pokémon, exactly four different move_name_id Moves, Player Enerkoro source, and AI difficulty. Hover a Move to open its detail card with Charakoro trigger/effect information. Move content editing remains in Content Studio."
+text = "Configure your Pokémon, Enerkoro, and four Moves. Opponent Loadout stays hidden until battle. Move details and Charakoro effects are shown directly below each Move."
 
 [node name="SetupStatusLabel" type="Label" parent="BattleSetupDialog/SetupRoot"]
 unique_name_in_owner = true
@@ -434,21 +442,6 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PlayerDiceSourceLabel" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
-layout_mode = 2
-text = "Enerkoro Source"
-
-[node name="SetupPlayerDiceSourceOption" type="OptionButton" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="SetupPlayerDiceStatus" type="Label" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
-unique_name_in_owner = true
-layout_mode = 2
-autowrap_mode = 2
-text = "Using Pokémon Default"
-
 [node name="PlayerMoveHeader" type="HBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
 layout_mode = 2
 
@@ -464,7 +457,7 @@ text = "0 / 4"
 
 [node name="SetupPlayerMoveScroll" type="ScrollContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(530, 0)
+custom_minimum_size = Vector2(1080, 0)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
@@ -478,6 +471,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 5
 
 [node name="AISetupPanel" type="PanelContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 

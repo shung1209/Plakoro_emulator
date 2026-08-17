@@ -307,11 +307,22 @@ layout_mode = 2
 text = "0 / 0"
 
 
-[node name="EnemyHeroContainer" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+[node name="EnemyCharakoroButton" type="Button" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 212)
 layout_mode = 2
-size_flags_horizontal = 3
+flat = true
+tooltip_text = "View opponent Charakoro and Moves"
+
+[node name="EnemyHeroContainer" type="VBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox/EnemyCharakoroButton"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 alignment = 1
 
 [node name="EnemyPendingEffectIndicator" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
@@ -386,7 +397,7 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 42)
 layout_mode = 2
-text = "Rematch"
+text = "Next Opponent"
 
 [node name="ResultPreparationButton" type="Button" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel/ResultBox/ResultActions"]
 unique_name_in_owner = true
@@ -530,6 +541,62 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 script = ExtResource("3_timeline")
+
+[node name="EnemyMoveWindow" type="PopupPanel" parent="."]
+unique_name_in_owner = true
+initial_position = 2
+size = Vector2i(820, 620)
+unresizable = true
+exclusive = true
+
+[node name="Margin" type="MarginContainer" parent="EnemyMoveWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="EnemyMoveWindow/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="EnemyMoveWindowTitle" type="Label" parent="EnemyMoveWindow/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.48, 0.6, 1)
+theme_override_font_sizes/font_size = 26
+text = "OPPONENT CHARAKORO / MOVES"
+horizontal_alignment = 1
+
+[node name="EnemyMoveWindowHint" type="Label" parent="EnemyMoveWindow/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Opponent information revealed after battle begins."
+horizontal_alignment = 1
+
+[node name="EnemyMoveDetailScroll" type="ScrollContainer" parent="EnemyMoveWindow/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="EnemyMoveDetailGrid" type="GridContainer" parent="EnemyMoveWindow/Margin/Content/EnemyMoveDetailScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="EnemyMoveWindowCloseButton" type="Button" parent="EnemyMoveWindow/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Close"
 
 [node name="QuitConfirmation" type="ConfirmationDialog" parent="."]
 unique_name_in_owner = true

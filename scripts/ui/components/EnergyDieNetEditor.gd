@@ -21,10 +21,13 @@ const FIXED_FIELDS: Array[StringName] = [
 var die_index: int = 0
 var setup: Variant = null
 var editor_service: Script = null
+var energy_inventory: Dictionary = {}
 
 var _face_buttons: Dictionary = {}
 var _palette_host: VBoxContainer = null
 var _palette: PanelContainer = null
+var _palette_window: PopupPanel = null
+var _palette_window_content: VBoxContainer = null
 var _active_field_id: StringName = &""
 var _active_face_kind: StringName = &""
 
@@ -32,11 +35,13 @@ var _active_face_kind: StringName = &""
 func initialize(
     source_setup: Variant,
     source_die_index: int,
-    source_editor_service: Script
+    source_editor_service: Script,
+    source_energy_inventory: Dictionary = {}
 ) -> void:
     setup = source_setup
     die_index = source_die_index
     editor_service = source_editor_service
+    energy_inventory = source_energy_inventory.duplicate(true)
 
     _build_ui()
     refresh_from_setup()
@@ -75,10 +80,15 @@ func relocalize() -> void:
 
 
 func close_palette() -> void:
-    if _palette != null and is_instance_valid(_palette):
-        _palette.queue_free()
-
+    var window_to_close: PopupPanel = _palette_window
+    _palette_window = null
+    _palette_window_content = null
     _palette = null
+
+    if window_to_close != null and is_instance_valid(window_to_close):
+        window_to_close.hide()
+        window_to_close.queue_free()
+
     _active_field_id = &""
     _active_face_kind = &""
 
@@ -227,12 +237,43 @@ func _on_edit_requested(
     _active_field_id = field_id
     _active_face_kind = face_kind
 
+    _palette_window = PopupPanel.new()
+    _palette_window.name = "EnergySelectionWindow"
+    _palette_window.exclusive = true
+    _palette_window.transparent_bg = true
+    _palette_window.unresizable = true
+    _palette_window.popup_hide.connect(_on_palette_window_hidden)
+    add_child(_palette_window)
+
+    var popup_style: StyleBoxFlat = StyleBoxFlat.new()
+    popup_style.bg_color = Color(0.018, 0.035, 0.055, 0.995)
+    popup_style.border_color = Color(0.20, 0.78, 1.0, 0.95)
+    popup_style.set_border_width_all(2)
+    popup_style.corner_radius_top_left = 14
+    popup_style.corner_radius_top_right = 14
+    popup_style.corner_radius_bottom_left = 14
+    popup_style.corner_radius_bottom_right = 14
+    popup_style.shadow_color = Color(0.0, 0.0, 0.0, 0.82)
+    popup_style.shadow_size = 22
+    popup_style.content_margin_left = 14.0
+    popup_style.content_margin_top = 14.0
+    popup_style.content_margin_right = 14.0
+    popup_style.content_margin_bottom = 14.0
+    _palette_window.add_theme_stylebox_override("panel", popup_style)
+
+    _palette_window_content = VBoxContainer.new()
+    _palette_window_content.add_theme_constant_override("separation", 10)
+    _palette_window.add_child(_palette_window_content)
+
     _palette = ENERGY_PALETTE.new()
     _palette.energy_selected.connect(
         _on_palette_energy_selected
     )
+    _palette.energy_cleared.connect(
+        _on_palette_energy_cleared
+    )
     _palette.cancelled.connect(close_palette)
-    _palette_host.add_child(_palette)
+    _palette_window_content.add_child(_palette)
 
     if face_kind == &"double":
         var die_data: Variant = setup.dice[die_index]
@@ -249,7 +290,21 @@ func _on_edit_requested(
         _palette.configure(
             LocalizationService.tr_key("enerkoro_builder.choose_energy_1", "Choose Energy 1"),
             0,
-            first_energy
+            first_energy,
+            _build_inventory_disabled_reasons([
+                &"double_a_first" if field_id == &"double_a" else &"double_b_first",
+                &"double_a_second" if field_id == &"double_a" else &"double_b_second"
+            ]),
+            true
+        )
+        _palette.set_clear_button_text(
+            LocalizationService.tr_key(
+                "enerkoro_builder.remove_both_energy",
+                "Remove Both Energy"
+            )
+        )
+        _palette.set_clear_enabled(
+            first_energy != &"" or second_energy != &""
         )
 
         _palette.set_meta(
@@ -272,13 +327,28 @@ func _on_edit_requested(
                     field_id
                 )
             )
+        _merge_disabled_reasons(
+            unavailable,
+            _build_inventory_disabled_reasons([field_id])
+        )
 
         _palette.configure(
             LocalizationService.tr_key("enerkoro_builder.choose_energy", "Choose Energy"),
             0,
             current_energy,
-            unavailable
+            unavailable,
+            face_kind == &"single"
         )
+
+    _palette_window.popup_centered(
+        Vector2i(500, 470 if face_kind == &"double" else 410)
+    )
+
+
+func _on_palette_window_hidden() -> void:
+    if _palette_window == null:
+        return
+    close_palette()
 
 
 func _on_palette_energy_selected(
@@ -314,6 +384,13 @@ func _on_palette_energy_selected(
                         "pending_second_energy",
                         ""
                     )
+                ),
+                _build_inventory_disabled_reasons(
+                    [
+                        &"double_a_first" if _active_field_id == &"double_a" else &"double_b_first",
+                        &"double_a_second" if _active_field_id == &"double_a" else &"double_b_second"
+                    ],
+                    {String(energy_type): 1}
                 )
             )
             return
@@ -359,6 +436,32 @@ func _on_palette_energy_selected(
             energy_type
         )
 
+    refresh_from_setup()
+    close_palette()
+    setup_changed.emit()
+
+
+func _on_palette_energy_cleared(slot_index: int) -> void:
+    if slot_index != 0:
+        return
+    if _active_face_kind == &"single":
+        editor_service.set_energy(
+            setup,
+            die_index,
+            _active_field_id,
+            &""
+        )
+    elif _active_face_kind == &"double":
+        var first_field: StringName = (
+            &"double_a_first" if _active_field_id == &"double_a" else &"double_b_first"
+        )
+        var second_field: StringName = (
+            &"double_a_second" if _active_field_id == &"double_a" else &"double_b_second"
+        )
+        editor_service.set_energy(setup, die_index, first_field, &"")
+        editor_service.set_energy(setup, die_index, second_field, &"")
+    else:
+        return
     refresh_from_setup()
     close_palette()
     setup_changed.emit()
@@ -430,3 +533,45 @@ func _field_label(
         return "FACE_DOWN"
 
     return String(field_id)
+
+
+func _build_inventory_disabled_reasons(
+    excluded_fields: Array[StringName],
+    pending_usage: Dictionary = {}
+) -> Dictionary:
+    var result: Dictionary = {}
+    if energy_inventory.is_empty():
+        return result
+    var usage: Dictionary = {}
+    for current_die_index: int in range(setup.dice.size()):
+        for field_id: StringName in [
+            &"fixed_a", &"fixed_b", &"double_a_first", &"double_a_second",
+            &"double_b_first", &"double_b_second", &"single_a", &"single_b"
+        ]:
+            if current_die_index == die_index and excluded_fields.has(field_id):
+                continue
+            var energy: String = String(editor_service.get_energy(
+                setup, current_die_index, field_id
+            ))
+            usage[energy] = int(usage.get(energy, 0)) + 1
+    for raw_energy: Variant in pending_usage.keys():
+        var pending_energy: String = String(raw_energy)
+        usage[pending_energy] = (
+            int(usage.get(pending_energy, 0)) + int(pending_usage[raw_energy])
+        )
+    for raw_energy: Variant in energy_inventory.keys():
+        var energy: String = String(raw_energy)
+        var owned: int = int(energy_inventory[raw_energy])
+        if int(usage.get(energy, 0)) >= owned:
+            result[StringName(energy)] = LocalizationService.tr_format(
+                "enerkoro_builder.energy_owned_limit",
+                {"energy": GameContentLocalizationService.localize_type(StringName(energy)), "owned": owned},
+                "{energy}: all {owned} owned units are already used"
+            )
+    return result
+
+
+func _merge_disabled_reasons(target: Dictionary, source: Dictionary) -> void:
+    for key: Variant in source.keys():
+        if not target.has(key):
+            target[key] = source[key]

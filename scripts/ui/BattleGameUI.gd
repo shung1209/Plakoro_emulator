@@ -99,6 +99,9 @@ const RESOURCE_RECOVERY: Script = preload(
 const PLAKORO_MOVE_BUTTON: Script = preload(
 	"res://scripts/ui/components/PlakoroMoveButton.gd"
 )
+const MOVE_ENERGY_COST_ROW: Script = preload(
+	"res://scripts/ui/components/MoveEnergyCostRow.gd"
+)
 const DICE_ICON_SUMMARY: Script = preload(
 	"res://scripts/ui/components/EnergyDiceIconSummary.gd"
 )
@@ -108,10 +111,6 @@ const PLAKORO_PORTRAIT: PackedScene = preload(
 const HP_PRESENTER: Script = preload(
 	"res://scripts/ui/components/BattleHPBarPresenter.gd"
 )
-const PREPARATION_SCENE: String = (
-	"res://scenes/ui/BattlePreparationUI.tscn"
-)
-
 const MESSAGE_PRESENTER: Script = preload(
 	"res://scripts/ui/components/BattleMessagePresenter.gd"
 )
@@ -121,8 +120,8 @@ const FLOATING_TEXT: Script = preload(
 const TURN_BANNER: Script = preload(
 	"res://scripts/ui/components/BattleTurnBannerPresenter.gd"
 )
-const RESULT_PRESENTER: Script = preload(
-	"res://scripts/ui/components/BattleResultPresenter.gd"
+const BATTLE_OUTCOME_DATA: Script = preload(
+	"res://scripts/game/data/BattleOutcomeData.gd"
 )
 const RESOLUTION_PRESENTATION_CONFIG: Script = preload(
 	"res://scripts/runtime/BattleResolutionPresentationConfig.gd"
@@ -181,6 +180,12 @@ const RESOLUTION_STEP_QUEUE_BUILDER: Script = preload(
 @onready var enemy_hp_label: Label = %EnemyHpLabel
 @onready var player_hero_container: VBoxContainer = %PlayerHeroContainer
 @onready var enemy_hero_container: VBoxContainer = %EnemyHeroContainer
+@onready var enemy_charakoro_button: Button = %EnemyCharakoroButton
+@onready var enemy_move_window: PopupPanel = %EnemyMoveWindow
+@onready var enemy_move_window_title: Label = %EnemyMoveWindowTitle
+@onready var enemy_move_window_hint: Label = %EnemyMoveWindowHint
+@onready var enemy_move_detail_grid: GridContainer = %EnemyMoveDetailGrid
+@onready var enemy_move_window_close_button: Button = %EnemyMoveWindowCloseButton
 @onready var player_pending_effect_indicator: HBoxContainer = (
 	%PlayerPendingEffectIndicator
 )
@@ -259,6 +264,7 @@ var ai_turn_service: Variant = null
 var move_buttons: Array[Button] = []
 var input_locked: bool = true
 var navigation_locked: bool = false
+var battle_report_transition_requested: bool = false
 
 var player_damage_dealt: int = 0
 var enemy_damage_dealt: int = 0
@@ -284,10 +290,10 @@ func _ready() -> void:
 		_start_new_battle
 	)
 	result_restart_button.pressed.connect(
-		_start_new_battle
+		_on_result_primary_pressed
 	)
 	result_preparation_button.pressed.connect(
-		_on_back_to_preparation_pressed
+		_open_battle_report
 	)
 	back_to_preparation_button.pressed.connect(
 		_on_back_to_preparation_pressed
@@ -295,6 +301,8 @@ func _ready() -> void:
 	quit_confirmation.confirmed.connect(
 		_on_quit_confirmed
 	)
+	enemy_charakoro_button.pressed.connect(_open_enemy_move_window)
+	enemy_move_window_close_button.pressed.connect(enemy_move_window.hide)
 
 	# Prevent the OS close button from quitting immediately. The close request
 	# is handled by _notification() so the player can confirm first.
@@ -342,6 +350,7 @@ func _on_locale_changed(
 	)
 	_apply_localized_text()
 	_rebuild_localized_move_buttons()
+	_refresh_enemy_move_reveal()
 	_refresh_ui()
 
 
@@ -368,13 +377,10 @@ func _apply_localized_text() -> void:
 		"battle.restart",
 		"Restart"
 	)
-	result_restart_button.text = LocalizationService.tr_key(
-		"battle.restart",
-		"Restart"
-	)
+	_refresh_result_primary_button()
 	result_preparation_button.text = LocalizationService.tr_key(
-		"battle.back_preparation",
-		"Back to Preparation"
+		"battle.view_results",
+		"View Results"
 	)
 	moves_title_label.text = LocalizationService.tr_key(
 		"battle.moves",
@@ -395,6 +401,22 @@ func _apply_localized_text() -> void:
 	enemy_header_label.text = LocalizationService.tr_key(
 		"battle.ai",
 		"AI"
+	)
+	enemy_charakoro_button.tooltip_text = LocalizationService.tr_key(
+		"battle.opponent_moves_open",
+		"View opponent Charakoro and Moves"
+	)
+	enemy_move_window_title.text = LocalizationService.tr_key(
+		"battle.opponent_moves_title",
+		"OPPONENT CHARAKORO / MOVES"
+	)
+	enemy_move_window_hint.text = LocalizationService.tr_key(
+		"battle.opponent_moves_hint",
+		"Opponent information revealed after battle begins."
+	)
+	enemy_move_window_close_button.text = LocalizationService.tr_key(
+		"common.close",
+		"Close"
 	)
 	timeline_technical_toggle.text = LocalizationService.tr_key(
 		"battle.technical",
@@ -421,6 +443,17 @@ func _apply_localized_text() -> void:
 func _apply_battle_visual_style() -> void:
 	setup_source_label.visible = false
 	turn_label.visible = false
+	var enemy_window_style: StyleBoxFlat = StyleBoxFlat.new()
+	enemy_window_style.bg_color = Color(0.045, 0.018, 0.032, 0.995)
+	enemy_window_style.border_color = Color(1.0, 0.30, 0.46, 0.95)
+	enemy_window_style.set_border_width_all(2)
+	enemy_window_style.corner_radius_top_left = 16
+	enemy_window_style.corner_radius_top_right = 16
+	enemy_window_style.corner_radius_bottom_left = 16
+	enemy_window_style.corner_radius_bottom_right = 16
+	enemy_window_style.shadow_color = Color(0.0, 0.0, 0.0, 0.86)
+	enemy_window_style.shadow_size = 24
+	enemy_move_window.add_theme_stylebox_override("panel", enemy_window_style)
 
 	player_panel.add_theme_stylebox_override(
 		"panel",
@@ -976,9 +1009,7 @@ func _on_back_to_preparation_pressed() -> void:
 		return
 
 	# Returning to Preparation is normal navigation, not quitting the game.
-	get_tree().change_scene_to_file(
-		PREPARATION_SCENE
-	)
+	GameFlow.open_preparation()
 
 
 func _show_quit_confirmation() -> void:
@@ -1194,6 +1225,7 @@ func _start_new_battle() -> void:
 		return
 
 	input_locked = true
+	battle_report_transition_requested = false
 	_set_battle_navigation_locked(false)
 	roll_result_panel.visible = layout_prototype.visible
 	if battle_dice_roll_presenter.has_method(
@@ -1403,6 +1435,7 @@ func _start_new_battle() -> void:
 	)
 
 	_refresh_plakoro_presentations()
+	_refresh_enemy_move_reveal()
 	_create_move_buttons()
 	_refresh_ui()
 	TURN_BANNER.show_turn(
@@ -1457,6 +1490,64 @@ func _refresh_single_portrait(
 	)
 	target.add_child(portrait)
 	portrait.setup(pokemon)
+
+
+func _refresh_enemy_move_reveal() -> void:
+	for child: Node in enemy_move_detail_grid.get_children():
+		child.queue_free()
+	if enemy_loadout == null:
+		return
+	for move_card: Variant in enemy_loadout.selected_move_cards:
+		if move_card == null:
+			continue
+		enemy_move_detail_grid.add_child(
+			_build_enemy_move_reveal_card(move_card)
+		)
+
+
+func _open_enemy_move_window() -> void:
+	if enemy_loadout == null:
+		return
+	_refresh_enemy_move_reveal()
+	enemy_move_window.popup_centered(Vector2i(820, 620))
+
+
+func _build_enemy_move_reveal_card(move_card: Variant) -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(370, 220)
+	var box: VBoxContainer = VBoxContainer.new()
+	box.add_theme_constant_override("separation", 5)
+	panel.add_child(box)
+	var title: Label = Label.new()
+	title.text = GameContentLocalizationService.localize_move(move_card)
+	title.add_theme_font_size_override("font_size", 17)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var stats: HBoxContainer = HBoxContainer.new()
+	stats.alignment = BoxContainer.ALIGNMENT_CENTER
+	stats.add_theme_constant_override("separation", 8)
+	box.add_child(stats)
+	var costs: HBoxContainer = HBoxContainer.new()
+	costs.set_script(MOVE_ENERGY_COST_ROW)
+	costs.setup(move_card, 18)
+	stats.add_child(costs)
+	var damage: Label = Label.new()
+	damage.text = "DMG " + (
+		str(int(move_card.printed_damage))
+		if move_card.printed_damage != null
+		else "—"
+	)
+	stats.add_child(damage)
+	var preview: Dictionary = MOVE_EFFECT_PRESENTATION.build_preview(move_card)
+	var effect: Label = Label.new()
+	effect.text = GameContentLocalizationService.localize_move_description(move_card)
+	if effect.text.is_empty():
+		effect.text = String(preview.get("summary", "—"))
+	effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	effect.max_lines_visible = 3
+	effect.modulate.a = 0.78
+	box.add_child(effect)
+	return panel
 
 
 func _create_move_buttons() -> void:
@@ -3068,41 +3159,68 @@ func _set_battle_navigation_locked(
 
 
 func _show_battle_result() -> void:
+	if battle_report_transition_requested:
+		return
+	battle_report_transition_requested = true
 	_set_player_input_enabled(false)
-	_set_battle_navigation_locked(false)
+	_set_battle_navigation_locked(true)
 	_set_battle_action_state(&"battle_finished")
+	# The full Battle Report is the only post-battle UI. Defer the transition
+	# until the current damage/KO presentation stack has returned.
+	_open_battle_report.call_deferred(false)
 
-	RESULT_PRESENTER.show_result(
-		result_panel,
-		result_title_label,
-		result_summary_label,
-		battle.state.winner_participant_id,
-		int(battle.state.turn_number),
-		player_damage_dealt,
-		enemy_damage_dealt,
-		result_hp_label,
-		int(battle.state.player.current_hp),
-		int(battle.state.player.max_hp),
-		int(battle.state.enemy.current_hp),
-		int(battle.state.enemy.max_hp)
+
+func _refresh_result_primary_button() -> void:
+	var player_won: bool = (
+		battle != null
+		and battle.state != null
+		and battle.state.is_finished
+		and battle.state.winner_participant_id == &"player"
+	)
+	result_restart_button.text = LocalizationService.tr_key(
+		"battle.next_opponent" if player_won else "battle.restart",
+		"Next Opponent" if player_won else "Restart"
 	)
 
 
-	if battle.state.winner_participant_id == &"player":
-		MESSAGE_PRESENTER.show_success(
-			message_label,
-			LocalizationService.tr_key("battle.victory_message", "Victory!")
+func _on_result_primary_pressed() -> void:
+	if (
+		battle != null
+		and battle.state != null
+		and battle.state.is_finished
+		and battle.state.winner_participant_id == &"player"
+	):
+		# Record rewards and unlock the next encounter before advancing.
+		_open_battle_report(true)
+		return
+	_start_new_battle()
+
+
+func _open_battle_report(advance_to_next_opponent: bool = false) -> void:
+	if battle == null or battle.state == null or not battle.state.is_finished:
+		return
+
+	var outcome: Variant = BATTLE_OUTCOME_DATA.new()
+	outcome.winner_participant_id = battle.state.winner_participant_id
+	outcome.player_pokemon_id = player_loadout_data.pokemon_id
+	outcome.encounter_id = EncounterSession.get_current_encounter_id()
+	if EncounterSession.has_active_encounter():
+		outcome.reward_pokemon_id = StringName(
+			EncounterSession.current_encounter.get("pokemon_id", "")
 		)
-	elif battle.state.winner_participant_id == &"enemy":
-		MESSAGE_PRESENTER.show_failure(
-			message_label,
-			LocalizationService.tr_key("battle.defeat_message", "Defeat.")
-		)
-	else:
-		MESSAGE_PRESENTER.show_normal(
-			message_label,
-			LocalizationService.tr_key("battle.finished_message", "Battle finished.")
-		)
+		outcome.reward_move_card_ids = (
+			EncounterSession.current_encounter.get("reward_move_ids", []) as Array
+		).duplicate()
+	outcome.turn_count = int(battle.state.turn_number)
+	outcome.player_name = String(battle.state.player.display_name)
+	outcome.enemy_name = String(battle.state.enemy.display_name)
+	outcome.player_damage_dealt = player_damage_dealt
+	outcome.enemy_damage_dealt = enemy_damage_dealt
+	outcome.player_hp = int(battle.state.player.current_hp)
+	outcome.player_max_hp = int(battle.state.player.max_hp)
+	outcome.enemy_hp = int(battle.state.enemy.current_hp)
+	outcome.enemy_max_hp = int(battle.state.enemy.max_hp)
+	GameFlow.finish_battle(outcome, advance_to_next_opponent)
 
 
 func _create_profiles(

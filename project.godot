@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="PLAKORO"
-run/main_scene="res://scenes/ui/BattlePreparationUI.tscn"
+run/main_scene="res://scenes/game/MainMenuUI.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
@@ -21,6 +21,10 @@ config/icon="res://icon.svg"
 UserDatabaseBootstrap="*res://scripts/content/UserDatabaseBootstrap.gd"
 LocalizationService="*res://scripts/localization/LocalizationService.gd"
 GameContentLocalizationService="*res://scripts/localization/GameContentLocalizationService.gd"
+ContentStudioAccess="*res://scripts/game/ContentStudioAccess.gd"
+EncounterSession="*res://scripts/game/EncounterSession.gd"
+GameFlow="*res://scripts/game/GameFlow.gd"
+PlayerProgress="*res://scripts/game/PlayerProgress.gd"
 
 [display]
 

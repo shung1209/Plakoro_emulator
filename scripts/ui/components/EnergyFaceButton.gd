@@ -66,11 +66,7 @@ func refresh_visual() -> void:
     _kind_text_label.text = _kind_label()
 
     if face_kind == &"double":
-        _energy_text_label.text = (
-            String(primary_energy)
-            + " + "
-            + String(secondary_energy)
-        )
+        _energy_text_label.text = _display_energy(primary_energy) + " + " + _display_energy(secondary_energy)
         tooltip_text = (
             LocalizationService.tr_format(
                 "enerkoro_builder.face_edit_tooltip",
@@ -79,9 +75,7 @@ func refresh_visual() -> void:
             )
         )
     else:
-        _energy_text_label.text = String(
-            primary_energy
-        )
+        _energy_text_label.text = _display_energy(primary_energy)
         tooltip_text = (
             LocalizationService.tr_format(
                 "enerkoro_builder.face_edit_tooltip",
@@ -256,6 +250,15 @@ func _add_energy_icon(
     _energy_icon_row.add_child(
         texture_rect
     )
+
+
+func _display_energy(energy_type: StringName) -> String:
+    if energy_type == &"":
+        return LocalizationService.tr_key(
+            "enerkoro_builder.empty_energy",
+            "EMPTY"
+        )
+    return String(energy_type)
 
 
 func _orientation_label_text() -> String:

@@ -33,6 +33,9 @@ const DEFAULT_MOVE_IDS: Array[StringName] = [
 
 
 static func load_ai_loadout() -> Variant:
+    if EncounterSession.has_active_encounter():
+        return EncounterSession.get_ai_loadout()
+
     USER_DATABASE.migrate_legacy_user_files()
     if FileAccess.file_exists(
         USER_LOADOUT_PATH
