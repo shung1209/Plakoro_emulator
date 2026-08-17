@@ -5,8 +5,8 @@ const TOP_COLOR: Color = Color(0.105, 0.255, 0.115, 1.0)
 const BOTTOM_COLOR: Color = Color(0.055, 0.155, 0.085, 1.0)
 const PLAYER_GLOW: Color = Color(0.18, 0.62, 1.0, 0.11)
 const ENEMY_GLOW: Color = Color(1.0, 0.30, 0.34, 0.10)
-const FIELD_LINE: Color = Color(0.78, 0.94, 0.67, 0.18)
-const FIELD_FILL: Color = Color(0.60, 0.88, 0.42, 0.055)
+const FIELD_LINE: Color = Color(0.82, 0.96, 0.70, 0.38)
+const FIELD_FILL: Color = Color(0.60, 0.88, 0.42, 0.11)
 
 
 func _ready() -> void:
@@ -46,16 +46,35 @@ func _draw_playmat_field() -> void:
 	draw_rect(field_rect, FIELD_LINE, false, 2.0)
 
 	var center: Vector2 = Vector2(size.x * 0.5, size.y * 0.5)
+	var player_anchor: Vector2 = Vector2(size.x * 0.18, size.y * 0.76)
+	var enemy_anchor: Vector2 = Vector2(size.x * 0.82, size.y * 0.24)
+	draw_line(
+		player_anchor,
+		enemy_anchor,
+		Color(0.82, 0.96, 0.70, 0.16),
+		18.0,
+		true
+	)
+	draw_line(
+		player_anchor,
+		enemy_anchor,
+		Color(0.90, 1.0, 0.78, 0.46),
+		2.0,
+		true
+	)
+	_draw_anchor_ring(player_anchor, Color(0.20, 0.68, 1.0, 0.48))
+	_draw_anchor_ring(enemy_anchor, Color(1.0, 0.32, 0.40, 0.46))
+
 	var target_radius: float = min(size.x, size.y) * 0.185
 	for ring: int in range(4, 0, -1):
 		var ratio: float = float(ring) / 4.0
-		var ring_color: Color = Color(0.83, 0.96, 0.70, 0.045)
+		var ring_color: Color = Color(0.83, 0.96, 0.70, 0.08)
 		if ring % 2 == 0:
-			ring_color.a = 0.105
+			ring_color.a = 0.20
 		draw_circle(center, target_radius * ratio, ring_color)
 	draw_arc(center, target_radius, 0.0, TAU, 96, FIELD_LINE, 2.0)
 	draw_arc(center, target_radius * 0.48, 0.0, TAU, 96, FIELD_LINE, 2.0)
-	draw_circle(center, target_radius * 0.12, Color(0.88, 0.97, 0.75, 0.16))
+	draw_circle(center, target_radius * 0.12, Color(0.88, 0.97, 0.75, 0.32))
 
 	draw_line(
 		Vector2(field_rect.position.x, center.y),
@@ -66,6 +85,13 @@ func _draw_playmat_field() -> void:
 
 	_draw_card_zones(size.y * 0.055)
 	_draw_card_zones(size.y * 0.875)
+
+
+func _draw_anchor_ring(center: Vector2, color: Color) -> void:
+	var radius: float = min(size.x, size.y) * 0.105
+	draw_circle(center, radius, Color(color, 0.055))
+	draw_arc(center, radius, 0.0, TAU, 72, color, 3.0)
+	draw_arc(center, radius * 0.72, 0.0, TAU, 72, Color(color, 0.26), 2.0)
 
 
 func _draw_card_zones(y: float) -> void:

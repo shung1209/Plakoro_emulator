@@ -425,7 +425,7 @@ func _apply_battle_visual_style() -> void:
 	player_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.035, 0.075, 0.130, 0.96),
+			Color(0.025, 0.060, 0.105, 0.86),
 			Color(0.20, 0.62, 1.0, 0.90),
 			2
 		)
@@ -433,7 +433,7 @@ func _apply_battle_visual_style() -> void:
 	enemy_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.120, 0.040, 0.070, 0.96),
+			Color(0.105, 0.025, 0.052, 0.86),
 			Color(1.0, 0.30, 0.42, 0.88),
 			2
 		)
@@ -441,15 +441,16 @@ func _apply_battle_visual_style() -> void:
 	roll_result_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.050, 0.055, 0.085, 0.98),
-			Color(0.92, 0.72, 0.28, 0.92),
-			2
+			Color(0.015, 0.030, 0.025, 0.12),
+			Color(0.92, 0.78, 0.36, 0.72),
+			1,
+			false
 		)
 	)
 	moves_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.040, 0.055, 0.085, 0.97),
+			Color(0.025, 0.038, 0.060, 0.84),
 			Color(0.25, 0.50, 0.82, 0.72),
 			1
 		)
@@ -457,7 +458,7 @@ func _apply_battle_visual_style() -> void:
 	timeline_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.030, 0.038, 0.058, 0.94),
+			Color(0.020, 0.028, 0.044, 0.82),
 			Color(0.24, 0.30, 0.42, 0.70),
 			1
 		)
@@ -465,9 +466,19 @@ func _apply_battle_visual_style() -> void:
 	%PrototypeBattleMessagePanel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.075, 0.050, 0.095, 0.97),
-			Color(0.68, 0.43, 0.92, 0.78),
-			1
+			Color(0.035, 0.020, 0.045, 0.12),
+			Color(0.76, 0.58, 0.92, 0.52),
+			1,
+			false
+		)
+	)
+	turn_banner_panel.add_theme_stylebox_override(
+		"panel",
+		_battle_panel_style(
+			Color(0.015, 0.025, 0.035, 0.72),
+			Color(0.48, 0.74, 0.90, 0.48),
+			1,
+			false
 		)
 	)
 
@@ -484,6 +495,14 @@ func _apply_battle_visual_style() -> void:
 		Color(1.0, 0.82, 0.40, 1.0)
 	)
 	roll_result_title_label.add_theme_font_size_override("font_size", 21)
+	prototype_battle_message_label.add_theme_color_override(
+		"font_outline_color",
+		Color(0.0, 0.0, 0.0, 0.92)
+	)
+	prototype_battle_message_label.add_theme_constant_override(
+		"outline_size",
+		5
+	)
 
 	player_hp_bar.add_theme_stylebox_override(
 		"fill",
@@ -498,7 +517,8 @@ func _apply_battle_visual_style() -> void:
 func _battle_panel_style(
 	background: Color,
 	border: Color,
-	border_width: int
+	border_width: int,
+	with_shadow: bool = true
 ) -> StyleBoxFlat:
 	var style: StyleBoxFlat = StyleBoxFlat.new()
 	style.bg_color = background
@@ -506,8 +526,9 @@ func _battle_panel_style(
 	style.set_border_width_all(border_width)
 	style.set_corner_radius_all(12)
 	style.set_content_margin_all(12.0)
-	style.shadow_color = Color(0.0, 0.0, 0.0, 0.40)
-	style.shadow_size = 8
+	if with_shadow:
+		style.shadow_color = Color(0.0, 0.0, 0.0, 0.40)
+		style.shadow_size = 8
 	return style
 
 
@@ -766,7 +787,7 @@ func _apply_prototype_responsive_layout() -> void:
 		)
 	)
 
-	var row_spacing: int = 8
+	var row_spacing: int = 18
 	var center_width: float = 430.0
 	var center_height: float = 374.0
 	var roll_height: float = 314.0
@@ -776,7 +797,7 @@ func _apply_prototype_responsive_layout() -> void:
 
 	match profile:
 		RESPONSIVE_PROFILE.PROFILE_FULL:
-			row_spacing = 8
+			row_spacing = 18
 			center_width = 430.0
 			center_height = (
 				340.0
@@ -789,7 +810,7 @@ func _apply_prototype_responsive_layout() -> void:
 			timeline_visible = true
 
 		RESPONSIVE_PROFILE.PROFILE_COMPACT:
-			row_spacing = 6
+			row_spacing = 12
 			center_width = 360.0
 			center_height = (
 				286.0
@@ -802,7 +823,7 @@ func _apply_prototype_responsive_layout() -> void:
 			timeline_visible = true
 
 		_:
-			row_spacing = 5
+			row_spacing = 8
 			center_width = 300.0
 			center_height = (
 				252.0
