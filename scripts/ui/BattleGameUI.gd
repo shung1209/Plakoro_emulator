@@ -269,6 +269,7 @@ func _ready() -> void:
 	if not layout_prototype_button.pressed.is_connected(_toggle_layout_prototype):
 		layout_prototype_button.pressed.connect(_toggle_layout_prototype)
 	PLAKORO_THEME.apply_to(self)
+	_apply_battle_visual_style()
 	LocalizationService.locale_changed.connect(
 		_on_locale_changed
 	)
@@ -417,6 +418,106 @@ func _apply_localized_text() -> void:
 	)
 
 
+func _apply_battle_visual_style() -> void:
+	setup_source_label.visible = false
+	turn_label.visible = false
+
+	player_panel.add_theme_stylebox_override(
+		"panel",
+		_battle_panel_style(
+			Color(0.035, 0.075, 0.130, 0.96),
+			Color(0.20, 0.62, 1.0, 0.90),
+			2
+		)
+	)
+	enemy_panel.add_theme_stylebox_override(
+		"panel",
+		_battle_panel_style(
+			Color(0.120, 0.040, 0.070, 0.96),
+			Color(1.0, 0.30, 0.42, 0.88),
+			2
+		)
+	)
+	roll_result_panel.add_theme_stylebox_override(
+		"panel",
+		_battle_panel_style(
+			Color(0.050, 0.055, 0.085, 0.98),
+			Color(0.92, 0.72, 0.28, 0.92),
+			2
+		)
+	)
+	moves_panel.add_theme_stylebox_override(
+		"panel",
+		_battle_panel_style(
+			Color(0.040, 0.055, 0.085, 0.97),
+			Color(0.25, 0.50, 0.82, 0.72),
+			1
+		)
+	)
+	timeline_panel.add_theme_stylebox_override(
+		"panel",
+		_battle_panel_style(
+			Color(0.030, 0.038, 0.058, 0.94),
+			Color(0.24, 0.30, 0.42, 0.70),
+			1
+		)
+	)
+	%PrototypeBattleMessagePanel.add_theme_stylebox_override(
+		"panel",
+		_battle_panel_style(
+			Color(0.075, 0.050, 0.095, 0.97),
+			Color(0.68, 0.43, 0.92, 0.78),
+			1
+		)
+	)
+
+	player_header_label.add_theme_color_override(
+		"font_color",
+		Color(0.38, 0.76, 1.0, 1.0)
+	)
+	enemy_header_label.add_theme_color_override(
+		"font_color",
+		Color(1.0, 0.48, 0.58, 1.0)
+	)
+	roll_result_title_label.add_theme_color_override(
+		"font_color",
+		Color(1.0, 0.82, 0.40, 1.0)
+	)
+	roll_result_title_label.add_theme_font_size_override("font_size", 21)
+
+	player_hp_bar.add_theme_stylebox_override(
+		"fill",
+		_battle_bar_style(Color(0.18, 0.66, 1.0, 1.0))
+	)
+	enemy_hp_bar.add_theme_stylebox_override(
+		"fill",
+		_battle_bar_style(Color(1.0, 0.26, 0.38, 1.0))
+	)
+
+
+func _battle_panel_style(
+	background: Color,
+	border: Color,
+	border_width: int
+) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = background
+	style.border_color = border
+	style.set_border_width_all(border_width)
+	style.set_corner_radius_all(12)
+	style.set_content_margin_all(12.0)
+	style.shadow_color = Color(0.0, 0.0, 0.0, 0.40)
+	style.shadow_size = 8
+	return style
+
+
+func _battle_bar_style(color: Color) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = color
+	style.set_corner_radius_all(5)
+	return style
+
+
 func _toggle_layout_prototype() -> void:
 	_set_layout_prototype_enabled(
 		not layout_prototype.visible
@@ -425,7 +526,10 @@ func _toggle_layout_prototype() -> void:
 
 func _set_layout_prototype_enabled(enabled: bool) -> void:
 	if enabled:
-		_move_control_to(player_panel, prototype_player_slot)
+		# Digital adaptation of the 2P Playseat: the opponent occupies the
+		# far/right end, the player the near/left end, and dice resolve in the
+		# shared center. Text stays upright for screen play.
+		_move_control_to(timeline_panel, prototype_player_slot)
 		_move_control_to(turn_banner_panel, prototype_turn_slot)
 		_move_control_to(roll_result_panel, prototype_roll_slot)
 		_fill_fixed_layout_slot(
@@ -439,16 +543,16 @@ func _set_layout_prototype_enabled(enabled: bool) -> void:
 		_move_control_to(enemy_panel, prototype_enemy_slot)
 
 		# All three top-row visual panels must occupy the same HBox row height.
-		player_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		enemy_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
-		_move_control_to(moves_panel, prototype_moves_slot)
+		_move_control_to(player_panel, prototype_moves_slot)
+		player_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		_move_control_to(moves_panel, prototype_timeline_slot)
 		moves_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		moves_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_apply_prototype_move_button_size()
 
 		_move_control_to(result_panel, prototype_message_slot)
-		_move_control_to(timeline_panel, prototype_timeline_slot)
 
 		prototype_battle_message_label.text = ""
 		message_panel.visible = false
@@ -750,7 +854,8 @@ func _apply_prototype_responsive_layout() -> void:
 		)
 
 	timeline_panel.visible = timeline_visible
-	prototype_timeline_slot.visible = timeline_visible
+	prototype_player_slot.visible = timeline_visible
+	prototype_timeline_slot.visible = true
 
 	# If Timeline is hidden, the two useful lower panels divide the full row.
 	prototype_moves_slot.size_flags_stretch_ratio = (
@@ -989,6 +1094,22 @@ func _set_battle_action_state(
 	)
 
 	turn_banner_panel.visible = true
+
+	if phase == &"rolling":
+		roll_result_title_label.text = LocalizationService.tr_key(
+			"battle.roll.player",
+			"YOUR ROLL"
+		)
+	elif phase == &"ai_rolling":
+		roll_result_title_label.text = LocalizationService.tr_key(
+			"battle.roll.opponent",
+			"OPPONENT ROLL"
+		)
+	elif phase == &"choose_move":
+		roll_result_title_label.text = LocalizationService.tr_key(
+			"battle.roll.ready",
+			"DICE READY"
+		)
 
 	var actor_color: Color = TURN_BANNER.PLAYER_COLOR
 	if actor_key == "battle.ai_turn":

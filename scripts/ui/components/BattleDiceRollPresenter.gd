@@ -29,6 +29,13 @@ const ORIENTATIONS: Array[StringName] = [
 const ICON_SIZE: int = 62
 const DOUBLE_ICON_SIZE: int = 42
 
+const SLOT_IDLE_BACKGROUND: Color = Color(0.030, 0.040, 0.065, 0.96)
+const SLOT_IDLE_BORDER: Color = Color(0.24, 0.33, 0.48, 0.88)
+const SLOT_ROLLING_BACKGROUND: Color = Color(0.080, 0.065, 0.055, 0.98)
+const SLOT_ROLLING_BORDER: Color = Color(1.0, 0.73, 0.24, 1.0)
+const SLOT_LANDED_BACKGROUND: Color = Color(0.055, 0.085, 0.105, 1.0)
+const SLOT_LANDED_BORDER: Color = Color(0.35, 0.86, 1.0, 1.0)
+
 
 var _slot_panels: Array[PanelContainer] = []
 var _icon_rows: Array[HBoxContainer] = []
@@ -62,6 +69,15 @@ func _build_slots() -> void:
             104,
             108
         )
+        panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        panel.add_theme_stylebox_override(
+            "panel",
+            _slot_style(
+                SLOT_IDLE_BACKGROUND,
+                SLOT_IDLE_BORDER,
+                1
+            )
+        )
         add_child(panel)
         _slot_panels.append(panel)
 
@@ -87,6 +103,14 @@ func _build_slots() -> void:
 
         var label: Label = Label.new()
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        label.add_theme_font_size_override(
+            "font_size",
+            13
+        )
+        label.add_theme_color_override(
+            "font_color",
+            Color(0.78, 0.84, 0.94, 1.0)
+        )
         label.text = (
             LocalizationService.tr_format(
             "battle.dice.energy_index",
@@ -117,6 +141,8 @@ func reset_display() -> void:
         _slot_panels.size()
     ):
         _slot_panels[index].visible = true
+        _reset_slot_transform(index)
+        _set_slot_visual(index, &"idle")
 
     for index: int in range(
         _labels.size()
@@ -437,6 +463,13 @@ func _animate_batch(
         not bool(active[3])
     ]
 
+    for index: int in range(4):
+        if bool(active[index]):
+            _set_slot_visual(index, &"rolling")
+            _slot_panels[index].pivot_offset = (
+                _slot_panels[index].size * 0.5
+            )
+
     while not (
         stopped[0]
         and stopped[1]
@@ -477,8 +510,20 @@ func _animate_batch(
                     )
 
                 stopped[index] = true
+                _reset_slot_transform(index)
+                _set_slot_visual(index, &"landed")
                 _pulse_slot(index)
                 continue
+
+            var slot: PanelContainer = _slot_panels[index]
+            slot.pivot_offset = slot.size * 0.5
+            slot.rotation = sin(
+                elapsed * 22.0 + float(index) * 1.7
+            ) * 0.045
+            var bounce: float = 1.0 + abs(
+                sin(elapsed * 15.0 + float(index))
+            ) * 0.035
+            slot.scale = Vector2.ONE * bounce
 
             if elapsed >= next_flip[index]:
                 var progress: float = clamp(
@@ -840,23 +885,67 @@ func _set_orientation_slot(
 func _pulse_slot(
     index: int
 ) -> void:
-    var row: HBoxContainer = _icon_rows[index]
-    row.scale = Vector2(
-        0.88,
-        0.88
-    )
+    var panel: PanelContainer = _slot_panels[index]
+    panel.pivot_offset = panel.size * 0.5
+    panel.scale = Vector2(0.84, 0.84)
 
     var tween: Tween = create_tween()
     tween.tween_property(
-        row,
+        panel,
         "scale",
         Vector2.ONE,
-        0.15
+        0.24
     ).set_trans(
         Tween.TRANS_BACK
     ).set_ease(
         Tween.EASE_OUT
     )
+
+
+func _reset_slot_transform(index: int) -> void:
+    if index < 0 or index >= _slot_panels.size():
+        return
+    _slot_panels[index].rotation = 0.0
+    _slot_panels[index].scale = Vector2.ONE
+
+
+func _set_slot_visual(index: int, state: StringName) -> void:
+    if index < 0 or index >= _slot_panels.size():
+        return
+
+    var background: Color = SLOT_IDLE_BACKGROUND
+    var border: Color = SLOT_IDLE_BORDER
+    var border_width: int = 1
+
+    if state == &"rolling":
+        background = SLOT_ROLLING_BACKGROUND
+        border = SLOT_ROLLING_BORDER
+        border_width = 2
+    elif state == &"landed":
+        background = SLOT_LANDED_BACKGROUND
+        border = SLOT_LANDED_BORDER
+        border_width = 2
+
+    _slot_panels[index].add_theme_stylebox_override(
+        "panel",
+        _slot_style(background, border, border_width)
+    )
+
+
+func _slot_style(
+    background: Color,
+    border: Color,
+    border_width: int
+) -> StyleBoxFlat:
+    var style: StyleBoxFlat = StyleBoxFlat.new()
+    style.bg_color = background
+    style.border_color = border
+    style.set_border_width_all(border_width)
+    style.set_corner_radius_all(12)
+    style.set_content_margin_all(8.0)
+    style.shadow_color = Color(0.0, 0.0, 0.0, 0.45)
+    style.shadow_size = 6
+    return style
 
 
 func _random_energy_face() -> Array:

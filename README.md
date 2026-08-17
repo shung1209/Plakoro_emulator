@@ -1,239 +1,56 @@
-# PLAKORO Emulator --- V1
+# PLAKORO V2
 
-**PLAKORO Emulator** is a fan-made PC recreation and sandbox inspired by
-Bandai's Pokémon PLAKORO dice game.
+PLAKORO V2 is the current Godot project for the Pokémon / Charakoro-style dice battle prototype.
 
-Roll your Pokémon, roll your Enerkoro, use different moves, and battle
-against an AI opponent while experimenting with different dice
-configurations.
+## Current baseline
 
-The goal of the project is not only to emulate the PLAKORO battle
-experience, but also to provide tools for players to customize,
-experiment with, and create their own setups.
+- Milestone 12.9 — Battle GUI UX: **PASS / CLOSED**
+- Milestone 12.10 — Ordinary User End-to-End Regression: **PASS / CLOSED**
+- Milestone 12.11 — Project UX / Tool Integration / Localization Foundation: **CLOSED**
+- Milestone 12.12 — Deep Localization: **PASS / CLOSED**
+- 12.12j Observer-Only Responsive Localization Regression: **PASS**
+- 12.12k Full Localization Final Gate: **PASS**
+- Main scene: `res://scenes/ui/BattlePreparationUI.tscn`
 
-> **V1 is the first official stable baseline of PLAKORO Emulator.**
+## Built-in languages
 
-------------------------------------------------------------------------
+- English — `en_US`
+- Traditional Chinese — `zh_TW`
+- Spanish (Spain) — `es_ES`
+- Japanese — `ja_JP`
 
-## Features
+Runtime UI language packs are under `language/`.
+Game-content localization fragments are under `language/content/`.
+User overrides remain under `user://user_database/language/`.
 
--   **Pokémon Dice Battles** --- Play PLAKORO-style battles against an
-    AI opponent.
--   **Enerkoro System** --- Configure and experiment with different
-    Energy combinations.
--   **Battle Preparation** --- Configure Pokémon, Moves, Enerkoro,
-    loadouts, AI difficulty, and battle settings.
--   **Content Studio** --- Create and modify Pokémon, Moves, Charakoro
-    profiles, and supported game content.
--   **Dice Weight Customization** --- Adjust Charakoro face weights and
-    experiment with roll probabilities.
--   **Model Weight Generator** --- Use compatible 3D models to help
-    generate model-weight information for custom Charakoro
-    configurations.
--   **Custom Loadouts** --- Select Pokémon, Moves, and Enerkoro setups
-    for battle.
--   **AI Battles** --- Test your configurations against the built-in AI
-    opponent.
--   **Custom Content** --- Extend or modify supplied game data through
-    your personal user database.
--   **Multiple Languages** --- English, Traditional Chinese, Spanish
-    (Spain), and Japanese.
--   **Sandbox Focus** --- Experiment with PLAKORO content and
-    configurations however you like.
+## Main user flow
 
-------------------------------------------------------------------------
+`Content Studio → Save/Reload → Preparation → Battle → Result → Rematch / Preparation`
 
-## Getting Started
+## Project structure
 
-1.  Download and extract the game.
-2.  Start **PLAKORO Emulator**.
-3.  On first launch, the game prepares your personal `user_database`.
-4.  Use **Battle Preparation** to select your Pokémon, Moves, Enerkoro,
-    and battle settings.
-5.  Start a battle and test your setup against the AI.
-6.  Use **Content Studio**, **Enerkoro Builder**, and **Model Weight
-    Generator** to create or customize content.
+- `scenes/ui/` — production UI scenes
+- `scenes/ui/components/` — reusable UI components
+- `scripts/battle/` — Battle runtime, rules and opcode execution
+- `scripts/content/` — Content Studio and database services
+- `scripts/dice/` — Enerkoro / Charakoro runtime and setup
+- `scripts/loadout/` — Player / AI Battle loadouts
+- `scripts/ui/` — UI controllers and presentation helpers
+- `database/` — packaged canonical runtime content
+- `language/` — built-in UI and game-content localization
+- `assets/` — images, models and UI assets
+- `docs/milestones/` — historical milestone implementation notes
+- `docs/audit/` — validation and localization audits
+- `docs/maintenance/` — cleanup / maintenance records
 
-------------------------------------------------------------------------
+## Release cleanup
 
-## Your `user_database`
+Historical regression assets have been removed from the release baseline:
 
-When PLAKORO Emulator is launched for the first time, it automatically
-creates a writable personal database under Godot's `user://` storage:
+- `scenes/tests/` — removed
+- `scripts/tests/` — removed
 
-``` text
-user://user_database/
-```
+The regression work remains documented under `docs/milestones/`, but test-only scenes/scripts
+are not shipped in this cleaned project baseline.
 
-This database is separate from the packaged game content and is intended
-to store your editable PLAKORO content, including:
-
--   Pokémon / Charakoro data
--   Moves and Move effects
--   Move loadouts
--   Enerkoro configurations
--   Charakoro profiles and weight data
--   User-editable database content
--   Language/localization overrides
-
-The game copies required starter data into the user database when
-necessary, allowing the packaged game files to remain read-only.
-
-### Accessing the database
-
-The game provides a `user_database_link` so you can conveniently reach
-the actual user database from your PLAKORO installation.
-
-Use this location when you want to inspect, back up, or manually work
-with your custom files.
-
-### Important
-
-**Do not edit the packaged game database just to create custom
-content.**
-
-Use the generated `user_database` instead. This keeps your personal
-content separate from the distributed game files and makes updating the
-emulator safer.
-
-------------------------------------------------------------------------
-
-## Content Studio
-
-**Content Studio** is the main interface for editing supported PLAKORO
-content.
-
-You can use it to work with Pokémon / Charakoro information, Moves,
-effects, profiles, and other editable database content without manually
-editing JSON files.
-
-For most users, Content Studio is the recommended way to customize the
-game. Advanced users can also inspect the JSON data inside the user
-database directly.
-
-------------------------------------------------------------------------
-
-## Enerkoro Builder
-
-The **Enerkoro Builder** allows you to create and modify Enerkoro
-configurations.
-
-Customize Energy faces, save different configurations, and use your
-saved setup when preparing a battle.
-
-This is useful for experimenting with how different Energy distributions
-affect available Moves and battle behavior.
-
-------------------------------------------------------------------------
-
-## Model Weight Generator
-
-The **Model Weight Generator** is provided for users experimenting with
-custom Charakoro / Pokémon 3D models.
-
-It can analyze supported model information and assist with generating
-model-weight data for use by the project.
-
-Because custom models may come from unofficial sources and may differ in
-geometry, scale, mesh quality, or watertightness, generated values
-should be treated as an aid for experimentation rather than an exact
-recreation of a physical manufactured die.
-
-------------------------------------------------------------------------
-
-## Languages
-
-PLAKORO Emulator V1 includes:
-
-  Language              Locale
-  --------------------- ---------
-  English               `en_US`
-  Traditional Chinese   `zh_TW`
-  Spanish (Spain)       `es_ES`
-  Japanese              `ja_JP`
-
-The localization system also supports user-side language data through
-the user database.
-
-------------------------------------------------------------------------
-
-## Backing Up Your Content
-
-If you create custom Pokémon, Moves, Enerkoro configurations, Charakoro
-profiles, or other content, periodically back up your:
-
-``` text
-user_database
-```
-
-When upgrading PLAKORO Emulator, keep your existing user database unless
-the release notes for a future version specifically instruct you to
-migrate or replace it.
-
-------------------------------------------------------------------------
-
-## V1 Status
-
-V1 establishes the first official base version of PLAKORO Emulator.
-
-The core flow is:
-
-``` text
-Content Studio
-    ↓
-Save / Reload
-    ↓
-Battle Preparation
-    ↓
-Battle
-    ↓
-Result
-    ↓
-Rematch / Preparation
-```
-
-V1 also establishes the localization, custom-content, Enerkoro,
-model-weight, and user-database foundations that future versions can
-build upon.
-
-------------------------------------------------------------------------
-
-## Special Thanks
-
-Thanks to everyone who contributed information, resources, testing
-material, and translation references for the project.
-
--   **InvestigatorFew7899 from Reddit** --- for allowing the project to
-    use their STL files for development and testing of the 3D model and
-    dice systems.
--   **Jollto** --- for providing a translation database used as a
-    localization reference.
--   **PLAKORO Chinese website** --- for providing valuable PLAKORO
-    information and reference material.
-
-And thanks to the PLAKORO community for preserving information about
-this unusual piece of Pokémon history.
-
-------------------------------------------------------------------------
-
-## Disclaimer
-
-PLAKORO Emulator is an **unofficial, fan-made project** created for
-experimentation, preservation, and enjoyment of the PLAKORO game system.
-
-This project is not affiliated with, endorsed by, or sponsored by
-Nintendo, The Pokémon Company, Game Freak, Creatures Inc., Bandai, or
-their respective affiliates.
-
-Pokémon, PLAKORO, and related names, characters, trademarks, and
-intellectual property belong to their respective owners. No ownership of
-those properties is claimed by this project.
-
-------------------------------------------------------------------------
-
-## Have Fun!
-
-Experiment with different Pokémon, Moves, Enerkoro configurations,
-weights, and custom content.
-
-**Play PLAKORO your way.**
+See `MILESTONE_ROADMAP.md` and `MILESTONE_12_COMPLETION.md` for the consolidated status.

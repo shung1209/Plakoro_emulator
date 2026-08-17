@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/BattleGameUI.gd" id="1_ui"]
 [ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
 [ext_resource type="Script" path="res://scripts/presentation/timeline/BattleTimelineView.gd" id="3_timeline"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/BattleDiceRollPresenter.tscn" id="4_roll"]
 [ext_resource type="Script" path="res://scripts/ui/components/BattlePendingEffectIndicator.gd" id="5_pending_effect"]
+[ext_resource type="Script" path="res://scripts/ui/components/BattleArenaBackdrop.gd" id="6_backdrop"]
 
 [ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="lang_selector"]
 
@@ -28,6 +29,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.027, 0.034, 0.05, 1)
+
+[node name="ArenaBackdrop" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_backdrop")
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
