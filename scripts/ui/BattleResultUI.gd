@@ -24,6 +24,9 @@ const ICONS: Script = preload(
 @onready var player_hp_label: Label = %PlayerHpLabel
 @onready var enemy_hp_label: Label = %EnemyHpLabel
 @onready var career_title: Label = %CareerTitle
+@onready var career_panel: PanelContainer = (
+	career_title.get_parent().get_parent() as PanelContainer
+)
 @onready var career_record_label: Label = %CareerRecordLabel
 @onready var streak_label: Label = %StreakLabel
 @onready var milestone_label: Label = %MilestoneLabel
@@ -141,6 +144,16 @@ func _apply_localized_text() -> void:
 
 
 func _apply_progress_text() -> void:
+	if GameFlow.free_mode:
+		career_panel.visible = false
+		milestone_label.visible = false
+		encounter_unlock_label.visible = false
+		collection_reward_label.visible = false
+		save_warning_label.visible = false
+		encounters_button.visible = false
+		return
+	career_panel.visible = true
+	encounters_button.visible = true
 	var progress: Variant = PlayerProgress.get_progress()
 	var update: Dictionary = PlayerProgress.get_last_update()
 	career_record_label.text = LocalizationService.tr_format(
@@ -213,6 +226,10 @@ func _apply_progress_text() -> void:
 func _refresh_energy_choice() -> void:
 	for child: Node in energy_reward_choices.get_children():
 		child.queue_free()
+	if GameFlow.free_mode:
+		energy_reward_panel.visible = false
+		_set_navigation_enabled(true)
+		return
 	var progress: Variant = PlayerProgress.get_progress()
 	var choices: Array = progress.pending_energy_choices
 	energy_reward_panel.visible = not choices.is_empty()
@@ -255,18 +272,27 @@ func _refresh_energy_choice() -> void:
 
 func _style_energy_choice_button(button: Button) -> void:
 	var normal: StyleBoxFlat = StyleBoxFlat.new()
-	normal.bg_color = Color(0.055, 0.085, 0.12, 1.0)
+	normal.bg_color = (
+		Color("e1d9c7") if PLAKORO_THEME.is_warm_theme()
+		else Color(0.055, 0.085, 0.12, 1.0)
+	)
 	normal.border_color = Color(1.0, 0.72, 0.18, 0.95)
 	normal.set_border_width_all(2)
 	normal.set_corner_radius_all(10)
 	normal.content_margin_left = 18.0
 	normal.content_margin_right = 18.0
 	var hover: StyleBoxFlat = normal.duplicate()
-	hover.bg_color = Color(0.12, 0.18, 0.24, 1.0)
+	hover.bg_color = (
+		Color("d7cdaf") if PLAKORO_THEME.is_warm_theme()
+		else Color(0.12, 0.18, 0.24, 1.0)
+	)
 	hover.border_color = Color(1.0, 0.86, 0.36, 1.0)
 	hover.set_border_width_all(3)
 	var pressed: StyleBoxFlat = normal.duplicate()
-	pressed.bg_color = Color(0.18, 0.24, 0.28, 1.0)
+	pressed.bg_color = (
+		Color("cbbd98") if PLAKORO_THEME.is_warm_theme()
+		else Color(0.18, 0.24, 0.28, 1.0)
+	)
 	button.add_theme_stylebox_override("normal", normal)
 	button.add_theme_stylebox_override("hover", hover)
 	button.add_theme_stylebox_override("focus", hover)
@@ -286,6 +312,8 @@ func _claim_energy(
 
 
 func _continue_to_next_opponent_if_ready() -> void:
+	if GameFlow.free_mode:
+		return
 	if not advance_to_next_opponent:
 		return
 	if not PlayerProgress.get_progress().pending_energy_choices.is_empty():

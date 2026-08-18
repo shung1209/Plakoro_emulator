@@ -38,6 +38,9 @@ const LOADOUT_VERIFICATION: Script = preload(
 const MOVE_EFFECT_PRESENTATION: Script = preload(
     "res://scripts/presentation/MoveKyokoroEffectPresentationService.gd"
 )
+const PLAKORO_MOVE_BUTTON: Script = preload(
+    "res://scripts/ui/components/PlakoroMoveButton.gd"
+)
 const RESOURCE_RECOVERY: Script = preload(
     "res://scripts/runtime/BattleResourceRecoveryService.gd"
 )
@@ -73,6 +76,9 @@ const KYOKORO_EFFECT_POPUP: Script = preload(
 )
 const DICE_BUILDER_CONTEXT: Script = preload(
     "res://scripts/dice/setup/EnergyDiceBuilderContextService.gd"
+)
+const ENERGY_DICE_SETUP_SAVE: Script = preload(
+    "res://scripts/dice/setup/EnergyDiceSetupSaveService.gd"
 )
 const POKEMON_AUTHORING: Script = preload(
     "res://scripts/content/PokemonAuthoringService.gd"
@@ -513,6 +519,7 @@ func _apply_responsive_layout() -> void:
 
 func _open_battle_setup() -> void:
 	_clear_setup_move_hover_preview()
+	_configure_setup_dialog_for_mode()
 	_populate_setup_pokemon_options()
 	_populate_setup_difficulties()
 
@@ -561,6 +568,25 @@ func _open_battle_setup() -> void:
 	)
 
 
+func _configure_setup_dialog_for_mode() -> void:
+	var configure_opponent: bool = GameFlow.free_mode
+	ai_setup_panel.visible = configure_opponent
+	setup_player_move_scroll.custom_minimum_size.x = (
+		530.0 if configure_opponent else 1080.0
+	)
+	setup_hint.text = LocalizationService.tr_key(
+		"preparation.setup_hint_free"
+		if configure_opponent
+		else "preparation.setup_hint",
+		"Choose both Pokémon, their four Moves, and AI difficulty. "
+		+ "Your current Enerkoro setup is used automatically."
+		if configure_opponent
+		else "Choose your Pokémon and four Moves. Your current "
+		+ "Enerkoro setup is used automatically. Opponent Loadout "
+		+ "stays hidden until battle."
+	)
+
+
 func _apply_encounter_setup_lock() -> void:
 	var locked: bool = (
 		EncounterSession.has_active_encounter()
@@ -576,7 +602,10 @@ func _populate_setup_pokemon_options() -> void:
 	setup_player_pokemon_option.clear()
 	setup_ai_pokemon_option.clear()
 	var progress: Variant = PlayerProgress.get_progress()
-	var collection_active: bool = progress.has_profile()
+	var collection_active: bool = (
+		progress.has_profile()
+		and not GameFlow.free_mode
+	)
 
 	for pokemon_id: String in (
 		POKEMON_AUTHORING.list_saved()
@@ -877,6 +906,7 @@ func _rebuild_setup_moves(
 			if (
 				not for_ai
 				and PlayerProgress.has_profile()
+				and not GameFlow.free_mode
 				and not PlayerProgress.get_progress().unlocked_move_card_ids.has(move_id)
 			):
 				continue
@@ -1695,8 +1725,12 @@ func _refresh_battle_setup_state() -> void:
 	if ready:
 		setup_status_label.text = (
 			LocalizationService.tr_key(
-				"preparation.ready_player_setup",
-				"READY — Player Loadout is valid. Opponent Loadout is hidden."
+				"preparation.ready_free_setup"
+				if GameFlow.free_mode
+				else "preparation.ready_player_setup",
+				"READY — Player and opponent Loadouts are valid."
+				if GameFlow.free_mode
+				else "READY — Player Loadout is valid. Opponent Loadout is hidden."
 			)
 			+ (
 				LocalizationService.tr_key(
@@ -1912,6 +1946,14 @@ func _reload_loadout() -> void:
 		start_battle_button.disabled = true
 		return
 
+	if GameFlow.free_mode and not _ensure_free_mode_custom_dice():
+		validation_label.text = LocalizationService.tr_key(
+			"preparation.free_dice_init_failed",
+			"Free Mode could not prepare an editable Enerkoro setup."
+		)
+		start_battle_button.disabled = true
+		return
+
 	_refresh_loadout_summary()
 	_refresh_opponent_summary()
 	_refresh_move_draft_status()
@@ -2117,6 +2159,49 @@ func _refresh_hero_plakoro(
 
 
 func _refresh_moves() -> void:
+	for child: Node in move_container.get_children():
+		child.queue_free()
+
+	if player_loadout_data == null:
+		return
+
+	for move_card_id: StringName in player_loadout_data.move_card_ids:
+		var move_card: Variant = RESOURCE_RECOVERY.safe_get_move(
+			database,
+			move_card_id,
+			"Battle Preparation"
+		)
+		if move_card == null:
+			continue
+
+		var button := Button.new()
+		button.set_script(PLAKORO_MOVE_BUTTON)
+		button.custom_minimum_size = Vector2(360, 220)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+		var damage_text: String = _format_damage(move_card)
+		var coverage_text: String = "—"
+		if player_loadout_data.energy_dice_setup != null:
+			var coverage: Variant = MOVE_COVERAGE_ANALYZER.analyze_move(
+				player_loadout_data.energy_dice_setup,
+				move_card
+			)
+			if coverage != null:
+				coverage_text = LocalizationService.format_percent(
+					float(coverage.success_probability),
+					0
+				)
+
+		button.setup_battle_summary(
+			move_card,
+			damage_text,
+			coverage_text
+		)
+		button.set_battle_availability(true, "", coverage_text)
+		move_container.add_child(button)
+
+
+func _refresh_moves_legacy() -> void:
 	for child: Node in move_container.get_children():
 		child.queue_free()
 
@@ -2927,12 +3012,14 @@ func _open_energy_dice_builder() -> void:
 			)
 		)
 
-	if (
-		target_path.is_empty()
-		or not FileAccess.file_exists(
-			target_path
+	if GameFlow.free_mode and not _ensure_free_mode_custom_dice():
+		validation_label.text = LocalizationService.tr_key(
+			"preparation.free_dice_init_failed",
+			"Free Mode could not prepare an editable Enerkoro setup."
 		)
-	):
+		return
+
+	if target_path.is_empty() or not FileAccess.file_exists(target_path):
 		validation_label.text = (
             "Selected Enerkoro file is missing: "
 			+ target_path
@@ -2953,6 +3040,21 @@ func _open_energy_dice_builder() -> void:
 
 	get_tree().change_scene_to_file(
 		ENERGY_DICE_BUILDER_SCENE_PATH
+	)
+
+
+func _ensure_free_mode_custom_dice() -> bool:
+	var target_path: String = CONTENT_PLAYTEST.PLAYER_CUSTOM_DICE_PATH
+	if FileAccess.file_exists(target_path):
+		return true
+	if (
+		player_loadout_data == null
+		or player_loadout_data.energy_dice_setup == null
+	):
+		return false
+	return ENERGY_DICE_SETUP_SAVE.save_setup(
+		player_loadout_data.energy_dice_setup,
+		target_path
 	)
 
 

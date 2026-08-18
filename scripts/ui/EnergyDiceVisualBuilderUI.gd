@@ -1167,7 +1167,11 @@ func _validate_current_setup() -> Dictionary:
 
 
 func _get_player_energy_inventory() -> Dictionary:
-    if not sync_player_loadout or not PlayerProgress.has_profile():
+    if (
+        not sync_player_loadout
+        or not PlayerProgress.has_profile()
+        or GameFlow.free_mode
+    ):
         return {}
     return PlayerProgress.get_progress().energy_inventory.duplicate(true)
 

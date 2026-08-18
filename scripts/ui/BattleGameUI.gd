@@ -443,22 +443,65 @@ func _apply_localized_text() -> void:
 func _apply_battle_visual_style() -> void:
 	setup_source_label.visible = false
 	turn_label.visible = false
+	var warm: bool = PLAKORO_THEME.is_warm_theme()
+	if warm:
+		page_title.add_theme_color_override(
+			"font_color",
+			Color("ebe6dc")
+		)
+		turn_banner_label.add_theme_color_override(
+			"font_color",
+			Color("245b88")
+		)
+		var warm_text: Color = Color("1d2940")
+		var warm_outline: Color = Color(0.96, 0.94, 0.88, 0.96)
+		for contrast_label: Label in [
+			roll_result_title_label,
+			energy_payment_label,
+			charakoro_feedback_title,
+			charakoro_feedback_label,
+			message_label,
+			prototype_battle_message_label
+		]:
+			contrast_label.add_theme_color_override(
+				"font_color",
+				warm_text
+			)
+			contrast_label.add_theme_color_override(
+				"font_outline_color",
+				warm_outline
+			)
+			contrast_label.add_theme_constant_override(
+				"outline_size",
+				3
+			)
+		turn_banner_label.add_theme_color_override(
+			"font_outline_color",
+			warm_outline
+		)
+		turn_banner_label.add_theme_constant_override(
+			"outline_size",
+			2
+		)
 	var enemy_window_style: StyleBoxFlat = StyleBoxFlat.new()
-	enemy_window_style.bg_color = Color(0.045, 0.018, 0.032, 0.995)
+	enemy_window_style.bg_color = (
+		Color("e4d3d0") if warm
+		else Color(0.045, 0.018, 0.032, 0.995)
+	)
 	enemy_window_style.border_color = Color(1.0, 0.30, 0.46, 0.95)
 	enemy_window_style.set_border_width_all(2)
 	enemy_window_style.corner_radius_top_left = 16
 	enemy_window_style.corner_radius_top_right = 16
 	enemy_window_style.corner_radius_bottom_left = 16
 	enemy_window_style.corner_radius_bottom_right = 16
-	enemy_window_style.shadow_color = Color(0.0, 0.0, 0.0, 0.86)
-	enemy_window_style.shadow_size = 24
+	enemy_window_style.shadow_color = Color(0.11, 0.15, 0.25, 0.16 if warm else 0.86)
+	enemy_window_style.shadow_size = 10 if warm else 24
 	enemy_move_window.add_theme_stylebox_override("panel", enemy_window_style)
 
 	player_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.025, 0.060, 0.105, 0.86),
+			Color(Color("d4dfe4"), 0.82) if warm else Color(0.025, 0.060, 0.105, 0.86),
 			Color(0.20, 0.62, 1.0, 0.90),
 			2
 		)
@@ -466,7 +509,7 @@ func _apply_battle_visual_style() -> void:
 	enemy_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.105, 0.025, 0.052, 0.86),
+			Color(Color("e4d3d0"), 0.82) if warm else Color(0.105, 0.025, 0.052, 0.86),
 			Color(1.0, 0.30, 0.42, 0.88),
 			2
 		)
@@ -474,7 +517,7 @@ func _apply_battle_visual_style() -> void:
 	roll_result_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.015, 0.030, 0.025, 0.12),
+			Color(Color("d8d1b7"), 0.58) if warm else Color(0.015, 0.030, 0.025, 0.12),
 			Color(0.92, 0.78, 0.36, 0.72),
 			1,
 			false
@@ -483,7 +526,7 @@ func _apply_battle_visual_style() -> void:
 	moves_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.025, 0.038, 0.060, 0.84),
+			Color(PLAKORO_THEME.get_color("surface"), 0.72) if warm else Color(0.025, 0.038, 0.060, 0.84),
 			Color(0.25, 0.50, 0.82, 0.72),
 			1
 		)
@@ -491,7 +534,7 @@ func _apply_battle_visual_style() -> void:
 	timeline_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.020, 0.028, 0.044, 0.82),
+			Color(PLAKORO_THEME.get_color("surface"), 0.72) if warm else Color(0.020, 0.028, 0.044, 0.82),
 			Color(0.24, 0.30, 0.42, 0.70),
 			1
 		)
@@ -499,7 +542,7 @@ func _apply_battle_visual_style() -> void:
 	%PrototypeBattleMessagePanel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.035, 0.020, 0.045, 0.12),
+			Color(Color("ddd7e2"), 0.46) if warm else Color(0.035, 0.020, 0.045, 0.12),
 			Color(0.76, 0.58, 0.92, 0.52),
 			1,
 			false
@@ -508,7 +551,7 @@ func _apply_battle_visual_style() -> void:
 	turn_banner_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(0.015, 0.025, 0.035, 0.72),
+			Color(Color("d8dfe2"), 0.72) if warm else Color(0.015, 0.025, 0.035, 0.72),
 			Color(0.48, 0.74, 0.90, 0.48),
 			1,
 			false
@@ -525,16 +568,16 @@ func _apply_battle_visual_style() -> void:
 	)
 	roll_result_title_label.add_theme_color_override(
 		"font_color",
-		Color(1.0, 0.82, 0.40, 1.0)
+		PLAKORO_THEME.get_color("text") if warm else Color(1.0, 0.82, 0.40, 1.0)
 	)
 	roll_result_title_label.add_theme_font_size_override("font_size", 21)
 	prototype_battle_message_label.add_theme_color_override(
 		"font_outline_color",
-		Color(0.0, 0.0, 0.0, 0.92)
+		Color(0.96, 0.94, 0.88, 0.98) if warm else Color(0.0, 0.0, 0.0, 0.92)
 	)
 	prototype_battle_message_label.add_theme_constant_override(
 		"outline_size",
-		5
+		4 if warm else 5
 	)
 
 	player_hp_bar.add_theme_stylebox_override(
@@ -978,18 +1021,18 @@ func _apply_move_button_responsive_size(
 	match profile:
 		RESPONSIVE_PROFILE.PROFILE_FULL:
 			button.custom_minimum_size = Vector2(
-				220,
-				76
+				240,
+				145
 			)
 		RESPONSIVE_PROFILE.PROFILE_COMPACT:
 			button.custom_minimum_size = Vector2(
-				170,
-				68
+				190,
+				118
 			)
 		_:
 			button.custom_minimum_size = Vector2(
 				0,
-				60
+				112
 			)
 			button.size_flags_horizontal = (
 				Control.SIZE_EXPAND_FILL
@@ -1035,18 +1078,8 @@ func _configure_battle_tooltip_theme() -> void:
 		battle_theme = theme.duplicate()
 
 	var tooltip_panel: StyleBoxFlat = StyleBoxFlat.new()
-	tooltip_panel.bg_color = Color(
-		0.035,
-		0.040,
-		0.052,
-		0.98
-	)
-	tooltip_panel.border_color = Color(
-		0.38,
-		0.42,
-		0.50,
-		1.0
-	)
+	tooltip_panel.bg_color = PLAKORO_THEME.get_color("surface")
+	tooltip_panel.border_color = PLAKORO_THEME.get_color("border_hover")
 	tooltip_panel.set_border_width_all(1)
 	tooltip_panel.corner_radius_top_left = 6
 	tooltip_panel.corner_radius_top_right = 6
@@ -1173,6 +1206,14 @@ func _set_battle_action_state(
 			0.88,
 			1.0
 		)
+	if PLAKORO_THEME.is_warm_theme():
+		actor_color = (
+			PLAKORO_THEME.get_color("danger")
+			if actor_key == "battle.ai_turn"
+			else PLAKORO_THEME.get_color("accent")
+		)
+		if actor_key == "battle.finished":
+			actor_color = PLAKORO_THEME.get_color("text_muted")
 
 	turn_banner_label.add_theme_color_override(
 		"font_color",
@@ -1509,45 +1550,41 @@ func _open_enemy_move_window() -> void:
 	if enemy_loadout == null:
 		return
 	_refresh_enemy_move_reveal()
-	enemy_move_window.popup_centered(Vector2i(820, 620))
+	enemy_move_window.popup_centered(Vector2i(960, 720))
 
 
-func _build_enemy_move_reveal_card(move_card: Variant) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(370, 220)
-	var box: VBoxContainer = VBoxContainer.new()
-	box.add_theme_constant_override("separation", 5)
-	panel.add_child(box)
-	var title: Label = Label.new()
-	title.text = GameContentLocalizationService.localize_move(move_card)
-	title.add_theme_font_size_override("font_size", 17)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(title)
-	var stats: HBoxContainer = HBoxContainer.new()
-	stats.alignment = BoxContainer.ALIGNMENT_CENTER
-	stats.add_theme_constant_override("separation", 8)
-	box.add_child(stats)
-	var costs: HBoxContainer = HBoxContainer.new()
-	costs.set_script(MOVE_ENERGY_COST_ROW)
-	costs.setup(move_card, 18)
-	stats.add_child(costs)
-	var damage: Label = Label.new()
-	damage.text = "DMG " + (
-		str(int(move_card.printed_damage))
-		if move_card.printed_damage != null
-		else "—"
+func _build_enemy_move_reveal_card(move_card: Variant) -> Button:
+	var button := Button.new()
+	button.set_script(PLAKORO_MOVE_BUTTON)
+	button.custom_minimum_size = Vector2(430, 220)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	var damage_text: String = "—"
+	if move_card.printed_damage != null:
+		damage_text = str(int(move_card.printed_damage))
+
+	var coverage_text: String = "—"
+	if (
+		ai_loadout_data != null
+		and ai_loadout_data.energy_dice_setup != null
+	):
+		var coverage: Variant = MOVE_COVERAGE_ANALYZER.analyze_move(
+			ai_loadout_data.energy_dice_setup,
+			move_card
+		)
+		if coverage != null:
+			coverage_text = LocalizationService.format_percent(
+				float(coverage.success_probability),
+				0
+			)
+
+	button.setup_battle_summary(
+		move_card,
+		damage_text,
+		coverage_text
 	)
-	stats.add_child(damage)
-	var preview: Dictionary = MOVE_EFFECT_PRESENTATION.build_preview(move_card)
-	var effect: Label = Label.new()
-	effect.text = GameContentLocalizationService.localize_move_description(move_card)
-	if effect.text.is_empty():
-		effect.text = String(preview.get("summary", "—"))
-	effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	effect.max_lines_visible = 3
-	effect.modulate.a = 0.78
-	box.add_child(effect)
-	return panel
+	button.set_battle_availability(true, "", coverage_text)
+	return button
 
 
 func _create_move_buttons() -> void:

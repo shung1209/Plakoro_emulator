@@ -10,6 +10,9 @@ const FACE_BUTTON: Script = preload(
 const ENERGY_PALETTE: Script = preload(
     "res://scripts/ui/components/EnergyPalette.gd"
 )
+const THEME_FACTORY: Script = preload(
+    "res://scripts/ui/theme/PlakoroThemeFactory.gd"
+)
 
 
 const FIXED_FIELDS: Array[StringName] = [
@@ -246,15 +249,18 @@ func _on_edit_requested(
     add_child(_palette_window)
 
     var popup_style: StyleBoxFlat = StyleBoxFlat.new()
-    popup_style.bg_color = Color(0.018, 0.035, 0.055, 0.995)
-    popup_style.border_color = Color(0.20, 0.78, 1.0, 0.95)
+    popup_style.bg_color = THEME_FACTORY.get_color("surface")
+    popup_style.border_color = THEME_FACTORY.get_color("accent")
     popup_style.set_border_width_all(2)
     popup_style.corner_radius_top_left = 14
     popup_style.corner_radius_top_right = 14
     popup_style.corner_radius_bottom_left = 14
     popup_style.corner_radius_bottom_right = 14
-    popup_style.shadow_color = Color(0.0, 0.0, 0.0, 0.82)
-    popup_style.shadow_size = 22
+    popup_style.shadow_color = Color(
+        0.11, 0.15, 0.25,
+        0.16 if THEME_FACTORY.is_warm_theme() else 0.82
+    )
+    popup_style.shadow_size = 10 if THEME_FACTORY.is_warm_theme() else 22
     popup_style.content_margin_left = 14.0
     popup_style.content_margin_top = 14.0
     popup_style.content_margin_right = 14.0

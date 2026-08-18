@@ -4,6 +4,9 @@ extends HBoxContainer
 const ICONS: Script = preload(
     "res://scripts/presentation/PlakoroIconService.gd"
 )
+const THEME_FACTORY: Script = preload(
+    "res://scripts/ui/theme/PlakoroThemeFactory.gd"
+)
 
 const ENERGY_TYPES: Array[StringName] = [
     &"grass",
@@ -73,8 +76,8 @@ func _build_slots() -> void:
         panel.add_theme_stylebox_override(
             "panel",
             _slot_style(
-                SLOT_IDLE_BACKGROUND,
-                SLOT_IDLE_BORDER,
+                _state_background(&"idle"),
+                _state_border(&"idle"),
                 1
             )
         )
@@ -109,7 +112,7 @@ func _build_slots() -> void:
         )
         label.add_theme_color_override(
             "font_color",
-            Color(0.78, 0.84, 0.94, 1.0)
+            THEME_FACTORY.get_color("text_muted")
         )
         label.text = (
             LocalizationService.tr_format(
@@ -913,17 +916,17 @@ func _set_slot_visual(index: int, state: StringName) -> void:
     if index < 0 or index >= _slot_panels.size():
         return
 
-    var background: Color = SLOT_IDLE_BACKGROUND
-    var border: Color = SLOT_IDLE_BORDER
+    var background: Color = _state_background(&"idle")
+    var border: Color = _state_border(&"idle")
     var border_width: int = 1
 
     if state == &"rolling":
-        background = SLOT_ROLLING_BACKGROUND
-        border = SLOT_ROLLING_BORDER
+        background = _state_background(&"rolling")
+        border = _state_border(&"rolling")
         border_width = 2
     elif state == &"landed":
-        background = SLOT_LANDED_BACKGROUND
-        border = SLOT_LANDED_BORDER
+        background = _state_background(&"landed")
+        border = _state_border(&"landed")
         border_width = 2
 
     _slot_panels[index].add_theme_stylebox_override(
@@ -943,9 +946,31 @@ func _slot_style(
     style.set_border_width_all(border_width)
     style.set_corner_radius_all(12)
     style.set_content_margin_all(8.0)
-    style.shadow_color = Color(0.0, 0.0, 0.0, 0.45)
+    style.shadow_color = Color(0.11, 0.15, 0.25, 0.14 if THEME_FACTORY.is_warm_theme() else 0.45)
     style.shadow_size = 6
     return style
+
+
+func _state_background(state: StringName) -> Color:
+    if not THEME_FACTORY.is_warm_theme():
+        if state == &"rolling":
+            return SLOT_ROLLING_BACKGROUND
+        if state == &"landed":
+            return SLOT_LANDED_BACKGROUND
+        return SLOT_IDLE_BACKGROUND
+    if state == &"rolling":
+        return Color("d7cdaf")
+    if state == &"landed":
+        return Color("d4dfe4")
+    return THEME_FACTORY.get_color("surface")
+
+
+func _state_border(state: StringName) -> Color:
+    if state == &"rolling":
+        return SLOT_ROLLING_BORDER
+    if state == &"landed":
+        return Color("2a6ebb") if THEME_FACTORY.is_warm_theme() else SLOT_LANDED_BORDER
+    return THEME_FACTORY.get_color("border") if THEME_FACTORY.is_warm_theme() else SLOT_IDLE_BORDER
 
 
 func _random_energy_face() -> Array:

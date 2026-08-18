@@ -14,18 +14,23 @@ var is_transitioning: bool = false
 var content_studio_return_scene: String = PREPARATION_SCENE
 var battle_outcome: Variant = null
 var collection_mode: bool = false
+var free_mode: bool = false
 var advance_after_battle_result: bool = false
 
 
 func open_main_menu() -> void:
 	battle_outcome = null
 	advance_after_battle_result = false
+	collection_mode = false
+	free_mode = false
 	EncounterSession.clear()
 	_change_scene(MAIN_MENU_SCENE)
 
 
 func start_game() -> void:
 	battle_outcome = null
+	collection_mode = false
+	free_mode = false
 	_change_scene(
 		ENCOUNTER_SELECT_SCENE
 		if PlayerProgress.has_profile()
@@ -35,6 +40,8 @@ func start_game() -> void:
 
 func open_save_creation() -> void:
 	battle_outcome = null
+	collection_mode = false
+	free_mode = false
 	EncounterSession.clear()
 	_change_scene(SAVE_CREATION_SCENE)
 
@@ -43,6 +50,7 @@ func open_encounter_select() -> void:
 	battle_outcome = null
 	advance_after_battle_result = false
 	collection_mode = false
+	free_mode = false
 	EncounterSession.clear()
 	_change_scene(ENCOUNTER_SELECT_SCENE)
 
@@ -56,6 +64,16 @@ func open_preparation() -> void:
 func open_collection() -> void:
 	battle_outcome = null
 	collection_mode = true
+	free_mode = false
+	EncounterSession.clear()
+	_change_scene(PREPARATION_SCENE)
+
+
+func open_free_mode() -> void:
+	battle_outcome = null
+	advance_after_battle_result = false
+	collection_mode = false
+	free_mode = true
 	EncounterSession.clear()
 	_change_scene(PREPARATION_SCENE)
 
@@ -83,7 +101,8 @@ func finish_battle(
 
 	battle_outcome = outcome
 	advance_after_battle_result = advance_to_next_opponent
-	PlayerProgress.record_battle(outcome)
+	if not free_mode:
+		PlayerProgress.record_battle(outcome)
 	_change_scene(BATTLE_RESULT_SCENE)
 
 

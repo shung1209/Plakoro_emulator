@@ -73,6 +73,12 @@ theme_override_colors/font_color = Color(0.32, 0.82, 1, 1)
 theme_override_font_sizes/font_size = 20
 text = "PLAKORO"
 
+[node name="ThemeOption" type="OptionButton" parent="TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(138, 0)
+layout_mode = 2
+tooltip_text = "Interface Theme"
+
 [node name="LanguageSelector" parent="TopBar" instance=ExtResource("2_language")]
 layout_mode = 2
 
@@ -89,20 +95,20 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="MenuPanel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(560, 560)
+custom_minimum_size = Vector2(560, 590)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBox_menu_panel")
 
 [node name="Margin" type="MarginContainer" parent="Center/MenuPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 58
-theme_override_constants/margin_top = 50
+theme_override_constants/margin_top = 38
 theme_override_constants/margin_right = 58
-theme_override_constants/margin_bottom = 50
+theme_override_constants/margin_bottom = 38
 
 [node name="Menu" type="VBoxContainer" parent="Center/MenuPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 13
 
 [node name="Accent" type="ColorRect" parent="Center/MenuPanel/Margin/Menu"]
 custom_minimum_size = Vector2(0, 5)
@@ -128,7 +134,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="Spacer" type="Control" parent="Center/MenuPanel/Margin/Menu"]
-custom_minimum_size = Vector2(0, 26)
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 
 [node name="PlayButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
@@ -145,6 +151,13 @@ layout_mode = 2
 visible = false
 theme_override_font_sizes/font_size = 18
 text = "Content Studio"
+
+[node name="FreeModeButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "FREE MODE"
 
 [node name="DeleteSaveButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
 unique_name_in_owner = true
