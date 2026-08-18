@@ -22,6 +22,7 @@ const FILES_BY_DIRECTORY: Dictionary = {
         "charmander_stl_custom.json",
         "eevee_stl_custom.json",
         "grimer_stl_custom.json",
+        "mew_model_custom.json",
         "mew_stl_custom.json",
         "pikachu_stl_custom.json",
         "squirtle_stl_custom.json",
@@ -186,10 +187,10 @@ static func files_for(directory_name: String) -> Array[String]:
             result.append(String(item))
     return result
 
+
 static func ids_for(directory_name: String) -> Array[String]:
     var result: Array[String] = []
     for file_name: String in files_for(directory_name):
         if file_name.ends_with(".json"):
             result.append(file_name.trim_suffix(".json"))
     return result
-
