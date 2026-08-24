@@ -2,3 +2,7 @@
 .godot/
 ITCH_IO.md
 user_database_link
+
+# Generated game exports.
+/web/
+/output/
