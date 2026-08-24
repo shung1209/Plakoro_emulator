@@ -360,6 +360,8 @@ func _format_inventory_summary() -> String:
 func _on_advanced_toggled(
     enabled: bool
 ) -> void:
+    if GameFlow.phone_mode:
+        enabled = false
     preview_coverage_row.visible = enabled
     summary_split.visible = enabled
     advanced_toggle.text = (
@@ -373,7 +375,7 @@ func _on_advanced_toggled(
     # is expanded.
     content_scroll.vertical_scroll_mode = (
         ScrollContainer.SCROLL_MODE_AUTO
-        if enabled
+        if enabled or GameFlow.phone_mode
         else ScrollContainer.SCROLL_MODE_DISABLED
     )
     content_scroll.scroll_vertical = 0
@@ -478,6 +480,16 @@ func _apply_preview_coverage_layout(
 func _apply_dice_builder_work_area(
     profile: StringName
 ) -> void:
+    if GameFlow.phone_mode:
+        dice_scroll.custom_minimum_size.y = 0.0
+        dice_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+        content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+        for editor: Variant in die_editors:
+            if editor is Control:
+                (editor as Control).custom_minimum_size.x = 0.0
+                (editor as Control).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        return
+
     var viewport_height: float = (
         get_viewport_rect().size.y
     )

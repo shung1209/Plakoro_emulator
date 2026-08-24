@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/phone/PhoneModeMenuUI.gd" id="1_menu"]
+
+[node name="PhoneModeMenuUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.07, 0.12, 0.1, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 28.0
+offset_right = -20.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="Margin"]
+layout_mode = 2
+
+[node name="Panel" type="PanelContainer" parent="Margin/Center"]
+custom_minimum_size = Vector2(440, 650)
+layout_mode = 2
+
+[node name="PanelMargin" type="MarginContainer" parent="Margin/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 34
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 34
+
+[node name="Menu" type="VBoxContainer" parent="Margin/Center/Panel/PanelMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Accent" type="ColorRect" parent="Margin/Center/Panel/PanelMargin/Menu"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.93, 0.68, 0.12, 1)
+
+[node name="TitleLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "PHONE MODE"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "A focused portrait layout for playing on your phone."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Spacer" type="Control" parent="Margin/Center/Panel/PanelMargin/Menu"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StoryButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "STORY MODE"
+
+[node name="FreeButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "FREE MODE"
+
+[node name="BackButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "BACK"
+
+[node name="Footer" type="Label" parent="Margin/Center/Panel/PanelMargin/Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "PLAKORO • PORTRAIT"
+horizontal_alignment = 1
