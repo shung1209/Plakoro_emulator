@@ -64,7 +64,7 @@ func _ready() -> void:
 func _apply_localized_text() -> void:
 	report_brand.text = LocalizationService.tr_key(
 		"battle_result.report",
-		"PLAKORO • BATTLE REPORT"
+		"PLAKORO  |  BATTLE REPORT"
 	)
 	turns_label.text = LocalizationService.tr_key(
 		"battle_result.turns",
@@ -163,7 +163,7 @@ func _apply_progress_text() -> void:
 			"wins": progress.wins,
 			"losses": progress.losses
 		},
-		"{battles} Battles  •  {wins} Wins  •  {losses} Losses"
+		"{battles} Battles   |   {wins} Wins   |   {losses} Losses"
 	)
 	streak_label.text = LocalizationService.tr_format(
 		"battle_result.streak_record",
@@ -171,13 +171,13 @@ func _apply_progress_text() -> void:
 			"current": progress.current_win_streak,
 			"best": progress.best_win_streak
 		},
-		"Current Streak: {current}  •  Best: {best}"
+		"Current Streak: {current}   |   Best: {best}"
 	)
 	var newly_unlocked: Array = update.get("newly_unlocked", []) as Array
 	milestone_label.visible = newly_unlocked.has("first_victory")
 	milestone_label.text = LocalizationService.tr_key(
 		"battle_result.first_victory",
-		"NEW MILESTONE • FIRST VICTORY"
+		"NEW MILESTONE  |  FIRST VICTORY"
 	)
 	var newly_completed: Array = update.get(
 		"newly_completed_encounters",
@@ -214,7 +214,7 @@ func _apply_progress_text() -> void:
 				"pokemon": pokemon_name,
 				"moves": outcome.reward_move_card_ids.size()
 			},
-			"COLLECTION UPDATED • {pokemon} + {moves} Moves + 6 Energy"
+			"COLLECTION UPDATED  |  {pokemon} + {moves} Moves + 6 Energy"
 		)
 	save_warning_label.visible = update.has("saved") and not bool(update["saved"])
 	save_warning_label.text = LocalizationService.tr_key(
@@ -246,7 +246,7 @@ func _refresh_energy_choice() -> void:
 	energy_reward_label.text = LocalizationService.tr_format(
 		"battle_result.energy_choice",
 		{"pokemon": pokemon_name, "level": level},
-		"LEVEL UP REWARD\n{pokemon} reached LV{level} — Choose 1 Energy to add"
+		"LEVEL UP REWARD\n{pokemon} reached LV{level} - Choose 1 Energy to add"
 	)
 	var first_button: Button = null
 	for raw_energy: Variant in choice.get("options", []):
@@ -342,13 +342,13 @@ func _show_missing_outcome() -> void:
 		"battle_result.unavailable_hint",
 		"Complete a battle to view its report."
 	)
-	turn_value.text = "—"
-	damage_dealt_value.text = "—"
-	damage_taken_value.text = "—"
-	player_hp_label.text = "—"
-	enemy_hp_label.text = "—"
-	career_record_label.text = "—"
-	streak_label.text = "—"
+	turn_value.text = "-"
+	damage_dealt_value.text = "-"
+	damage_taken_value.text = "-"
+	player_hp_label.text = "-"
+	enemy_hp_label.text = "-"
+	career_record_label.text = "-"
+	streak_label.text = "-"
 	milestone_label.visible = false
 	encounter_unlock_label.visible = false
 	collection_reward_label.visible = false

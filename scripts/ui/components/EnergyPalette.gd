@@ -142,7 +142,7 @@ func _refresh_buttons() -> void:
 
         if is_current:
             button.text = (
-                "✓ "
+                "[OK] "
                 + _energy_label(energy_type)
             )
         else:

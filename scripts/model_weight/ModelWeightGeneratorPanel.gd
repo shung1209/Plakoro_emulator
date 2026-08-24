@@ -104,13 +104,13 @@ func _build_ui() -> void:
 	page.add_child(header)
 
 	var subtitle: Label = Label.new()
-	_bind_text(subtitle, "model_weight.subtitle", "3D model → orientation setup → Godot/Jolt throws → Charakoro weighted profile")
+	_bind_text(subtitle, "model_weight.subtitle", "3D model -> orientation setup -> Godot/Jolt throws -> Charakoro weighted profile")
 	subtitle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	subtitle.modulate = Color(0.82, 0.82, 0.82)
 	header.add_child(subtitle)
 
 	var formats: Label = Label.new()
-	_bind_text(formats, "model_weight.supported", "Supported: STL • OBJ • GLB • GLTF")
+	_bind_text(formats, "model_weight.supported", "Supported: STL  |  OBJ  |  GLB  |  GLTF")
 	formats.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	formats.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	formats.custom_minimum_size.x = 240
@@ -128,7 +128,7 @@ func _build_ui() -> void:
 	page.add_child(workspace)
 
 	# ================================================================
-	# LEFT — Orientation Setup
+	# LEFT - Orientation Setup
 	# ================================================================
 	var left_panel: PanelContainer = PanelContainer.new()
 	left_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -159,7 +159,7 @@ func _build_ui() -> void:
 	preview_panel.add_child(instruction)
 
 	var direction_hint: Label = Label.new()
-	_bind_text(direction_hint, "model_weight.direction_hint", "↑ HEAD UP     •     FACE → CAMERA / YOU")
+	_bind_text(direction_hint, "model_weight.direction_hint", "^ HEAD UP      |      FACE -> CAMERA / YOU")
 	direction_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	direction_hint.modulate = Color(0.84, 0.84, 0.84)
 	preview_panel.add_child(direction_hint)
@@ -251,7 +251,7 @@ func _build_ui() -> void:
 	appearance_row.add_child(preview_mode_option)
 
 	var view_info: Label = Label.new()
-	view_info.text = LocalizationService.tr_key("model_weight.view_info", "Orthographic • Opaque")
+	view_info.text = LocalizationService.tr_key("model_weight.view_info", "Orthographic  |  Opaque")
 	view_info.modulate = Color(0.75, 0.75, 0.75)
 	appearance_row.add_child(view_info)
 
@@ -289,7 +289,7 @@ func _build_ui() -> void:
 	rotate_row.add_child(rz)
 
 	var mouse_help: Label = Label.new()
-	_bind_text(mouse_help, "model_weight.mouse_help", "Left-drag: rotate • Wheel: zoom")
+	_bind_text(mouse_help, "model_weight.mouse_help", "Left-drag: rotate  |  Wheel: zoom")
 	mouse_help.modulate = Color(0.78, 0.78, 0.78)
 	rotate_row.add_child(mouse_help)
 
@@ -305,7 +305,7 @@ func _build_ui() -> void:
 	preview_panel.add_child(orientation_state)
 
 	# ================================================================
-	# RIGHT — Model/Profile then Simulation/Result
+	# RIGHT - Model/Profile then Simulation/Result
 	# ================================================================
 	var right_stack: VBoxContainer = VBoxContainer.new()
 	right_stack.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -822,7 +822,7 @@ func _analyze_mesh(mesh: ArrayMesh, source_path: String) -> Dictionary:
 	}
 
 func _format_vec3(v: Vector3) -> String:
-	return "{x} × {y} × {z}" .format({
+	return "{x} x {y} x {z}" .format({
 		"x": LocalizationService.format_decimal(v.x, 2),
 		"y": LocalizationService.format_decimal(v.y, 2),
 		"z": LocalizationService.format_decimal(v.z, 2)
@@ -835,15 +835,15 @@ func _update_model_info_display(info: Dictionary) -> void:
 
 	var mesh_state: String
 	if bool(info["watertight"]):
-		mesh_state = "[color=#79C98B]" + LocalizationService.tr_key("model_weight.watertight", "✓ Watertight") + "[/color]"
+		mesh_state = "[color=#79C98B]" + LocalizationService.tr_key("model_weight.watertight", "[OK] Watertight") + "[/color]"
 	elif int(info["non_manifold_edges"]) > 0:
-		mesh_state = "[color=#E6A85C]" + LocalizationService.tr_key("model_weight.non_manifold", "⚠ Non-manifold mesh") + "[/color] " + LocalizationService.tr_format(
+		mesh_state = "[color=#E6A85C]" + LocalizationService.tr_key("model_weight.non_manifold", "WARNING Non-manifold mesh") + "[/color] " + LocalizationService.tr_format(
 			"model_weight.mesh_edges",
 			{"open": int(info["boundary_edges"]), "non_manifold": int(info["non_manifold_edges"])},
 			"(open edges: {open}, non-manifold edges: {non_manifold})"
 		)
 	else:
-		mesh_state = "[color=#E6A85C]" + LocalizationService.tr_key("model_weight.open_mesh", "⚠ Open / non-watertight mesh") + "[/color] " + LocalizationService.tr_format(
+		mesh_state = "[color=#E6A85C]" + LocalizationService.tr_key("model_weight.open_mesh", "WARNING Open / non-watertight mesh") + "[/color] " + LocalizationService.tr_format(
 			"model_weight.open_edges",
 			{"open": int(info["boundary_edges"])},
 			"(open edges: {open})"
@@ -865,7 +865,7 @@ func _update_model_info_display(info: Dictionary) -> void:
 			"original": _format_vec3(info["source_size"]),
 			"normalized": _format_vec3(info["normalized_size"])
 		},
-		"[b]{format}[/b]   •   {mesh_state}   •   {triangles}   •   {vertices}\nOriginal bounds: {original}   →   Normalized: {normalized} mm"
+		"[b]{format}[/b]    |    {mesh_state}    |    {triangles}    |    {vertices}\nOriginal bounds: {original}   ->   Normalized: {normalized} mm"
 	)
 
 
@@ -922,9 +922,9 @@ func _load_selected(path: String) -> void:
 	confirm_orientation_button.disabled = false
 
 	if bool(imported_mesh_info["watertight"]):
-		import_state_label.text = LocalizationService.tr_key("model_weight.model_imported", "Model: imported ✓")
+		import_state_label.text = LocalizationService.tr_key("model_weight.model_imported", "Model: imported [OK]")
 	else:
-		import_state_label.text = LocalizationService.tr_key("model_weight.model_imported_warning", "Model: imported with mesh warning ⚠")
+		import_state_label.text = LocalizationService.tr_key("model_weight.model_imported_warning", "Model: imported with mesh warning WARNING")
 
 	ready_state_label.text = LocalizationService.tr_key("model_weight.status_confirm_orientation", "Status: confirm orientation")
 	status.text = LocalizationService.tr_key("model_weight.imported_confirm", "Imported. Confirm model orientation before generating.")
@@ -1088,8 +1088,8 @@ func _reset_preview_orientation() -> void:
 func _mark_orientation_dirty() -> void:
 	if orientation_confirmed:
 		orientation_confirmed = false
-		orientation_state.text = LocalizationService.tr_key("model_weight.orientation_changed", "Orientation: changed — confirm again")
-		ready_state_label.text = LocalizationService.tr_key("model_weight.status_orientation_changed", "Status: orientation changed — confirm again")
+		orientation_state.text = LocalizationService.tr_key("model_weight.orientation_changed", "Orientation: changed - confirm again")
+		ready_state_label.text = LocalizationService.tr_key("model_weight.status_orientation_changed", "Status: orientation changed - confirm again")
 		generate_button.disabled = true
 
 func _confirm_orientation() -> void:
@@ -1098,8 +1098,8 @@ func _confirm_orientation() -> void:
 
 	confirmed_orientation = preview_pivot.transform.basis.orthonormalized()
 	orientation_confirmed = true
-	orientation_state.text = LocalizationService.tr_key("model_weight.orientation_confirmed", "Orientation: confirmed ✓")
-	ready_state_label.text = LocalizationService.tr_key("model_weight.status_ready", "Status: ready to generate ✓")
+	orientation_state.text = LocalizationService.tr_key("model_weight.orientation_confirmed", "Orientation: confirmed [OK]")
+	ready_state_label.text = LocalizationService.tr_key("model_weight.status_ready", "Status: ready to generate [OK]")
 	generate_button.disabled = false
 	status.text = LocalizationService.tr_key("model_weight.orientation_ready", "Orientation confirmed. Ready to generate.")
 
@@ -1469,7 +1469,7 @@ func _generate() -> void:
 				status.text += LocalizationService.tr_format(
 					"model_weight.convergence",
 					{"delta": LocalizationService.format_decimal(delta * 100.0, 3), "stable": stable_checks, "required": int(profile["stable_checks_required"])},
-					" | convergence Δ {delta}% ({stable}/{required})"
+					" | convergence delta {delta}% ({stable}/{required})"
 				)
 
 				if stable_checks >= int(profile["stable_checks_required"]):

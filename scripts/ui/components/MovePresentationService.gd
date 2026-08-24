@@ -59,7 +59,7 @@ static func build_tooltip(
         (
             "Damage: "
             + (
-                "—"
+                "-"
                 if damage_value == null
                 else str(
                     int(
@@ -89,7 +89,7 @@ static func build_tooltip(
 
         for effect_text: String in effects:
             lines.append(
-                "• " + effect_text
+                " |  " + effect_text
             )
 
     return "\n".join(
@@ -128,7 +128,7 @@ static func format_energy_cost(
                     "normal"
                 )
             ).capitalize()
-            + " ×"
+            + " x"
             + str(
                 int(
                     entry.get(

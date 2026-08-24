@@ -90,7 +90,7 @@ text = "Test Layout"
 [node name="BackToPreparationButton" type="Button" parent="Margin/Main/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "← Back to Preparation"
+text = "<- Back to Preparation"
 
 [node name="RestartButton" type="Button" parent="Margin/Main/Header"]
 unique_name_in_owner = true
@@ -231,13 +231,13 @@ text = "Pikachu"
 [node name="PlayerTypeLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Type: —"
+text = "Type: -"
 
 [node name="PlayerWeaknessLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
-text = "Weakness: —"
+text = "Weakness: -"
 
 [node name="PlayerHpBar" type="ProgressBar" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
 unique_name_in_owner = true
@@ -287,13 +287,13 @@ text = "Squirtle"
 [node name="EnemyTypeLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Type: —"
+text = "Type: -"
 
 [node name="EnemyWeaknessLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
-text = "Weakness: —"
+text = "Weakness: -"
 
 [node name="EnemyHpBar" type="ProgressBar" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
 unique_name_in_owner = true
@@ -357,7 +357,7 @@ layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 theme_override_font_sizes/font_size = 15
-text = "Turn 1 — YOUR TURN • Choose a Move"
+text = "Turn 1 - YOUR TURN  |  Choose a Move"
 
 [node name="ResultPanel" type="PanelContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn"]
 unique_name_in_owner = true
@@ -386,7 +386,7 @@ text = "Turns: 0"
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
-text = "YOU 0 / 0 HP   •   AI 0 / 0 HP"
+text = "YOU 0 / 0 HP    |    AI 0 / 0 HP"
 
 [node name="ResultActions" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ResultPanel/ResultBox"]
 layout_mode = 2
@@ -477,7 +477,7 @@ theme_override_constants/margin_bottom = 6
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "能量 requirement"
+text = "Energy requirement"
 
 
 [node name="CharakoroFeedbackPanel" type="MarginContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox"]

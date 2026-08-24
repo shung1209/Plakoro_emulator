@@ -15,6 +15,18 @@ const BUILTIN_LANGUAGE_DIR: String = (
 )
 const DEFAULT_LOCALE: String = "en_US"
 const SCHEMA_VERSION: String = "1.0"
+const WEB_SUPPORTED_LOCALES: Array[String] = [
+	"en_US",
+	"es_ES",
+	"zh_TW",
+	"ja_JP",
+]
+const NOTO_SANS_JP_PATH: String = (
+	"res://assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"
+)
+const NOTO_SANS_TC_PATH: String = (
+	"res://assets/fonts/NotoSansTC/NotoSansTC-Regular.ttf"
+)
 
 
 var current_locale: String = DEFAULT_LOCALE
@@ -61,6 +73,8 @@ func reload_languages() -> void:
 	locales.sort()
 
 	for locale: String in locales:
+		if OS.has_feature("web") and locale not in WEB_SUPPORTED_LOCALES:
+			continue
 		available_languages.append(
 			(locale_map[locale] as Dictionary).duplicate(true)
 		)
@@ -80,6 +94,8 @@ func set_locale(
 ) -> bool:
 	var normalized: String = locale.strip_edges()
 	if normalized.is_empty():
+		normalized = DEFAULT_LOCALE
+	if OS.has_feature("web") and normalized not in WEB_SUPPORTED_LOCALES:
 		normalized = DEFAULT_LOCALE
 
 	var document: Dictionary = _load_language_document(
@@ -169,6 +185,8 @@ func set_locale(
 					fallback_strings[key] = (
 						english_document["strings"][raw_key]
 					)
+
+	_apply_locale_font(current_locale)
 
 	if persist:
 		_save_selected_locale()
@@ -636,6 +654,52 @@ func _ensure_user_language_directory() -> void:
 		)
 
 
+func _apply_locale_font(locale: String) -> void:
+	var primary_path: String = NOTO_SANS_JP_PATH
+	var fallback_path: String = NOTO_SANS_TC_PATH
+	if locale == "zh_TW":
+		primary_path = NOTO_SANS_TC_PATH
+		fallback_path = NOTO_SANS_JP_PATH
+
+	var primary: Font = load(primary_path) as Font
+	var fallback: Font = load(fallback_path) as Font
+	if primary == null:
+		push_warning(
+			"LocalizationService: bundled locale font missing: "
+			+ primary_path
+		)
+		return
+
+	var fallbacks: Array[Font] = []
+	if fallback != null:
+		fallbacks.append(fallback)
+	primary.fallbacks = fallbacks
+	ThemeDB.fallback_font = primary
+	_apply_font_to_existing_themes(primary)
+
+
+func _apply_font_to_existing_themes(font: Font) -> void:
+	if font == null:
+		return
+	var tree: SceneTree = get_tree()
+	if tree == null:
+		return
+	var root: Window = tree.root
+	if root == null:
+		return
+	_apply_font_recursive(root, font)
+
+
+func _apply_font_recursive(node: Node, font: Font) -> void:
+	if node is Control:
+		var control := node as Control
+		if control.theme != null:
+			control.theme.default_font = font
+		control.queue_redraw()
+	for child: Node in node.get_children():
+		_apply_font_recursive(child, font)
+
+
 func _load_selected_locale() -> String:
 	var settings: Dictionary = (
 		_read_json_dictionary(
@@ -675,6 +739,16 @@ func _save_selected_locale() -> void:
 
 
 func _initial_locale() -> String:
+	if OS.has_feature("web"):
+		var browser_locale: String = OS.get_locale().to_lower()
+		if browser_locale.begins_with("zh"):
+			return "zh_TW"
+		if browser_locale.begins_with("ja"):
+			return "ja_JP"
+		if browser_locale.begins_with("es"):
+			return "es_ES"
+		return DEFAULT_LOCALE
+
 	var os_locale: String = OS.get_locale()
 
 	if os_locale.begins_with(

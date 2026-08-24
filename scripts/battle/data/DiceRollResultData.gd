@@ -8,6 +8,7 @@ var kyokoro_orientation: StringName = &""
 # The normal kyokoro_orientation above is always roll #1.
 var additional_kyokoro_orientations: Array = []
 var opponent_kyokoro_orientation: StringName = &""
+var opponent_kyokoro_orientations: Array = []
 var opponent_kyokoro_roll_triggered: bool = false
 var selected_opponent_move_name_id: StringName = &""
 var opponent_enerkoro_roll_triggered: bool = false

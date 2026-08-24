@@ -22,6 +22,9 @@ const MOVE_LOCK: StringName = (
 const KYOKORO_DISABLE: StringName = (
     &"kyokoro_disable"
 )
+const KYOKORO_FORCED_ORIENTATION: StringName = (
+    &"kyokoro_forced_orientation"
+)
 
 const TIMING_NEXT_OWNER_TURN: StringName = (
     &"next_owner_turn"
@@ -185,6 +188,27 @@ static func consume_kyokoro_disable(
             false
         )
     )
+
+
+static func consume_forced_kyokoro_orientation(
+    participant: Variant
+) -> StringName:
+    var statuses: Array = (
+        participant.status_container.get_by_type_and_timing(
+            KYOKORO_FORCED_ORIENTATION,
+            TIMING_NEXT_OWNER_TURN
+        )
+    )
+    if statuses.is_empty():
+        return &""
+
+    var status: Variant = statuses[0]
+    var orientation: StringName = StringName(
+        status.parameters.get("orientation", "")
+    )
+    status.consume_use()
+    participant.status_container.remove_expired()
+    return orientation
 
 
 static func has_repeat_permission(

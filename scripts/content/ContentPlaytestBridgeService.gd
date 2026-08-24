@@ -35,6 +35,14 @@ const AI_LOADOUT_PATH: String = (
     "user://user_database/loadouts/ai_battle_loadout.json"
 )
 
+const FREE_MODE_PLAYER_LOADOUT_PATH: String = (
+    "user://user_database/loadouts/free_mode_player_battle_loadout.json"
+)
+
+const FREE_MODE_AI_LOADOUT_PATH: String = (
+    "user://user_database/loadouts/free_mode_ai_battle_loadout.json"
+)
+
 const DATABASE_DICE_DIRECTORY: String = (
     "res://database/dice_setups"
 )
@@ -47,9 +55,37 @@ const PLAYER_CUSTOM_DICE_PATH: String = (
     "user://user_database/dice_setups/player_energy_dice_setup.json"
 )
 
+const FREE_MODE_PLAYER_CUSTOM_DICE_PATH: String = (
+    "user://user_database/dice_setups/free_mode_player_energy_dice_setup.json"
+)
+
 const FALLBACK_DICE_PATH: String = (
     "res://database/dice_setups/pikachu_default.json"
 )
+
+
+static func get_player_loadout_path() -> String:
+    return (
+        FREE_MODE_PLAYER_LOADOUT_PATH
+        if GameFlow.free_mode
+        else PLAYER_LOADOUT_PATH
+    )
+
+
+static func get_ai_loadout_path() -> String:
+    return (
+        FREE_MODE_AI_LOADOUT_PATH
+        if GameFlow.free_mode
+        else AI_LOADOUT_PATH
+    )
+
+
+static func get_player_custom_dice_path() -> String:
+    return (
+        FREE_MODE_PLAYER_CUSTOM_DICE_PATH
+        if GameFlow.free_mode
+        else PLAYER_CUSTOM_DICE_PATH
+    )
 
 
 static func create_playtest_loadout(
@@ -188,7 +224,7 @@ static func create_playtest_loadout(
         "pokemon_default":
             dice_path = get_pokemon_default_dice_path(pokemon)
         "player_custom":
-            dice_path = PLAYER_CUSTOM_DICE_PATH
+            dice_path = get_player_custom_dice_path()
         _:
             return {
                 "success": false,
@@ -241,7 +277,7 @@ static func create_playtest_loadout(
 
     if not LOADOUT_SAVE.save_loadout(
         loadout,
-        PLAYER_LOADOUT_PATH
+        get_player_loadout_path()
     ):
         return {
             "success": false,
@@ -255,7 +291,7 @@ static func create_playtest_loadout(
         "pokemon_id": pokemon_id,
         "move_ids": move_ids,
         "dice_path": dice_path,
-        "loadout_path": PLAYER_LOADOUT_PATH
+        "loadout_path": get_player_loadout_path()
     }
 
 
@@ -281,7 +317,7 @@ static func has_pokemon_default_dice(
 
 
 static func has_player_custom_dice() -> bool:
-    return FileAccess.file_exists(PLAYER_CUSTOM_DICE_PATH)
+    return FileAccess.file_exists(get_player_custom_dice_path())
 
 
 static func list_playtest_opponents(
@@ -480,7 +516,9 @@ static func create_playtest_opponent_loadout(
         }
 
     var dice_path: String = (
-        _find_dice_setup_path(
+        get_pokemon_default_dice_path(pokemon)
+        if GameFlow.free_mode
+        else _find_dice_setup_path(
             pokemon,
             false
         )
@@ -542,7 +580,7 @@ static func create_playtest_opponent_loadout(
 
     if not AI_LOADOUT_SAVE.save_loadout(
         loadout,
-        AI_LOADOUT_PATH
+        get_ai_loadout_path()
     ):
         return {
             "success": false,
@@ -559,7 +597,7 @@ static func create_playtest_opponent_loadout(
         "difficulty": String(
             difficulty
         ),
-        "loadout_path": AI_LOADOUT_PATH
+        "loadout_path": get_ai_loadout_path()
     }
 
 

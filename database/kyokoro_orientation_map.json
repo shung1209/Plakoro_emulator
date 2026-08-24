@@ -1,7 +1,7 @@
 {
   "schema_version": "2.2",
   "description": "Canonical ST/EB01 Kyokoro effect/orientation mapping synced from the completed hand-reviewed Excel.",
-  "source_workbook": "ST_EB01_Kyokoro_Orientation_Mapping_new(1).xlsx",
+  "source_workbook": "ST_EB01_Kyokoro_Orientation_Mapping_new(4).xlsx",
   "orientations": [
     {
       "id": "FACE_UP",
@@ -1413,6 +1413,110 @@
         ],
         "runtime_status": "roll_orchestration_pending"
       }
+    ],
+    "gengar_sinister_shot_stw07_001": [
+      "HEAD_UP",
+      "FACE_UP",
+      "FACE_DOWN"
+    ],
+    "gengar_headstand_stw07_002": [
+      "HEAD_UP",
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "gengar_ghost_trick_stw07_003": [
+      "HEAD_UP",
+      "HEAD_DOWN",
+      "FACE_UP",
+      "FACE_DOWN"
+    ],
+    "gengar_shadow_bind_stw07_004": [
+      "HEAD_UP",
+      "FACE_UP",
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "gengar_gas_surround_stw07_005": [
+      "HEAD_UP",
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "gengar_psywave_stw07_006": [
+      "HEAD_UP"
+    ],
+    "gengar_sludge_bomb_stw07_007": [
+      "HEAD_UP",
+      "FACE_UP",
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "metagross_beam_stw08_001": [],
+    "metagross_arithmetic_stw08_002": [
+      "HEAD_UP",
+      "FACE_UP",
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "metagross_area_suppression_stw08_003": [
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "metagross_direct_stamp_stw08_004": [
+      "HEAD_UP",
+      "FACE_UP",
+      "FACE_DOWN"
+    ],
+    "metagross_meteor_mash_stw08_005": [
+      "HEAD_UP",
+      "FACE_UP"
+    ],
+    "metagross_heavy_slam_stw08_006": [
+      [
+        "HEAD_UP",
+        "HEAD_LEFT",
+        "HEAD_RIGHT"
+      ],
+      [
+        "HEAD_DOWN",
+        "FACE_UP",
+        "FACE_DOWN"
+      ]
+    ],
+    "metagross_explosion_stw08_007": [
+      "HEAD_UP"
+    ],
+    "lucario_kick_stw09_001": [
+      "HEAD_UP",
+      "FACE_UP",
+      "FACE_DOWN"
+    ],
+    "lucario_force_palm_stw09_002": [
+      "HEAD_UP",
+      "FACE_UP"
+    ],
+    "lucario_aura_knuckle_stw09_003": [
+      "HEAD_UP",
+      "FACE_UP",
+      "FACE_DOWN"
+    ],
+    "lucario_rolling_kick_stw09_004": [
+      "HEAD_UP",
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "lucario_aura_thrust_stw09_005": [
+      "HEAD_UP",
+      "FACE_UP",
+      "HEAD_LEFT",
+      "HEAD_RIGHT"
+    ],
+    "lucario_aura_sphere_stw09_006": [
+      "HEAD_UP",
+      "FACE_UP",
+      "FACE_DOWN"
+    ],
+    "lucario_metal_claw_stw09_007": [
+      "HEAD_UP"
     ]
   }
 }

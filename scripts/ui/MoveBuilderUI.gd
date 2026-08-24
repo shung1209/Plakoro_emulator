@@ -665,7 +665,7 @@ func _refresh_validation() -> void:
 
     if bool(result["success"]):
         validation_label.text = (
-            "READY — Move selection is valid."
+            "READY - Move selection is valid."
         )
         continue_button.disabled = false
 
@@ -694,9 +694,9 @@ func _refresh_live_analysis() -> void:
         player_loadout_data == null
         or player_loadout_data.energy_dice_setup == null
     ):
-        overall_rating_label.text = "☆☆☆☆☆  No Dice Setup"
-        overall_probability_label.text = "Overall coverage: —"
-        energy_usage_label.text = "Energy Usage\n—"
+        overall_rating_label.text = "-----  No Dice Setup"
+        overall_probability_label.text = "Overall coverage: -"
+        energy_usage_label.text = "Energy Usage\n-"
         return
 
     var analysis: Dictionary = (
@@ -1055,7 +1055,7 @@ func _format_move_cost(
             )
             + " "
             + String(cost.energy_type)
-            + "×"
+            + "x"
             + str(int(cost.count))
         )
 
@@ -1066,7 +1066,7 @@ func _format_damage(
     move_card: Variant
 ) -> String:
     if move_card.printed_damage == null:
-        return "—"
+        return "-"
 
     return str(
         int(move_card.printed_damage)
@@ -1095,7 +1095,7 @@ func _format_energy_usage(
             _energy_icon(energy_type)
             + " "
             + String(energy_type)
-            + " × "
+            + " x "
             + str(
                 int(
                     energy_usage[raw_energy]
@@ -1113,9 +1113,9 @@ func _stars_text(
 
     for index: int in range(5):
         text += (
-            "★"
+            "*"
             if index < filled_count
-            else "☆"
+            else "-"
         )
 
     return text
@@ -1142,7 +1142,7 @@ func _energy_icon(
 ) -> String:
     match energy_type:
         &"normal":
-            return "☆"
+            return "-"
         &"grass":
             return "Grass"
         &"fire":
@@ -1162,4 +1162,4 @@ func _energy_icon(
         &"flying":
             return "Flying"
         _:
-            return "•"
+            return " | "

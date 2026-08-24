@@ -1,0 +1,31 @@
+{
+  "available_move_card_ids": [
+    "lucario_kick_stw09_001",
+    "lucario_force_palm_stw09_002",
+    "lucario_aura_knuckle_stw09_003",
+    "lucario_rolling_kick_stw09_004",
+    "lucario_aura_thrust_stw09_005",
+    "lucario_aura_sphere_stw09_006",
+    "lucario_metal_claw_stw09_007"
+  ],
+  "display_name": "Lucario",
+  "id": "lucario_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "fighting",
+  "schema_version": "2.0",
+  "species_id": "lucario",
+  "weaknesses": [
+    {
+      "attack_type": "fire",
+      "bonus_damage": 20.0
+    }
+  ],
+  "review": {
+    "status": "v2.2_verified_weakness",
+    "notes": [
+      "Kyokoro uses standard_equal until a measured profile is available.",
+      "Lucario weakness verified as Fire +20."
+    ]
+  }
+}

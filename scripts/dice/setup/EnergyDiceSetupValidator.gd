@@ -7,7 +7,8 @@ const REQUIRED_FIXED_ENERGY_COUNT: int = 6
 
 static func validate(
     setup: Variant,
-    valid_energy_types: Array
+    valid_energy_types: Array,
+    allow_repeated_fixed_energy: bool = false
 ) -> Dictionary:
     var result: Dictionary = {
         "success": true,
@@ -52,6 +53,13 @@ static func validate(
             valid_energy_types,
             "Die %d fixed B" % (index + 1)
         )
+
+        if StringName(die_data.fixed_a) == StringName(die_data.fixed_b):
+            _add_error(
+                result,
+                "Die %d fixed A and fixed B must use different Energy types."
+                % (index + 1)
+            )
 
         fixed_energies.append(
             StringName(die_data.fixed_a)
@@ -98,7 +106,10 @@ static func validate(
             "Die %d single B" % (index + 1)
         )
 
-    if fixed_energies.size() == REQUIRED_FIXED_ENERGY_COUNT:
+    if (
+        not allow_repeated_fixed_energy
+        and fixed_energies.size() == REQUIRED_FIXED_ENERGY_COUNT
+    ):
         var unique_fixed: Dictionary = {}
 
         for energy_type: StringName in fixed_energies:

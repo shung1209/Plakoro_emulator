@@ -66,12 +66,10 @@ offset_right = -28.0
 offset_bottom = 70.0
 grow_horizontal = 2
 
-[node name="Brand" type="Label" parent="TopBar"]
+[node name="TopBarSpacer" type="Control" parent="TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.32, 0.82, 1, 1)
-theme_override_font_sizes/font_size = 20
-text = "PLAKORO"
+mouse_filter = 2
 
 [node name="ThemeOption" type="OptionButton" parent="TopBar"]
 unique_name_in_owner = true
@@ -116,13 +114,13 @@ layout_mode = 2
 mouse_filter = 2
 color = Color(0.14, 0.75, 1, 1)
 
-[node name="TitleLabel" type="Label" parent="Center/MenuPanel/Margin/Menu"]
+[node name="TitleLabel" type="TextureRect" parent="Center/MenuPanel/Margin/Menu"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.97, 1, 1)
-theme_override_font_sizes/font_size = 54
-text = "PLAKORO"
-horizontal_alignment = 1
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="SubtitleLabel" type="Label" parent="Center/MenuPanel/Margin/Menu"]
 unique_name_in_owner = true

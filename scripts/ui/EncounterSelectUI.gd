@@ -12,6 +12,7 @@ const PLAYER_LOADOUT_PROVIDER: Script = preload(
 )
 
 
+@onready var brand_label: Label = $TopBar/Brand
 @onready var page_title: Label = %PageTitle
 @onready var page_subtitle: Label = %PageSubtitle
 @onready var progress_label: Label = %ProgressLabel
@@ -27,6 +28,10 @@ func _ready() -> void:
 
 
 func _apply_localized_text() -> void:
+	brand_label.text = LocalizationService.tr_key(
+		"encounter_select.mode_label",
+		"Story Mode"
+	)
 	page_title.text = LocalizationService.tr_key(
 		"encounter_select.title",
 		"CHOOSE YOUR NEXT BATTLE"
@@ -133,7 +138,7 @@ func _encounter_button_text(
 	if self_match:
 		status = LocalizationService.tr_key(
 			"encounter_select.self_match",
-			"CHANGE PLAKORO • You cannot battle yourself"
+			"CHANGE PLAKORO  |  You cannot battle yourself"
 		)
 	elif completed:
 		status = LocalizationService.tr_key(
@@ -148,9 +153,9 @@ func _encounter_button_text(
 	else:
 		status = LocalizationService.tr_key(
 			"encounter_select.locked",
-			"LOCKED • Win the previous encounter"
+			"LOCKED  |  Win the previous encounter"
 		)
-	return "%s — %s\n%s • %s\n%s" % [
+	return "%s - %s\n%s  |  %s\n%s" % [
 		stage_text,
 		title,
 		opponent,

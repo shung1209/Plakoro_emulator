@@ -27,17 +27,29 @@ func _ready() -> void:
 
     _bootstrap_language_files()
 
-    var shortcut: Dictionary = USER_DATABASE_SHORTCUT.ensure_shortcut()
-    if bool(shortcut.get("created", false)):
+    var weakness_migration: Dictionary = USER_DATABASE.migrate_v22_corrected_weaknesses()
+    if not bool(weakness_migration.get("success", false)):
+        for message: Variant in weakness_migration.get("errors", []):
+            push_error("UserDatabaseBootstrap weakness correction: " + String(message))
+    elif not (weakness_migration.get("updated", []) as Array).is_empty():
         print(
-            "UserDatabaseBootstrap: user_database_link → ",
-            shortcut.get("target_path", "")
+            "UserDatabaseBootstrap: corrected v2.2 Pokemon weakness data in ",
+            (weakness_migration.get("updated", []) as Array).size(),
+            " user JSON file(s)."
         )
-    elif not bool(shortcut.get("success", false)):
-        push_warning(
-            "UserDatabaseBootstrap shortcut: "
-            + String(shortcut.get("message", "Unknown shortcut error."))
-        )
+
+    if not OS.has_feature("web"):
+        var shortcut: Dictionary = USER_DATABASE_SHORTCUT.ensure_shortcut()
+        if bool(shortcut.get("created", false)):
+            print(
+                "UserDatabaseBootstrap: user_database_link → ",
+                shortcut.get("target_path", "")
+            )
+        elif not bool(shortcut.get("success", false)):
+            push_warning(
+                "UserDatabaseBootstrap shortcut: "
+                + String(shortcut.get("message", "Unknown shortcut error."))
+            )
 
     var retired_cleanup: Dictionary = USER_DATABASE.remove_retired_test_content()
     if not bool(retired_cleanup.get("success", false)):

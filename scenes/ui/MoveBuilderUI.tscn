@@ -77,7 +77,7 @@ text = "Discard Draft"
 [node name="BackButton" type="Button" parent="Margin/Main/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "← Back to Preparation"
+text = "<- Back to Preparation"
 
 [node name="ContentScroll" type="ScrollContainer" parent="Margin/Main"]
 layout_mode = 2
@@ -224,18 +224,18 @@ theme_override_constants/separation = 6
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "☆☆☆☆☆ No Analysis"
+text = "----- No Analysis"
 
 [node name="OverallProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/OverallPanel/OverallBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Overall coverage: —"
+text = "Overall coverage: -"
 
 [node name="EnergyUsageLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightScroll/RightColumn/OverallPanel/OverallBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
-text = "能量 Usage"
+text = "Energy Usage"
 
 [node name="ValidationPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content"]
 layout_mode = 2

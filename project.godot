@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="PLAKORO"
+config/name="PLAKORO Adventures"
 run/main_scene="res://scenes/game/MainMenuUI.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/show_image=false
@@ -25,13 +25,14 @@ ContentStudioAccess="*res://scripts/game/ContentStudioAccess.gd"
 EncounterSession="*res://scripts/game/EncounterSession.gd"
 GameFlow="*res://scripts/game/GameFlow.gd"
 PlayerProgress="*res://scripts/game/PlayerProgress.gd"
+UIInteractionMotion="*res://scripts/ui/UIInteractionMotion.gd"
+WebUIUsability="*res://scripts/ui/WebUIUsability.gd"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
 
 [physics]
 

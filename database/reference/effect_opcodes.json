@@ -28,6 +28,12 @@
     "energy_dice.modify": {
       "description": "Create an energy-dice modifier status."
     },
+    "kyokoro.force_next_orientation": {
+      "description": "Force the acting Kyokoro to use a selected orientation on its next roll.",
+      "required_args": [
+        "orientation"
+      ]
+    },
     "move.repeat_permission": {
       "description": "Create a repeat-move permission status."
     },

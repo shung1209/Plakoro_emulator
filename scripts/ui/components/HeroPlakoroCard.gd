@@ -29,8 +29,8 @@ func setup(
     if pokemon == null:
         name_label.text = "Unknown PLAKORO"
         id_label.text = ""
-        hp_label.text = "HP —"
-        type_label.text = "Type —"
+        hp_label.text = "HP -"
+        type_label.text = "Type -"
         source_label.text = "Presentation: unavailable"
         PRESENTATION.present(
             visual_slot,
@@ -74,7 +74,7 @@ func setup(
     hp_label.text = (
         "HP " + str(int(hp_value))
         if hp_value != null
-        else "HP —"
+        else "HP -"
     )
 
     var type_value: Variant = _first_property(
@@ -91,7 +91,7 @@ func setup(
     type_label.text = (
         "Type: " + String(type_value)
         if type_value != null
-        else "Type: —"
+        else "Type: -"
     )
 
     var presentation_result: Dictionary = (

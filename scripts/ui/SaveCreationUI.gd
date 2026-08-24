@@ -103,7 +103,7 @@ func _choose_starter(starter_pokemon_id: StringName) -> void:
 			LocalizationService.tr_format(
 				"save_creation.energy_primary_nine",
 				{"primary": GameContentLocalizationService.localize_type(primary_energy)},
-				"{primary} ×9"
+				"{primary} x9"
 			)
 			if StringName(energy) == primary_energy
 			else LocalizationService.tr_format(
@@ -112,7 +112,7 @@ func _choose_starter(starter_pokemon_id: StringName) -> void:
 					"primary": GameContentLocalizationService.localize_type(primary_energy),
 					"alternate": GameContentLocalizationService.localize_type(StringName(energy))
 				},
-				"{primary} ×8 + {alternate} ×1"
+				"{primary} x8 + {alternate} x1"
 			)
 		)
 		button.pressed.connect(_create_save.bind(StringName(energy)))

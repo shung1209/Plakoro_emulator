@@ -1,0 +1,76 @@
+{
+  "schema_version": "2.0",
+  "id": "gengar_headstand_stw07_002",
+  "move_name_id": "headstand",
+  "owner_id": "gengar",
+  "display_name": "Headstand",
+  "move_category": "attack",
+  "attack_type": "dark",
+  "energy_cost": [
+    {
+      "energy_type": "dark",
+      "count": 2
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "dark",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "kyokoro.force_next_orientation",
+          "args": {
+            "target": "opponent",
+            "orientation": "HEAD_DOWN"
+          }
+        }
+      ],
+      "raw_text": "On the opponent's next turn, their Charakoro orientation becomes HEAD_DOWN."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST07-ST09 preview / supplied workbook",
+    "page": null,
+    "card_code": "STW07-002",
+    "raw_text": "Kyokoro Effect: On the opponent's next turn, their Charakoro orientation becomes HEAD_DOWN.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "On the opponent's next turn, their Charakoro orientation becomes HEAD_DOWN."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(4).xlsx",
+    "reference_url": "https://pla-koro.com/moves?p=gengar"
+  },
+  "review": {
+    "status": "v2.2_new_user_mapping",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": true,
+    "notes": [
+      "Move data and orientation mapping transcribed from the user-supplied workbook rows 127-148.",
+      "English move name is provisional unless it matches an established Pokémon move name or the public source.",
+      "Some newly revealed effects require runtime support and are preserved in special_effects for follow-up implementation."
+    ]
+  },
+  "special_effects": []
+}

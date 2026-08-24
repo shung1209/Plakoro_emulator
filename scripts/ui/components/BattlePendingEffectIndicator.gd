@@ -105,7 +105,7 @@ func _badge_text(
                             effect.duration_turns
                         )
                     },
-                    "TURN ×{count}"
+                    "TURN x{count}"
                 )
 
     return LocalizationService.tr_key("battle.pending.active", "ACTIVE")

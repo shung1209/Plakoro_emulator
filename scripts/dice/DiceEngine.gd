@@ -49,7 +49,8 @@ func roll_battle_dice(
 	energy_die_profiles: Array,
 	kyokoro_profile: Variant,
 	energy_dice_count_modifier: int = 0,
-	kyokoro_enabled: bool = true
+	kyokoro_enabled: bool = true,
+	forced_kyokoro_orientation: StringName = &""
 ) -> Variant:
 	if energy_die_profiles.is_empty():
 		push_error(
@@ -138,7 +139,9 @@ func roll_battle_dice(
 
 	if kyokoro_enabled:
 		dice_result.kyokoro_orientation = (
-			KYOKORO_ROLLER.roll(
+			forced_kyokoro_orientation
+			if forced_kyokoro_orientation != &""
+			else KYOKORO_ROLLER.roll(
 				kyokoro_profile,
 				reference_data,
 				rng

@@ -90,7 +90,7 @@ static func format_event(
 			)
 
 		&"damage_applied":
-			return "%s took [color=%s][b]%d damage[/b][/color] — HP %d." % [
+			return "%s took [color=%s][b]%d damage[/b][/color] - HP %d." % [
 				_actor_tag(
 					StringName(
 						event.target_participant_id
@@ -117,7 +117,7 @@ static func format_event(
 			]
 
 		&"hp_restored":
-			return "%s restored [color=%s][b]%d HP[/b][/color] — HP %d." % [
+			return "%s restored [color=%s][b]%d HP[/b][/color] - HP %d." % [
 				_actor_tag(
 					StringName(
 						event.target_participant_id
@@ -190,7 +190,7 @@ static func format_event(
 			)
 
 			return (
-                "[color=%s][b]Battle finished — Winner: %s[/b][/color]"
+                "[color=%s][b]Battle finished - Winner: %s[/b][/color]"
 				% [
 					RESULT_COLOR,
 					_actor_tag(

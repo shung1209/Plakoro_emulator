@@ -775,6 +775,24 @@
     "opcode.dice_energy": "ダイス / エネルギー",
     "global_quit.title": "終了 PLAKORO?",
     "global_quit.message": "ゲームを終了しますか？",
-    "global_quit.exit": "終了"
+    "global_quit.exit": "終了",
+    "encounter_select.mode_label": "ストーリーモード",
+    "preparation.allow_repeated_fixed_energy": "Fixed Energy の重複を許可",
+    "enerkoro_builder.hint_repeat": "Free Mode：有効にすると、別々の Enerkoro で同じ Fixed Energy を使用できます。",
+    "enerkoro_builder.allow_repeated_fixed_energy": "Fixed Energy の重複を許可",
+    "common.use": "使用",
+    "battle.dice_colors": "Enerkoro カラー",
+    "battle.enerkoro_color_hint": "Enerkoro {index} の背景色を選択します。",
+    "energy.fire": "ほのお",
+    "energy.water": "みず",
+    "energy.grass": "くさ",
+    "energy.electric": "でんき",
+    "energy.psychic": "エスパー",
+    "energy.fighting": "かくとう",
+    "energy.dark": "あく",
+    "energy.steel": "はがね",
+    "energy.flying": "ひこう",
+    "enerkoro_builder.dice_color": "カラー",
+    "enerkoro_builder.dice_color_hint": "Enerkoro {index} のバトル画面での色を選択します。"
   }
 }

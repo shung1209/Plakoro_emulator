@@ -511,7 +511,7 @@ func _populate_move_content(
                 "damage": (
                     str(int(printed_damage))
                     if printed_damage != null
-                    else "—"
+                    else "-"
                 )
             },
             "Damage: {damage}"
@@ -705,7 +705,7 @@ func _format_energy_cost(
 
         parts.append(
             energy_type.capitalize()
-            + " ×"
+            + " x"
             + str(
                 count
             )

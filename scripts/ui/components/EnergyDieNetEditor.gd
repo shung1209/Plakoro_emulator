@@ -25,6 +25,7 @@ var die_index: int = 0
 var setup: Variant = null
 var editor_service: Script = null
 var energy_inventory: Dictionary = {}
+var allow_repeated_fixed_energy: bool = false
 
 var _face_buttons: Dictionary = {}
 var _palette_host: VBoxContainer = null
@@ -39,15 +40,22 @@ func initialize(
     source_setup: Variant,
     source_die_index: int,
     source_editor_service: Script,
-    source_energy_inventory: Dictionary = {}
+    source_energy_inventory: Dictionary = {},
+    source_allow_repeated_fixed_energy: bool = false
 ) -> void:
     setup = source_setup
     die_index = source_die_index
     editor_service = source_editor_service
     energy_inventory = source_energy_inventory.duplicate(true)
+    allow_repeated_fixed_energy = source_allow_repeated_fixed_energy
 
     _build_ui()
     refresh_from_setup()
+
+
+func set_allow_repeated_fixed_energy(value: bool) -> void:
+    allow_repeated_fixed_energy = value
+    close_palette()
 
 
 func refresh_from_setup() -> void:
@@ -499,6 +507,12 @@ func _build_fixed_disabled_reasons(
     for current_die_index: int in range(
         setup.dice.size()
     ):
+        if (
+            allow_repeated_fixed_energy
+            and current_die_index != die_index
+        ):
+            continue
+
         for current_field_id: StringName in FIXED_FIELDS:
             if (
                 current_die_index == die_index

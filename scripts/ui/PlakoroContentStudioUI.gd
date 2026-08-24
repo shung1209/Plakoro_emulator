@@ -362,7 +362,7 @@ func _on_validate_language_packs_pressed() -> void:
 				else "FAIL"
 			)
 		},
-        "Language Pack Validation — {result}"
+        "Language Pack Validation - {result}"
 	)
 	database_integrity_dialog.ok_button_text = LocalizationService.tr_key(
 		"content_studio.close",
@@ -379,7 +379,7 @@ func _on_validate_language_packs_pressed() -> void:
 func _apply_localized_text() -> void:
 	page_title.text = LocalizationService.tr_key("content_studio.title", "PLAKORO Content Studio")
 	validate_database_button.text = LocalizationService.tr_key("content_studio.validate_database", "Validate Database")
-	back_button.text = "← " + LocalizationService.tr_key("content_studio.back_preparation", "Back to Preparation")
+	back_button.text = "<- " + LocalizationService.tr_key("content_studio.back_preparation", "Back to Preparation")
 	pokemon_tab.text = LocalizationService.tr_key("content_studio.pokemon_editor", "Pokémon Editor")
 	kyokoro_tab.text = LocalizationService.tr_key("content_studio.kyokoro_editor", "Charakoro Profile Editor")
 	move_tab.text = LocalizationService.tr_key("content_studio.move_editor", "Move Editor")
@@ -402,8 +402,8 @@ func _apply_localized_text() -> void:
 		["EditDefaultDiceButton", "content_studio.edit_default_enerkoro", "Edit Default Dice"],
 		["RegenerateDefaultDiceButton", "content_studio.regenerate_default_enerkoro", "Regenerate Default Dice"],
 		["MovesTitle", "content_studio.move_loadout", "Move Loadout"],
-		["AddMoveButton", "content_studio.add", "Add →"],
-		["RemoveMoveButton", "content_studio.remove", "← Remove"],
+		["AddMoveButton", "content_studio.add", "Add ->"],
+		["RemoveMoveButton", "content_studio.remove", "<- Remove"],
 		["OpenSelectedMoveButton", "content_studio.open_selected_move", "Open Selected Move"],
 		["WeightsTitle", "content_studio.weights", "Landing Orientation Weights"],
 		["ProfileReferencesTitle", "content_studio.used_by_pokemon", "Used by Pokémon"],
@@ -803,7 +803,7 @@ func _refresh_default_dice_status() -> void:
 					"old_type": GameContentLocalizationService.localize_type(saved_type),
 					"new_type": GameContentLocalizationService.localize_type(selected_type)
 				},
-				" — Pokémon type changed from {old_type} to {new_type}. Existing Dice is preserved until Regenerate."
+				" - Pokémon type changed from {old_type} to {new_type}. Existing Dice is preserved until Regenerate."
 			)
 
 	default_dice_status_label.text = status_text
@@ -934,7 +934,7 @@ func _validate_database_integrity() -> void:
 				else "FAIL"
 			)
 		},
-		"Database Integrity Deep Scan — {result}"
+		"Database Integrity Deep Scan - {result}"
 	)
 
 	database_integrity_dialog.popup_centered(
@@ -1000,9 +1000,9 @@ func _refresh_unsaved_status() -> void:
 		)
 		return
 	unsaved_status_label.text = (
-		"● Unsaved Changes"
+		"* Unsaved Changes"
 		if _has_unsaved_changes()
-		else "✓ Saved"
+		else "[OK] Saved"
 	)
 
 
@@ -1817,14 +1817,14 @@ func _request_delete_selected() -> void:
 		message_lines.append("")
 		message_lines.append(LocalizationService.tr_key("content_studio.what_happens", "What will happen:"))
 		for warning: Variant in warnings:
-			message_lines.append("• " + String(warning))
+			message_lines.append(" |  " + String(warning))
 
 	var blocked: bool = bool(preview.get("blocked", false))
 	if blocked:
 		message_lines.append("")
 		message_lines.append(LocalizationService.tr_key("content_studio.cannot_delete", "This content cannot be deleted:"))
 		for error_text: Variant in preview.get("errors", []):
-			message_lines.append("• " + String(error_text))
+			message_lines.append(" |  " + String(error_text))
 
 	delete_dialog.title = LocalizationService.tr_key("content_studio.delete_user_title", "Delete User Content?")
 	delete_dialog.ok_button_text = LocalizationService.tr_key("content_studio.delete", "Delete")
@@ -2129,7 +2129,7 @@ func _format_validation_errors(
 	lines.append("")
 
 	for raw_error: Variant in raw_errors:
-		lines.append("• " + _friendly_validation_error(String(raw_error)))
+		lines.append(" |  " + _friendly_validation_error(String(raw_error)))
 
 	return "\n".join(lines)
 
@@ -3281,7 +3281,7 @@ func _refresh_move_card_preview(
 
 	move_preview_meta.text = (
 		attack_type.capitalize()
-		+ "  •  "
+		+ "   |   "
 		+ move_category.capitalize()
 	)
 
@@ -3294,7 +3294,7 @@ func _refresh_move_card_preview(
 		"content_studio.damage",
 		{
 			"damage": (
-				"—"
+				"-"
 				if printed_damage == null
 				else str(int(printed_damage))
 			)
@@ -3494,7 +3494,7 @@ func _refresh_move_preview_effects(
 			)
 
 			if not raw_text.is_empty():
-				line += " → " + raw_text
+				line += " -> " + raw_text
 			else:
 				var actions: Variant = rule.get(
 					"actions",
@@ -3510,7 +3510,7 @@ func _refresh_move_preview_effects(
 						actions as Array
 					)[0] is Dictionary
 				):
-					line += " → " + _action_preview_text(
+					line += " -> " + _action_preview_text(
 						(
 							actions as Array
 						)[0] as Dictionary
@@ -3534,7 +3534,7 @@ func _add_move_preview_effect_line(
 	label.text = LocalizationService.tr_format(
 		"content_studio.preview_bullet",
 		{"text": text},
-        "• {text}"
+        " |  {text}"
 	)
 	label.autowrap_mode = (
 		TextServer.AUTOWRAP_WORD_SMART
@@ -3940,7 +3940,7 @@ func _refresh_pokemon_charakoro_preview() -> void:
 	)
 	pokemon_charakoro_preview_status.text = (
 		path.get_file()
-		+ " · "
+		+ "  |  "
 		+ LocalizationService.tr_key(
 			(
 				"content_studio.user_asset"
@@ -4002,12 +4002,12 @@ func _refresh_move_runtime_status() -> void:
 			LocalizationService.tr_format(
 				"content_studio.runtime_details",
 				{"opcodes": ", ".join(used)},
-                " — {opcodes}"
+                " - {opcodes}"
 			)
 			if not used.is_empty()
 			else LocalizationService.tr_key(
 				"content_studio.runtime_no_opcodes",
-                " — No effect opcodes"
+                " - No effect opcodes"
 			)
 		)
 		move_runtime_status.text = LocalizationService.tr_format(
@@ -4019,7 +4019,7 @@ func _refresh_move_runtime_status() -> void:
 		move_runtime_status.text = LocalizationService.tr_format(
 			"content_studio.runtime_blocked",
 			{"opcodes": ", ".join(report.get("unsupported_opcodes", []))},
-            "Runtime Effects: BLOCKED — {opcodes}"
+            "Runtime Effects: BLOCKED - {opcodes}"
 		)
 
 
@@ -4032,7 +4032,7 @@ func _is_creating_new_content() -> bool:
 
 
 func _checkmark(done: bool) -> String:
-	return "✓" if done else "○"
+	return "[OK]" if done else "[ ]"
 
 
 func _check_item(
@@ -4200,12 +4200,12 @@ func _refresh_authoring_session() -> void:
 				"content_studio.unsaved"
 				if _has_unsaved_changes()
 				else "content_studio.saved",
-				"● Unsaved"
+				"* Unsaved"
 				if _has_unsaved_changes()
-				else "✓ Saved"
+				else "[OK] Saved"
 			)
 		},
-		"{source} · {state}"
+		"{source}  |  {state}"
 	)
 
 	var summary_lines: Array[String] = []
@@ -4232,7 +4232,7 @@ func _refresh_authoring_session() -> void:
 							"{count} Moves"
 						)
 					},
-					"Dependencies: Charakoro {profile} · {moves}"
+					"Dependencies: Charakoro {profile}  |  {moves}"
 				)
 			)
 			var missing: Array[String] = []
@@ -4409,7 +4409,7 @@ func _refresh_validation() -> void:
 		validation["success"]
 	):
 		validation_label.text = (
-			LocalizationService.tr_key("content_studio.valid", "VALID — Ready to save.")
+			LocalizationService.tr_key("content_studio.valid", "VALID - Ready to save.")
 		)
 		save_button.disabled = false
 	else:
@@ -4671,9 +4671,9 @@ func _library_display_text(
 				)
 			var source_info: Dictionary = CONTENT_SOURCE.describe(mode, content_id)
 			var source_mark: String = (
-				LocalizationService.tr_key("content_studio.source_modified", " • Modified")
+				LocalizationService.tr_key("content_studio.source_modified", "  |  Modified")
 				if String(source_info.get("source", "")) == "override"
-				else LocalizationService.tr_key("content_studio.source_user", " • User")
+				else LocalizationService.tr_key("content_studio.source_user", "  |  User")
 				if String(source_info.get("source", "")) == "user"
 				else ""
 			)
@@ -4687,9 +4687,9 @@ func _library_display_text(
 
 	var source_info: Dictionary = CONTENT_SOURCE.describe(mode, content_id)
 	var source_mark: String = (
-		LocalizationService.tr_key("content_studio.source_modified", " • Modified")
+		LocalizationService.tr_key("content_studio.source_modified", "  |  Modified")
 		if String(source_info.get("source", "")) == "override"
-		else LocalizationService.tr_key("content_studio.source_user", " • User")
+		else LocalizationService.tr_key("content_studio.source_user", "  |  User")
 		if String(source_info.get("source", "")) == "user"
 		else ""
 	)

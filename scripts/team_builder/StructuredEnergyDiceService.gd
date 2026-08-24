@@ -27,7 +27,8 @@ const VALID_ENERGY_TYPES: Array[StringName] = [
 
 static func apply_setup_to_loadout(
     loadout: Variant,
-    setup: Variant
+    setup: Variant,
+    allow_repeated_fixed_energy: bool = false
 ) -> bool:
     if loadout == null or setup == null:
         return false
@@ -40,7 +41,8 @@ static func apply_setup_to_loadout(
     var setup_validation: Dictionary = (
         SETUP_VALIDATOR.validate(
             setup,
-            valid_energy_types
+            valid_energy_types,
+            allow_repeated_fixed_energy
         )
     )
 

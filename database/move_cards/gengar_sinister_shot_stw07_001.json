@@ -1,0 +1,76 @@
+{
+  "schema_version": "2.0",
+  "id": "gengar_sinister_shot_stw07_001",
+  "move_name_id": "sinister_shot",
+  "owner_id": "gengar",
+  "display_name": "Sinister Shot",
+  "move_category": "attack",
+  "attack_type": "dark",
+  "energy_cost": [
+    {
+      "energy_type": "dark",
+      "count": 2
+    }
+  ],
+  "printed_damage": 20,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 20,
+        "damage_type": "dark",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP",
+          "FACE_DOWN"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "This attack does 20 more damage."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST07-ST09 preview / supplied workbook",
+    "page": null,
+    "card_code": "STW07-001",
+    "raw_text": "Kyokoro Effect: This attack does 20 more damage.",
+    "move_effect_text": [],
+    "kyokoro_effect_text": [
+      "This attack does 20 more damage."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(4).xlsx",
+    "reference_url": "https://pla-koro.com/moves?p=gengar"
+  },
+  "review": {
+    "status": "v2.2_new_user_mapping",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": false,
+    "notes": [
+      "Move data and orientation mapping transcribed from the user-supplied workbook rows 127-148.",
+      "English move name is provisional unless it matches an established Pokémon move name or the public source.",
+      "Some newly revealed effects require runtime support and are preserved in special_effects for follow-up implementation."
+    ]
+  },
+  "special_effects": []
+}

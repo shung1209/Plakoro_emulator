@@ -54,10 +54,35 @@ func localize_move(document: Variant) -> String:
 func localize_move_description(document: Variant) -> String:
 	if document == null:
 		return ""
+
 	var fallback: String = ""
 	if document.get("source") is Dictionary:
-		fallback = String((document.get("source") as Dictionary).get("raw_text", ""))
-	return text("move", String(document.move_name_id), "description", fallback)
+		fallback = String(
+			(document.get("source") as Dictionary).get("raw_text", "")
+		)
+
+	# Some Pokemon share the same move_name_id while their printed card
+	# effects differ (for example Charmander/Moltres Flamethrower and
+	# Pikachu/Zapdos Thunder Shock). Prefer an exact card translation first
+	# and only fall back to the shared move-name translation when no
+	# card-specific entry exists.
+	var card_id: String = String(document.id) if _has_property(document, "id") else ""
+	if not card_id.is_empty():
+		var card_description: String = text(
+			"move_card",
+			card_id,
+			"description",
+			""
+		)
+		if not card_description.is_empty():
+			return card_description
+
+	return text(
+		"move",
+		String(document.move_name_id),
+		"description",
+		fallback
+	)
 
 
 func localize_type(type_id: Variant) -> String:

@@ -16,12 +16,14 @@ static func build_runtime_loadout(
     loadout_data: Variant,
     database: Variant,
     team_rules: Dictionary,
-    participant_id: StringName = &"ai"
+    participant_id: StringName = &"ai",
+    allow_repeated_fixed_energy: bool = false
 ) -> Variant:
     var validation: Dictionary = (
         AI_LOADOUT_VALIDATOR.validate(
             loadout_data,
-            database
+            database,
+            allow_repeated_fixed_energy
         )
     )
 
@@ -34,9 +36,13 @@ static func build_runtime_loadout(
 
         return null
 
+    var runtime_rules: Dictionary = team_rules.duplicate(true)
+    if allow_repeated_fixed_energy:
+        runtime_rules["fixed_energies_across_dice_must_be_unique"] = false
+
     var service: Variant = TEAM_BUILDER_SERVICE.new(
         database,
-        team_rules
+        runtime_rules
     )
 
     var runtime_loadout: Variant = (
@@ -65,7 +71,8 @@ static func build_runtime_loadout(
 
     if not STRUCTURED_DICE_SERVICE.apply_setup_to_loadout(
         runtime_loadout,
-        loadout_data.energy_dice_setup
+        loadout_data.energy_dice_setup,
+        allow_repeated_fixed_energy
     ):
         return null
 

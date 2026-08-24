@@ -601,7 +601,7 @@ static func _format_orientation_list(
 	if parts.is_empty():
 		return LocalizationService.tr_key("battle.none", "(none)")
 
-	return " → ".join(
+	return " -> ".join(
 		parts
 	)
 
@@ -623,7 +623,7 @@ static func _format_energy_counts(
 
 		parts.append(
 			String(raw_key)
-			+ " × "
+			+ " x "
 			+ str(count)
 		)
 
@@ -641,7 +641,7 @@ static func _format_costs(
 	for cost: Variant in costs:
 		parts.append(
 			String(cost.energy_type)
-			+ " × "
+			+ " x "
 			+ str(int(cost.count))
 		)
 

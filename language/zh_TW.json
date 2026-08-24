@@ -775,6 +775,24 @@
     "opcode.dice_energy": "骰子／能量",
     "global_quit.title": "離開 PLAKORO？",
     "global_quit.message": "確定要關閉遊戲嗎？",
-    "global_quit.exit": "離開"
+    "global_quit.exit": "離開",
+    "encounter_select.mode_label": "劇情模式",
+    "preparation.allow_repeated_fixed_energy": "允許重複 Fixed Energy",
+    "enerkoro_builder.hint_repeat": "Free Mode：開啟後，不同 Enerkoro 可重複使用相同的 Fixed Energy。",
+    "enerkoro_builder.allow_repeated_fixed_energy": "允許重複 Fixed Energy",
+    "common.use": "使用",
+    "battle.dice_colors": "Enerkoro 顏色",
+    "battle.enerkoro_color_hint": "選擇 Enerkoro {index} 的視覺背景顏色。",
+    "energy.fire": "火",
+    "energy.water": "水",
+    "energy.grass": "草",
+    "energy.electric": "電",
+    "energy.psychic": "超能力",
+    "energy.fighting": "格鬥",
+    "energy.dark": "惡",
+    "energy.steel": "鋼",
+    "energy.flying": "飛行",
+    "enerkoro_builder.dice_color": "顏色",
+    "enerkoro_builder.dice_color_hint": "選擇 Enerkoro {index} 在對戰介面中的顏色。"
   }
 }

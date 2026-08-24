@@ -53,7 +53,7 @@ static func show_result(
             "dealt": player_damage_dealt,
             "taken": enemy_damage_dealt
         },
-        "Turn Count: {turn}   •   Damage Dealt: {dealt}   •   Damage Taken: {taken}"
+        "Turn Count: {turn}    |    Damage Dealt: {dealt}    |    Damage Taken: {taken}"
     )
 
     if hp_label != null:
@@ -65,7 +65,7 @@ static func show_result(
                 "enemy_hp": enemy_hp,
                 "enemy_max": enemy_max_hp
             },
-            "YOU  {player_hp} / {player_max} HP   •   AI  {enemy_hp} / {enemy_max} HP"
+            "YOU  {player_hp} / {player_max} HP    |    AI  {enemy_hp} / {enemy_max} HP"
         )
 
     panel.visible = true

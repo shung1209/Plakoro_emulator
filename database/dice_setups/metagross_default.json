@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "metagross_die_1",
+      "fixed": [
+        "electric",
+        "steel"
+      ],
+      "double": [
+        [
+          "steel",
+          "electric"
+        ],
+        [
+          "steel",
+          "steel"
+        ]
+      ],
+      "single": [
+        "steel",
+        "steel"
+      ]
+    },
+    {
+      "die_id": "metagross_die_2",
+      "fixed": [
+        "water",
+        "fire"
+      ],
+      "double": [
+        [
+          "steel",
+          "water"
+        ],
+        [
+          "steel",
+          "fire"
+        ]
+      ],
+      "single": [
+        "steel",
+        "fire"
+      ]
+    },
+    {
+      "die_id": "metagross_die_3",
+      "fixed": [
+        "grass",
+        "psychic"
+      ],
+      "double": [
+        [
+          "steel",
+          "grass"
+        ],
+        [
+          "steel",
+          "psychic"
+        ]
+      ],
+      "single": [
+        "steel",
+        "psychic"
+      ]
+    }
+  ]
+}

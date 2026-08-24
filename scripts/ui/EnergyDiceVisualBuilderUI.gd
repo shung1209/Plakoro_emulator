@@ -103,6 +103,7 @@ const PREPARATION_SCENE_PATH: String = (
 @onready var page_title: Label = $Margin/Main/Header/Title
 @onready var context_title: Label = $Margin/Main/ContentScroll/Content/ContextPanel/ContextRow/ContextBox/ContextTitle
 @onready var builder_hint: Label = $Margin/Main/ContentScroll/Content/BuilderHint
+@onready var repeat_fixed_energy_toggle: CheckButton = %RepeatFixedEnergyToggle
 @onready var dice_section_title: Label = $Margin/Main/ContentScroll/Content/DiceSectionHeader/DiceSectionTitle
 @onready var dice_section_hint: Label = $Margin/Main/ContentScroll/Content/DiceSectionHeader/DiceSectionHint
 @onready var energy_preview_title: Label = $Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel/PreviewBox/DiceIconPreviewTitle
@@ -141,6 +142,7 @@ const PREPARATION_SCENE_PATH: String = (
 
 var setup: Variant = null
 var die_editors: Array = []
+var enerkoro_color_options: Array[OptionButton] = []
 var move_cards: Array = []
 
 var current_player_loadout: Variant = null
@@ -173,6 +175,14 @@ func _ready() -> void:
     advanced_toggle.toggled.connect(
         _on_advanced_toggled
     )
+    repeat_fixed_energy_toggle.visible = GameFlow.free_mode
+    repeat_fixed_energy_toggle.button_pressed = (
+        GameFlow.free_mode
+        and GameFlow.free_mode_allow_repeated_fixed_energy
+    )
+    repeat_fixed_energy_toggle.toggled.connect(
+        _on_repeat_fixed_energy_toggled
+    )
     _on_advanced_toggled(
         false
     )
@@ -204,6 +214,7 @@ func _on_locale_changed(
     for editor: Variant in die_editors:
         if editor != null and editor.has_method("relocalize"):
             editor.relocalize()
+    _refresh_enerkoro_color_option_texts()
     _refresh_all_analysis()
 
 
@@ -212,7 +223,7 @@ func _apply_localized_text() -> void:
         "enerkoro_builder.title",
         "Enerkoro Builder"
     )
-    back_button.text = "← " + LocalizationService.tr_key(
+    back_button.text = "<- " + LocalizationService.tr_key(
         "enerkoro_builder.back_preparation",
         "Back to Preparation"
     )
@@ -221,8 +232,16 @@ func _apply_localized_text() -> void:
         "CURRENT SETUP"
     )
     builder_hint.text = LocalizationService.tr_key(
-        "enerkoro_builder.hint",
-        "Select a face to change its Energy. Fixed faces must use unique Energy types across all three Enerkoro."
+        "enerkoro_builder.hint_repeat"
+        if GameFlow.free_mode_allow_repeated_fixed_energy
+        else "enerkoro_builder.hint",
+        "Select a face to change its Energy. Fixed Energy may repeat across Enerkoro in Free Mode."
+        if GameFlow.free_mode_allow_repeated_fixed_energy
+        else "Select a face to change its Energy. Fixed faces must use unique Energy types across all three Enerkoro."
+    )
+    repeat_fixed_energy_toggle.text = LocalizationService.tr_key(
+        "enerkoro_builder.allow_repeated_fixed_energy",
+        "Allow repeated Fixed Energy (Free Mode only)"
     )
     dice_section_title.text = LocalizationService.tr_key(
         "enerkoro_builder.faces",
@@ -230,7 +249,7 @@ func _apply_localized_text() -> void:
     )
     dice_section_hint.text = LocalizationService.tr_key(
         "enerkoro_builder.faces_hint",
-        "3 Enerkoro • 6 faces each"
+        "3 Enerkoro  |  6 faces each"
     )
     energy_preview_title.text = LocalizationService.tr_key(
         "enerkoro_builder.energy_preview",
@@ -305,7 +324,7 @@ func _refresh_editing_context_label() -> void:
 
     editing_context_label.text = (
         (
-            GameContentLocalizationService.text("pokemon", pokemon_id, "name", pokemon_id.capitalize()) + "  •  "
+            GameContentLocalizationService.text("pokemon", pokemon_id, "name", pokemon_id.capitalize()) + "   |   "
             if not pokemon_id.is_empty()
             else ""
         )
@@ -313,7 +332,7 @@ func _refresh_editing_context_label() -> void:
          + "\n" + LocalizationService.tr_format(
             "enerkoro_builder.save_target",
             {"path": active_setup_path},
-            "Save target  •  {path}"
+            "Save target   |   {path}"
         )
         + _format_inventory_summary()
     )
@@ -326,15 +345,15 @@ func _format_inventory_summary() -> String:
     var parts: Array[String] = []
     for energy_type: StringName in VALID_ENERGY_TYPES:
         parts.append(
-            "%s ×%d" % [
+            "%s x%d" % [
                 GameContentLocalizationService.localize_type(energy_type),
                 int(inventory.get(String(energy_type), 0))
             ]
         )
     return "\n" + LocalizationService.tr_format(
         "enerkoro_builder.inventory_summary",
-        {"inventory": "  •  ".join(parts)},
-        "Energy Pool  •  {inventory}"
+        {"inventory": "   |   ".join(parts)},
+        "Energy Pool   |   {inventory}"
     )
 
 
@@ -344,9 +363,9 @@ func _on_advanced_toggled(
     preview_coverage_row.visible = enabled
     summary_split.visible = enabled
     advanced_toggle.text = (
-        LocalizationService.tr_key("enerkoro_builder.advanced_open", "Advanced ▾")
+        LocalizationService.tr_key("enerkoro_builder.advanced_open", "Advanced v")
         if enabled
-        else LocalizationService.tr_key("enerkoro_builder.advanced_closed", "Advanced ▸")
+        else LocalizationService.tr_key("enerkoro_builder.advanced_closed", "Advanced >")
     )
 
     # Normal Builder mode is intentionally a single-screen workspace.
@@ -645,6 +664,7 @@ func _load_factory_default() -> void:
 
 func _build_die_editors() -> void:
     die_editors.clear()
+    enerkoro_color_options.clear()
 
     for child: Node in (
         dice_container.get_children()
@@ -660,6 +680,35 @@ func _build_die_editors() -> void:
             Control.SIZE_EXPAND_FILL
         )
         dice_container.add_child(slot)
+
+        var column: VBoxContainer = VBoxContainer.new()
+        column.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+        column.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+        column.add_theme_constant_override("separation", 8)
+        slot.add_child(column)
+
+        var color_row: HBoxContainer = HBoxContainer.new()
+        color_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        color_row.alignment = BoxContainer.ALIGNMENT_CENTER
+        color_row.add_theme_constant_override("separation", 8)
+        column.add_child(color_row)
+
+        var color_label: Label = Label.new()
+        color_label.text = LocalizationService.tr_key(
+            "enerkoro_builder.dice_color",
+            "Color"
+        )
+        color_row.add_child(color_label)
+
+        var color_option: OptionButton = OptionButton.new()
+        color_option.custom_minimum_size = Vector2(150.0, 42.0)
+        color_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        color_row.add_child(color_option)
+        enerkoro_color_options.append(color_option)
+        _populate_enerkoro_color_option(color_option, index)
+        color_option.item_selected.connect(
+            _on_enerkoro_color_selected.bind(index)
+        )
 
         var editor: PanelContainer = (
             NET_EDITOR.new()
@@ -677,12 +726,14 @@ func _build_die_editors() -> void:
             _on_setup_changed.bind(editor)
         )
 
-        slot.add_child(editor)
+        column.add_child(editor)
         editor.initialize(
             setup,
             index,
             EDITOR_SERVICE,
-            _get_player_energy_inventory()
+            _get_player_energy_inventory(),
+            GameFlow.free_mode
+            and GameFlow.free_mode_allow_repeated_fixed_energy
         )
 
         _polish_die_editor_layout(
@@ -690,6 +741,51 @@ func _build_die_editors() -> void:
         )
 
         die_editors.append(editor)
+
+
+
+func _populate_enerkoro_color_option(
+    option: OptionButton,
+    slot_index: int
+) -> void:
+    var saved_type: String = PLAKORO_THEME.get_enerkoro_color_type(slot_index)
+    option.clear()
+    for color_type: String in PLAKORO_THEME.ENERKORO_COLOR_TYPES:
+        option.add_item(
+            LocalizationService.tr_key(
+                "energy.%s" % color_type,
+                color_type.capitalize()
+            )
+        )
+        option.set_item_metadata(option.item_count - 1, color_type)
+        if color_type == saved_type:
+            option.select(option.item_count - 1)
+    option.tooltip_text = LocalizationService.tr_format(
+        "enerkoro_builder.dice_color_hint",
+        {"index": slot_index + 1},
+        "Choose the Battle GUI color for Enerkoro {index}."
+    )
+
+
+func _refresh_enerkoro_color_option_texts() -> void:
+    for slot_index: int in range(enerkoro_color_options.size()):
+        _populate_enerkoro_color_option(
+            enerkoro_color_options[slot_index],
+            slot_index
+        )
+
+
+func _on_enerkoro_color_selected(
+    item_index: int,
+    slot_index: int
+) -> void:
+    if slot_index < 0 or slot_index >= enerkoro_color_options.size():
+        return
+    var option: OptionButton = enerkoro_color_options[slot_index]
+    if item_index < 0 or item_index >= option.item_count:
+        return
+    var color_type: String = str(option.get_item_metadata(item_index))
+    PLAKORO_THEME.set_enerkoro_color_type(slot_index, color_type)
 
 
 
@@ -828,6 +924,19 @@ func _refresh_dice_icon_preview() -> void:
     )
 
 
+func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
+    if not GameFlow.free_mode:
+        repeat_fixed_energy_toggle.set_pressed_no_signal(false)
+        return
+    GameFlow.free_mode_allow_repeated_fixed_energy = enabled
+    PLAKORO_THEME.set_free_mode_allow_repeated_fixed_energy(enabled)
+    for editor: Variant in die_editors:
+        if editor != null and editor.has_method("set_allow_repeated_fixed_energy"):
+            editor.set_allow_repeated_fixed_energy(enabled)
+    _apply_localized_text()
+    _refresh_all_analysis()
+
+
 func _refresh_validation() -> void:
     var valid_energy_types: Array = []
 
@@ -841,13 +950,15 @@ func _refresh_validation() -> void:
     var validation: Dictionary = (
         VALIDATOR.validate(
             setup,
-            valid_energy_types
+            valid_energy_types,
+            GameFlow.free_mode
+            and GameFlow.free_mode_allow_repeated_fixed_energy
         )
     )
     _merge_inventory_validation(validation)
 
     if bool(validation["success"]):
-        top_validation_label.text = LocalizationService.tr_key("enerkoro_builder.valid", "✓ Valid")
+        top_validation_label.text = LocalizationService.tr_key("enerkoro_builder.valid", "[OK] Valid")
         top_validation_label.modulate = Color(
             0.45,
             0.9,
@@ -855,12 +966,12 @@ func _refresh_validation() -> void:
             1.0
         )
         validation_label.text = (
-            LocalizationService.tr_key("enerkoro_builder.valid_ready", "✓ VALID  •  Ready for battle.")
+            LocalizationService.tr_key("enerkoro_builder.valid_ready", "[OK] VALID   |   Ready for battle.")
         )
         confirm_button.disabled = false
         back_button.disabled = false
     else:
-        top_validation_label.text = LocalizationService.tr_key("enerkoro_builder.invalid", "✕ Invalid")
+        top_validation_label.text = LocalizationService.tr_key("enerkoro_builder.invalid", "X Invalid")
         top_validation_label.modulate = Color(
             0.95,
             0.5,
@@ -871,7 +982,7 @@ func _refresh_validation() -> void:
             LocalizationService.tr_format(
                 "enerkoro_builder.invalid_details",
                 {"errors": "\n".join(validation["errors"])},
-                "✕ INVALID\n{errors}"
+                "X INVALID\n{errors}"
             )
         )
         confirm_button.disabled = true
@@ -887,7 +998,7 @@ func _refresh_energy_probability() -> void:
     )
 
     var lines: Array[String] = [
-        LocalizationService.tr_key("enerkoro_builder.energy_output_title", "ENERGY OUTPUT — expected per three-dice roll")
+        LocalizationService.tr_key("enerkoro_builder.energy_output_title", "ENERGY OUTPUT - expected per three-dice roll")
     ]
 
     var keys: Array = expected.keys()
@@ -916,7 +1027,7 @@ func _refresh_energy_probability() -> void:
                     "expected": LocalizationService.format_decimal(expected_value, 3),
                     "probability": LocalizationService.format_decimal(probability * 100.0, 1)
                 },
-                "{energy}  •  expected {expected}  •  at least one {probability}%"
+                "{energy}   |   expected {expected}   |   at least one {probability}%"
             )
         )
 
@@ -1030,7 +1141,7 @@ func _save_setup_and_sync_loadout() -> bool:
 
     if not PLAYER_LOADOUT_SAVE_SERVICE.save_loadout(
         loadout,
-        PLAYER_LOADOUT_PROVIDER.USER_LOADOUT_PATH
+        PLAYER_LOADOUT_PROVIDER.get_user_loadout_path()
     ):
         return false
 
@@ -1108,7 +1219,7 @@ func _sync_player_default_if_matching(
 
     if not PLAYER_LOADOUT_SAVE_SERVICE.save_loadout(
         loadout,
-        PLAYER_LOADOUT_PROVIDER.USER_LOADOUT_PATH
+        PLAYER_LOADOUT_PROVIDER.get_user_loadout_path()
     ):
         return false
 
@@ -1146,7 +1257,7 @@ func _sync_ai_default_if_matching(
 
     return AI_LOADOUT_SAVE_SERVICE.save_loadout(
         loadout,
-        AI_LOADOUT_PROVIDER.USER_LOADOUT_PATH
+        AI_LOADOUT_PROVIDER.get_user_loadout_path()
     )
 
 
@@ -1160,7 +1271,9 @@ func _validate_current_setup() -> Dictionary:
 
     var result: Dictionary = VALIDATOR.validate(
         setup,
-        valid_energy_types
+        valid_energy_types,
+        GameFlow.free_mode
+        and GameFlow.free_mode_allow_repeated_fixed_energy
     )
     _merge_inventory_validation(result)
     return result

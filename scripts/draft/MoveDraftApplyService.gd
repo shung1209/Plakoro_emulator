@@ -90,7 +90,7 @@ static func apply_draft(
 
     if not PLAYER_LOADOUT_SAVE_SERVICE.save_loadout(
         loadout,
-        PLAYER_LOADOUT_PROVIDER.USER_LOADOUT_PATH
+        PLAYER_LOADOUT_PROVIDER.get_user_loadout_path()
     ):
         result["errors"].append(
             "Could not save Player Battle Loadout."

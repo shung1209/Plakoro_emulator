@@ -87,7 +87,7 @@ func _render_setup() -> void:
 		title.text = (
             "Dice "
 			+ str(index + 1)
-			+ " — "
+			+ " - "
 			+ String(die_data.die_id)
 		)
 		title.add_theme_font_size_override(
@@ -98,9 +98,9 @@ func _render_setup() -> void:
 
 		_add_line(
 			box,
-			"FACE_UP ↔ FACE_DOWN",
+			"FACE_UP <-> FACE_DOWN",
 			String(die_data.fixed_a)
-			+ " ↔ "
+			+ " <-> "
 			+ String(die_data.fixed_b)
 			+ "  [fixed]"
 		)
@@ -125,9 +125,9 @@ func _render_setup() -> void:
 
 		_add_line(
 			box,
-			"HEAD_LEFT ↔ HEAD_RIGHT",
+			"HEAD_LEFT <-> HEAD_RIGHT",
 			String(die_data.single_a)
-			+ " ↔ "
+			+ " <-> "
 			+ String(die_data.single_b)
 			+ "  [single]"
 		)
@@ -148,7 +148,7 @@ func _render_validation() -> void:
 
 	if bool(result["success"]):
 		validation_label.text = (
-            "VALID — 3 dice, 6 unique fixed energies."
+            "VALID - 3 dice, 6 unique fixed energies."
 		)
 		return
 

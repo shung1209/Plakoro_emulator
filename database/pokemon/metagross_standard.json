@@ -1,0 +1,31 @@
+{
+  "available_move_card_ids": [
+    "metagross_beam_stw08_001",
+    "metagross_arithmetic_stw08_002",
+    "metagross_area_suppression_stw08_003",
+    "metagross_direct_stamp_stw08_004",
+    "metagross_meteor_mash_stw08_005",
+    "metagross_heavy_slam_stw08_006",
+    "metagross_explosion_stw08_007"
+  ],
+  "display_name": "Metagross",
+  "id": "metagross_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "steel",
+  "schema_version": "2.0",
+  "species_id": "metagross",
+  "weaknesses": [
+    {
+      "attack_type": "fire",
+      "bonus_damage": 20.0
+    }
+  ],
+  "review": {
+    "status": "v2.2_new_provisional_character_metadata",
+    "notes": [
+      "Move set and PNG are supplied/confirmed for v2.2_new. HP/weakness use provisional defaults and should be verified against the final character card.",
+      "Kyokoro uses standard_equal until a measured profile is available."
+    ]
+  }
+}

@@ -8,6 +8,7 @@ const ENCOUNTER_SELECT_SCENE: String = "res://scenes/game/EncounterSelectUI.tscn
 const BATTLE_SCENE: String = "res://scenes/ui/BattleGameUI.tscn"
 const BATTLE_RESULT_SCENE: String = "res://scenes/game/BattleResultUI.tscn"
 const CONTENT_STUDIO_SCENE: String = "res://scenes/ui/PlakoroContentStudioUI.tscn"
+const PLAKORO_THEME: Script = preload("res://scripts/ui/theme/PlakoroThemeFactory.gd")
 
 
 var is_transitioning: bool = false
@@ -15,6 +16,7 @@ var content_studio_return_scene: String = PREPARATION_SCENE
 var battle_outcome: Variant = null
 var collection_mode: bool = false
 var free_mode: bool = false
+var free_mode_allow_repeated_fixed_energy: bool = false
 var advance_after_battle_result: bool = false
 
 
@@ -23,6 +25,7 @@ func open_main_menu() -> void:
 	advance_after_battle_result = false
 	collection_mode = false
 	free_mode = false
+	free_mode_allow_repeated_fixed_energy = false
 	EncounterSession.clear()
 	_change_scene(MAIN_MENU_SCENE)
 
@@ -31,6 +34,7 @@ func start_game() -> void:
 	battle_outcome = null
 	collection_mode = false
 	free_mode = false
+	free_mode_allow_repeated_fixed_energy = false
 	_change_scene(
 		ENCOUNTER_SELECT_SCENE
 		if PlayerProgress.has_profile()
@@ -42,6 +46,7 @@ func open_save_creation() -> void:
 	battle_outcome = null
 	collection_mode = false
 	free_mode = false
+	free_mode_allow_repeated_fixed_energy = false
 	EncounterSession.clear()
 	_change_scene(SAVE_CREATION_SCENE)
 
@@ -51,6 +56,7 @@ func open_encounter_select() -> void:
 	advance_after_battle_result = false
 	collection_mode = false
 	free_mode = false
+	free_mode_allow_repeated_fixed_energy = false
 	EncounterSession.clear()
 	_change_scene(ENCOUNTER_SELECT_SCENE)
 
@@ -65,6 +71,7 @@ func open_collection() -> void:
 	battle_outcome = null
 	collection_mode = true
 	free_mode = false
+	free_mode_allow_repeated_fixed_energy = false
 	EncounterSession.clear()
 	_change_scene(PREPARATION_SCENE)
 
@@ -74,6 +81,7 @@ func open_free_mode() -> void:
 	advance_after_battle_result = false
 	collection_mode = false
 	free_mode = true
+	free_mode_allow_repeated_fixed_energy = PLAKORO_THEME.get_free_mode_allow_repeated_fixed_energy()
 	EncounterSession.clear()
 	_change_scene(PREPARATION_SCENE)
 

@@ -201,7 +201,7 @@ static func _build_summary(
         ).strip_edges()
 
         var line: String = (
-            "✓ "
+            "[OK] "
             + " / ".join(
                 orientations
             )

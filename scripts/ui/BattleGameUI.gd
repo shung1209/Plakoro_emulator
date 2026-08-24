@@ -117,6 +117,9 @@ const MESSAGE_PRESENTER: Script = preload(
 const FLOATING_TEXT: Script = preload(
 	"res://scripts/ui/components/BattleFloatingTextPresenter.gd"
 )
+const ATTACK_VFX: Script = preload(
+	"res://scripts/ui/components/BattleAttackVFX.gd"
+)
 const TURN_BANNER: Script = preload(
 	"res://scripts/ui/components/BattleTurnBannerPresenter.gd"
 )
@@ -236,7 +239,6 @@ const RESOLUTION_STEP_QUEUE_BUILDER: Script = preload(
 @onready var timeline_technical_toggle: CheckButton = (
 	%TimelineTechnicalToggle
 )
-
 @onready var setup_source_label: Label = %SetupSourceLabel
 @onready var moves_title_label: Label = $Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/MovesPanel/MovesBox/MovesTitle
 @onready var roll_result_title_label: Label = $Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox/RollResultTitle
@@ -285,6 +287,8 @@ func _ready() -> void:
 	)
 	_apply_responsive_layout()
 	_configure_battle_tooltip_theme()
+
+	_apply_enerkoro_color_preferences()
 
 	restart_button.pressed.connect(
 		_start_new_battle
@@ -367,7 +371,7 @@ func _apply_localized_text() -> void:
 		"PLAKORO Battle"
 	)
 	back_to_preparation_button.text = (
-		"← "
+		"<- "
 		+ LocalizationService.tr_key(
 			"battle.back_preparation",
 			"Back to Preparation"
@@ -449,40 +453,37 @@ func _apply_battle_visual_style() -> void:
 			"font_color",
 			Color("ebe6dc")
 		)
-		turn_banner_label.add_theme_color_override(
-			"font_color",
-			Color("245b88")
-		)
-		var warm_text: Color = Color("1d2940")
-		var warm_outline: Color = Color(0.96, 0.94, 0.88, 0.96)
-		for contrast_label: Label in [
-			roll_result_title_label,
-			energy_payment_label,
-			charakoro_feedback_title,
-			charakoro_feedback_label,
-			message_label,
-			prototype_battle_message_label
-		]:
-			contrast_label.add_theme_color_override(
-				"font_color",
-				warm_text
-			)
-			contrast_label.add_theme_color_override(
-				"font_outline_color",
-				warm_outline
-			)
-			contrast_label.add_theme_constant_override(
-				"outline_size",
-				3
-			)
-		turn_banner_label.add_theme_color_override(
-			"font_outline_color",
-			warm_outline
-		)
-		turn_banner_label.add_theme_constant_override(
-			"outline_size",
-			2
-		)
+
+	# The center battle arena deliberately uses the exact same presentation in
+	# Warm and Dark themes. Only the surrounding player/enemy/move UI follows
+	# the selected application theme. This prevents the combat result text and
+	# dice presentation from changing contrast when the theme is switched.
+	var arena_text: Color = Color(0.95, 0.98, 1.0, 1.0)
+	var arena_outline: Color = Color(0.0, 0.0, 0.0, 0.92)
+	for contrast_label: Label in [
+		energy_payment_label,
+		charakoro_feedback_title,
+		charakoro_feedback_label,
+		message_label,
+		prototype_battle_message_label
+	]:
+		contrast_label.add_theme_color_override("font_color", arena_text)
+		contrast_label.add_theme_color_override("font_outline_color", arena_outline)
+		contrast_label.add_theme_constant_override("outline_size", 5)
+	roll_result_title_label.add_theme_color_override(
+		"font_color",
+		Color(1.0, 0.82, 0.40, 1.0)
+	)
+	roll_result_title_label.add_theme_color_override(
+		"font_outline_color",
+		arena_outline
+	)
+	roll_result_title_label.add_theme_constant_override("outline_size", 5)
+	turn_banner_label.add_theme_color_override(
+		"font_outline_color",
+		arena_outline
+	)
+	turn_banner_label.add_theme_constant_override("outline_size", 4)
 	var enemy_window_style: StyleBoxFlat = StyleBoxFlat.new()
 	enemy_window_style.bg_color = (
 		Color("e4d3d0") if warm
@@ -517,7 +518,7 @@ func _apply_battle_visual_style() -> void:
 	roll_result_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(Color("d8d1b7"), 0.58) if warm else Color(0.015, 0.030, 0.025, 0.12),
+			Color(0.015, 0.030, 0.025, 0.12),
 			Color(0.92, 0.78, 0.36, 0.72),
 			1,
 			false
@@ -542,8 +543,8 @@ func _apply_battle_visual_style() -> void:
 	%PrototypeBattleMessagePanel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(Color("ddd7e2"), 0.46) if warm else Color(0.035, 0.020, 0.045, 0.12),
-			Color(0.76, 0.58, 0.92, 0.52),
+			Color(0.035, 0.020, 0.045, 0.12),
+			Color(0.76, 0.58, 0.92, 0.60),
 			1,
 			false
 		)
@@ -551,8 +552,8 @@ func _apply_battle_visual_style() -> void:
 	turn_banner_panel.add_theme_stylebox_override(
 		"panel",
 		_battle_panel_style(
-			Color(Color("d8dfe2"), 0.72) if warm else Color(0.015, 0.025, 0.035, 0.72),
-			Color(0.48, 0.74, 0.90, 0.48),
+			Color(0.015, 0.025, 0.035, 0.72),
+			Color(0.48, 0.74, 0.90, 0.58),
 			1,
 			false
 		)
@@ -568,16 +569,16 @@ func _apply_battle_visual_style() -> void:
 	)
 	roll_result_title_label.add_theme_color_override(
 		"font_color",
-		PLAKORO_THEME.get_color("text") if warm else Color(1.0, 0.82, 0.40, 1.0)
+		Color(1.0, 0.82, 0.40, 1.0)
 	)
 	roll_result_title_label.add_theme_font_size_override("font_size", 21)
 	prototype_battle_message_label.add_theme_color_override(
 		"font_outline_color",
-		Color(0.96, 0.94, 0.88, 0.98) if warm else Color(0.0, 0.0, 0.0, 0.92)
+		Color(0.0, 0.0, 0.0, 0.92)
 	)
 	prototype_battle_message_label.add_theme_constant_override(
 		"outline_size",
-		4 if warm else 5
+		5
 	)
 
 	player_hp_bar.add_theme_stylebox_override(
@@ -1206,15 +1207,6 @@ func _set_battle_action_state(
 			0.88,
 			1.0
 		)
-	if PLAKORO_THEME.is_warm_theme():
-		actor_color = (
-			PLAKORO_THEME.get_color("danger")
-			if actor_key == "battle.ai_turn"
-			else PLAKORO_THEME.get_color("accent")
-		)
-		if actor_key == "battle.finished":
-			actor_color = PLAKORO_THEME.get_color("text_muted")
-
 	turn_banner_label.add_theme_color_override(
 		"font_color",
 		actor_color
@@ -1226,7 +1218,7 @@ func _set_battle_action_state(
 			"actor": actor_text,
 			"phase": phase_text
 		},
-		"Turn {turn} — {actor} • {phase}"
+		"Turn {turn} - {actor}  |  {phase}"
 	)
 
 
@@ -1243,6 +1235,15 @@ func _hold_action_state(
 	# Keep the current Turn Dialog visible until the next battle phase replaces it.
 	# No timer-driven hide/fade is used.
 	await get_tree().process_frame
+
+
+func _apply_enerkoro_color_preferences() -> void:
+	if battle_dice_roll_presenter == null:
+		return
+	if battle_dice_roll_presenter.has_method("set_custom_slot_color_types"):
+		battle_dice_roll_presenter.set_custom_slot_color_types(
+			PLAKORO_THEME.get_enerkoro_color_types()
+		)
 
 
 func _on_timeline_technical_toggled(
@@ -1360,7 +1361,9 @@ func _start_new_battle() -> void:
 			player_loadout_data,
 			database,
 			team_rules,
-			&"player"
+			&"player",
+			GameFlow.free_mode
+			and GameFlow.free_mode_allow_repeated_fixed_energy
 		)
 	)
 
@@ -1369,7 +1372,9 @@ func _start_new_battle() -> void:
 			ai_loadout_data,
 			database,
 			team_rules,
-			&"ai"
+			&"ai",
+			GameFlow.free_mode
+			and GameFlow.free_mode_allow_repeated_fixed_energy
 		)
 	)
 
@@ -1559,11 +1564,11 @@ func _build_enemy_move_reveal_card(move_card: Variant) -> Button:
 	button.custom_minimum_size = Vector2(430, 220)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-	var damage_text: String = "—"
+	var damage_text: String = "-"
 	if move_card.printed_damage != null:
 		damage_text = str(int(move_card.printed_damage))
 
-	var coverage_text: String = "—"
+	var coverage_text: String = "-"
 	if (
 		ai_loadout_data != null
 		and ai_loadout_data.energy_dice_setup != null
@@ -1610,7 +1615,7 @@ func _create_move_buttons() -> void:
 			button,
 			profile
 		)
-		var damage_text: String = "—"
+		var damage_text: String = "-"
 		if move_card.printed_damage != null:
 			damage_text = str(
 				int(
@@ -1624,7 +1629,7 @@ func _create_move_buttons() -> void:
 				move_card
 			)
 		)
-		var coverage_text: String = "—"
+		var coverage_text: String = "-"
 
 		if coverage != null:
 			coverage_text = LocalizationService.format_percent(
@@ -1639,11 +1644,22 @@ func _create_move_buttons() -> void:
 			damage_text,
 			coverage_text
 		)
-		button.pressed.connect(
-			_on_move_pressed.bind(
-				StringName(move_card.id)
+		if OS.has_feature("web"):
+			button.call("set_web_popup_allow_use", true)
+			button.pressed.connect(
+				func() -> void:
+					button.call("_open_web_move_info_popup")
 			)
-		)
+			button.connect(
+				"web_move_use_requested",
+				Callable(self, "_on_move_pressed")
+			)
+		else:
+			button.pressed.connect(
+				_on_move_pressed.bind(
+					StringName(move_card.id)
+				)
+			)
 
 		move_button_container.add_child(button)
 		move_buttons.append(button)
@@ -1664,11 +1680,11 @@ func _format_move_button_text(
 			)
 			+ " "
 			+ GameContentLocalizationService.localize_type(cost.energy_type)
-			+ "×"
+			+ "x"
 			+ str(int(cost.count))
 		)
 
-	var damage_text: String = "—"
+	var damage_text: String = "-"
 	if move_card.printed_damage != null:
 		damage_text = str(
 			int(move_card.printed_damage)
@@ -1681,7 +1697,7 @@ func _format_move_button_text(
 		)
 	)
 
-	var coverage_text: String = "—"
+	var coverage_text: String = "-"
 	if coverage != null:
 		coverage_text = (
 			"%.0f%%"
@@ -1728,9 +1744,9 @@ func _refresh_current_energy_state(
 			"actor": actor_label
 		},
 		(
-			"✓ {actor} Energy requirement met"
+			"[OK] {actor} Energy requirement met"
 			if sufficient
-			else "✕ {actor} Energy requirement not met"
+			else "X {actor} Energy requirement not met"
 		)
 	)
 
@@ -1816,12 +1832,17 @@ func _on_move_pressed(
 			+ " applied. Rolling..."
 		)
 
+	var forced_orientation: StringName = &""
+	if kyokoro_enabled:
+		forced_orientation = STATUS_RESOLVER.consume_forced_kyokoro_orientation(actor)
+
 	var dice_result: Variant = (
 		player_dice_engine.roll_battle_dice(
 			profiles,
 			actor.pokemon_data.kyokoro_profile,
 			dice_modifier,
-			kyokoro_enabled
+			kyokoro_enabled,
+			forced_orientation
 		)
 	)
 
@@ -2055,7 +2076,12 @@ func _on_move_pressed(
 		turn_result,
 		&"player",
 		enemy_hp_before,
-		player_hp_before
+		player_hp_before,
+		move_card,
+		_turn_attack_executed(
+			turn_result,
+			initial_energy_sufficient
+		)
 	)
 	_refresh_ui()
 
@@ -2166,6 +2192,15 @@ func _execute_ai_turn() -> void:
 		"AI"
 	)
 
+	# The AI dice presentation must explicitly enter the AI rolling phase.
+	# battle.state.current_participant_id can already have advanced by the time
+	# the visual roll is presented, so relying on state inference can leave
+	# the persistent roll label showing the player's "YOUR ROLL" text.
+	await _hold_action_state(
+		&"ai_rolling",
+		0.0
+	)
+
 	_clear_charakoro_feedback()
 	roll_result_panel.visible = true
 	await battle_dice_roll_presenter.play_result(
@@ -2273,7 +2308,15 @@ func _execute_ai_turn() -> void:
 		turn_result,
 		&"enemy",
 		player_hp_before,
-		enemy_hp_before
+		enemy_hp_before,
+		move_card,
+		(
+			move_card != null
+			and ENERGY_RESOLVER.can_pay_cost(
+				move_card,
+				dice_result
+			)
+		)
 	)
 	_refresh_ui()
 
@@ -2354,7 +2397,7 @@ func _show_charakoro_feedback(
 	charakoro_feedback_title.text = LocalizationService.tr_format(
 		"battle.charakoro_triggered",
 		{"actor": actor_text},
-		"✓ {actor} Charakoro effect triggered"
+		"[OK] {actor} Charakoro effect triggered"
 	)
 	charakoro_feedback_label.text = LocalizationService.tr_format(
 		"battle.charakoro_effect",
@@ -2493,7 +2536,7 @@ func _request_special_move_lock_target(
 		message_label,
 		LocalizationService.tr_key(
 			"battle.special_choose_message",
-			"Charakoro Effect triggered — choose an opponent Move."
+			"Charakoro Effect triggered - choose an opponent Move."
 		)
 	)
 
@@ -2573,11 +2616,41 @@ func _add_timeline_turn(
 	)
 
 
+func _play_attack_vfx(
+	move_card: Variant,
+	actor_side: StringName
+) -> void:
+	if move_card == null:
+		return
+
+	var source_hero: Control = (
+		player_hero_container
+		if actor_side == &"player"
+		else enemy_hero_container
+	)
+	var target_hero: Control = (
+		enemy_hero_container
+		if actor_side == &"player"
+		else player_hero_container
+	)
+	var attack_type: StringName = StringName(move_card.attack_type)
+	var effect: Control = ATTACK_VFX.new()
+	effect.name = "BattleAttackVFX"
+	add_child(effect)
+	await effect.play(
+		source_hero,
+		target_hero,
+		attack_type
+	)
+
+
 func _present_turn_damage(
 	turn_result: Variant,
 	actor_side: StringName,
 	target_hp_before: int,
-	actor_hp_before: int
+	actor_hp_before: int,
+	move_card: Variant = null,
+	attack_executed: bool = false
 ) -> void:
 	if turn_result == null:
 		return
@@ -2588,6 +2661,15 @@ func _present_turn_damage(
 	var target_max_hp: int = int(battle.state.enemy.max_hp) if actor_side == &"player" else int(battle.state.player.max_hp)
 	var final_target_hp: int = int(battle.state.enemy.current_hp) if actor_side == &"player" else int(battle.state.player.current_hp)
 	var actual_damage: int = max(0, target_hp_before - final_target_hp)
+
+	# Attack VFX is keyed from the Move's attack_type / Energy family and is
+	# played only after the Move has passed its Energy gate. This keeps the
+	# animation synchronized with real battle execution for both Player and AI.
+	if attack_executed and move_card != null:
+		await _play_attack_vfx(
+			move_card,
+			actor_side
+		)
 
 	if not RESOLUTION_PRESENTATION_CONFIG.is_step_by_step():
 		if actual_damage > 0:
@@ -2899,7 +2981,7 @@ func _format_battle_weakness(
 	if pokemon_data == null:
 		return LocalizationService.tr_format(
 			"battle.weakness_value",
-			{"value": "—"},
+			{"value": "-"},
 			"Weakness: {value}"
 		)
 
@@ -2979,22 +3061,22 @@ func _refresh_combatant_identity() -> void:
 	if battle == null or battle.state == null:
 		player_type_label.text = LocalizationService.tr_format(
 			"battle.type_value",
-			{"type": "—"},
+			{"type": "-"},
 			"Type: {type}"
 		)
 		enemy_type_label.text = LocalizationService.tr_format(
 			"battle.type_value",
-			{"type": "—"},
+			{"type": "-"},
 			"Type: {type}"
 		)
 		player_weakness_label.text = LocalizationService.tr_format(
 			"battle.weakness_value",
-			{"value": "—"},
+			{"value": "-"},
 			"Weakness: {value}"
 		)
 		enemy_weakness_label.text = LocalizationService.tr_format(
 			"battle.weakness_value",
-			{"value": "—"},
+			{"value": "-"},
 			"Weakness: {value}"
 		)
 		return
@@ -3076,7 +3158,7 @@ func _refresh_ui() -> void:
 				)
 			)
 		},
-		"Turn {turn} — {actor}"
+		"Turn {turn} - {actor}"
 	)
 
 	_refresh_pending_effect_indicators()
@@ -3152,7 +3234,7 @@ func _refresh_move_button_states() -> void:
 				move_card
 			)
 		)
-		var coverage_text: String = "—"
+		var coverage_text: String = "-"
 		if coverage != null:
 			coverage_text = LocalizationService.format_percent(
 				float(coverage.success_probability),
@@ -3167,11 +3249,19 @@ func _refresh_move_button_states() -> void:
 				coverage_text
 			)
 
-		button.disabled = (
-			input_locked
-			or not usable
-			or battle.state.is_finished
-		)
+		if OS.has_feature("web"):
+			# Web users may inspect an unavailable move; the popup Use button
+			# remains disabled and cannot bypass battle validation.
+			button.disabled = (
+				input_locked
+				or battle.state.is_finished
+			)
+		else:
+			button.disabled = (
+				input_locked
+				or not usable
+				or battle.state.is_finished
+			)
 
 
 func _set_player_input_enabled(
@@ -3286,7 +3376,7 @@ func _energy_icon(
 ) -> String:
 	match energy_type:
 		&"normal":
-			return "☆"
+			return "-"
 		&"grass":
 			return "Grass"
 		&"fire":
@@ -3306,4 +3396,4 @@ func _energy_icon(
 		&"flying":
 			return "Flying"
 		_:
-			return "•"
+			return " | "

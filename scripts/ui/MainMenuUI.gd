@@ -4,9 +4,15 @@ extends Control
 const PLAKORO_THEME: Script = preload(
 	"res://scripts/ui/theme/PlakoroThemeFactory.gd"
 )
+const TITLE_WARM: Texture2D = preload(
+	"res://assets/ui/brand/plakoro_adventures_warm.png"
+)
+const TITLE_DARK: Texture2D = preload(
+	"res://assets/ui/brand/plakoro_adventures_dark.png"
+)
 
 
-@onready var title_label: Label = %TitleLabel
+@onready var title_label: TextureRect = %TitleLabel
 @onready var subtitle_label: Label = %SubtitleLabel
 @onready var theme_option: OptionButton = %ThemeOption
 @onready var play_button: Button = %PlayButton
@@ -24,11 +30,12 @@ const PLAKORO_THEME: Script = preload(
 func _ready() -> void:
 	PLAKORO_THEME.apply_to(self)
 	_setup_theme_option()
-	play_button.pressed.connect(GameFlow.start_game)
+	_setup_web_controls()
+	play_button.pressed.connect(_start_story_mode)
 	content_studio_button.pressed.connect(
 		GameFlow.open_content_studio_from_main_menu
 	)
-	free_mode_button.pressed.connect(GameFlow.open_free_mode)
+	free_mode_button.pressed.connect(_start_free_mode)
 	quit_button.pressed.connect(_request_quit)
 	delete_save_button.pressed.connect(_request_delete_save)
 	quit_confirmation.confirmed.connect(_confirm_quit)
@@ -45,10 +52,7 @@ func _ready() -> void:
 
 func _apply_localized_text() -> void:
 	_refresh_theme_option_text()
-	title_label.text = LocalizationService.tr_key(
-		"main_menu.title",
-		"PLAKORO"
-	)
+	_apply_brand_title()
 	subtitle_label.text = LocalizationService.tr_key(
 		"main_menu.subtitle",
 		"Build your dice. Choose your moves. Enter the arena."
@@ -57,9 +61,9 @@ func _apply_localized_text() -> void:
 		"main_menu.story_continue"
 		if PlayerProgress.has_profile()
 		else "main_menu.story_new",
-		"STORY MODE • CONTINUE"
+		"STORY MODE  |  CONTINUE"
 		if PlayerProgress.has_profile()
-		else "STORY MODE • NEW GAME"
+		else "STORY MODE  |  NEW GAME"
 	)
 	content_studio_button.text = LocalizationService.tr_key(
 		"main_menu.content_studio",
@@ -117,6 +121,30 @@ func _apply_localized_text() -> void:
 		"common.cancel",
 		"Cancel"
 	)
+
+
+func _apply_brand_title() -> void:
+	if title_label == null:
+		return
+	title_label.texture = (
+		TITLE_WARM
+		if PLAKORO_THEME.is_warm_theme()
+		else TITLE_DARK
+	)
+
+
+func _setup_web_controls() -> void:
+	# itch.io / hosting page owns fullscreen controls. Do not request browser
+	# fullscreen from gameplay navigation or first-click events.
+	quit_button.visible = not OS.has_feature("web")
+
+
+func _start_story_mode() -> void:
+	GameFlow.start_game()
+
+
+func _start_free_mode() -> void:
+	GameFlow.open_free_mode()
 
 
 func _setup_theme_option() -> void:

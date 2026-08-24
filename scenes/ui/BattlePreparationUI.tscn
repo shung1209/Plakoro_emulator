@@ -151,18 +151,18 @@ text = "pokemon_id"
 [node name="PokemonTypeLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Type: —"
+text = "Type: -"
 
 [node name="PokemonHpLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "HP: —"
+text = "HP: -"
 
 [node name="PokemonWeaknessLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
-text = "Weakness: —"
+text = "Weakness: -"
 
 [node name="BattleReadyPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow"]
 custom_minimum_size = Vector2(0, 220)
@@ -219,7 +219,7 @@ text = "Difficulty"
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
-text = "Weakness: —"
+text = "Weakness: -"
 
 [node name="ResolutionModeBox" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox"]
 layout_mode = 2
@@ -277,6 +277,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Enerkoro"
 
+
+[node name="RepeatFixedEnergyToggle" type="CheckButton" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/DicePanel/DiceBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Allow repeated Fixed Energy"
+visible = false
+
 [node name="DiceIconSummaryContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/DicePanel/DiceBox"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -300,13 +307,13 @@ text = "Loadout Analysis"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "☆☆☆☆☆  No Analysis"
+text = "-----  No Analysis"
 
 [node name="OverallProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
-text = "Overall coverage: —"
+text = "Overall coverage: -"
 
 [node name="SeparatorA" type="HSeparator" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
 layout_mode = 2
@@ -328,7 +335,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
-text = "能量 Usage"
+text = "Energy Usage"
 
 [node name="EnergyIconContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
 unique_name_in_owner = true
@@ -343,7 +350,7 @@ text = "Loadout Status: Saved"
 [node name="LoadoutSignatureLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Loadout Signature: —"
+text = "Loadout Signature: -"
 
 
 [node name="MoveDraftStatusPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn"]
@@ -356,7 +363,7 @@ unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Move Configuration: ✓ Saved Loadout"
+text = "Move Configuration: [OK] Saved Loadout"
 
 [node name="Actions" type="HBoxContainer" parent="Margin/Main"]
 custom_minimum_size = Vector2(0, 56)
@@ -457,12 +464,14 @@ text = "0 / 4"
 
 [node name="SetupPlayerMoveScroll" type="ScrollContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(1080, 0)
+custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 1
 follow_focus = true
+scroll_deadzone = 8
 
 [node name="SetupPlayerMoveRows" type="VBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/SetupPlayerMoveScroll"]
 unique_name_in_owner = true
@@ -509,12 +518,14 @@ text = "0 / 4"
 
 [node name="SetupAIMoveScroll" type="ScrollContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(530, 0)
+custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 1
 follow_focus = true
+scroll_deadzone = 8
 
 [node name="SetupAIMoveRows" type="VBoxContainer" parent="BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox/SetupAIMoveScroll"]
 unique_name_in_owner = true

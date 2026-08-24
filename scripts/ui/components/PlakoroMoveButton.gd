@@ -26,8 +26,15 @@ var _hover_popup_card: Control = null
 var _hover_request_serial: int = 0
 var _availability_label: Label = null
 var _card_content_root: Control = null
-var _battle_damage_text: String = "—"
-var _battle_coverage_text: String = "—"
+var _battle_damage_text: String = "-"
+var _battle_coverage_text: String = "-"
+var _is_large_preview: bool = false
+var _web_info_popup: PopupPanel = null
+var _web_popup_allow_use: bool = false
+var _battle_usable: bool = true
+var _battle_unavailable_reason: String = ""
+
+signal web_move_use_requested(move_card_id: StringName)
 
 const BATTLE_HOVER_DELAY_SECONDS: float = 0.35
 const BATTLE_HOVER_LAYOUT_DEBUG: bool = false
@@ -38,6 +45,13 @@ func set_move_card(
 ) -> void:
     move_card = value
     tooltip_text = ""
+
+    # Web uses click/tap popups only. Do not connect hover preview signals,
+    # otherwise a mouse click can leave both the hover and click popups open.
+    if OS.has_feature("web"):
+        _hover_request_serial += 1
+        _hide_manual_battle_hover_popup()
+        return
 
     if not mouse_entered.is_connected(
         _on_battle_hover_entered
@@ -165,7 +179,7 @@ func setup_battle_summary(
     _availability_label.text = LocalizationService.tr_format(
         "battle.move_success",
         {"coverage": coverage_text},
-        "✓ Success {coverage}"
+        "[OK] Success {coverage}"
     )
     _availability_label.modulate.a = 0.88
     box.add_child(_availability_label)
@@ -176,6 +190,7 @@ func setup_large_card_preview(
     damage_text: String,
     coverage_text: String
 ) -> void:
+    _is_large_preview = true
     move_card = value
     text = ""
     tooltip_text = ""
@@ -325,9 +340,111 @@ func _setup_generated_card_summary(
     _availability_label.text = LocalizationService.tr_format(
         "battle.move_success",
         {"coverage": coverage_text},
-        "✓ Success {coverage}"
+        "[OK] Success {coverage}"
     )
     status_panel.add_child(_availability_label)
+
+
+func set_web_popup_allow_use(enabled: bool) -> void:
+    _web_popup_allow_use = enabled
+
+
+func _open_web_move_info_popup() -> void:
+    # Defensive cleanup: Web must have exactly one move popup.
+    _hover_request_serial += 1
+    _hide_manual_battle_hover_popup()
+    if move_card == null:
+        return
+    if _web_info_popup != null and is_instance_valid(_web_info_popup):
+        _web_info_popup.queue_free()
+        _web_info_popup = null
+
+    var viewport_size: Vector2 = get_viewport_rect().size
+    var max_card_width: float = maxf(320.0, viewport_size.x - 40.0)
+    var max_by_height: float = maxf(320.0, (viewport_size.y - 120.0) * 2.0)
+    var card_width: float = minf(760.0, minf(max_card_width, max_by_height))
+    var card_height: float = card_width * 0.5 + 31.0
+
+    var popup := PopupPanel.new()
+    popup.name = "WebMoveInfoPopup"
+    popup.exclusive = true
+    popup.transparent_bg = false
+    add_child(popup)
+    _web_info_popup = popup
+    popup.popup_hide.connect(_on_web_info_popup_hidden)
+
+    var margin := MarginContainer.new()
+    margin.add_theme_constant_override("margin_left", 10)
+    margin.add_theme_constant_override("margin_top", 10)
+    margin.add_theme_constant_override("margin_right", 10)
+    margin.add_theme_constant_override("margin_bottom", 10)
+    popup.add_child(margin)
+
+    var box := VBoxContainer.new()
+    box.add_theme_constant_override("separation", 8)
+    margin.add_child(box)
+
+    var preview := Button.new()
+    preview.name = "MoveInfoPreview"
+    preview.set_script(get_script())
+    preview.custom_minimum_size = Vector2(card_width, card_height)
+    preview.size = Vector2(card_width, card_height)
+    preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    preview.focus_mode = Control.FOCUS_NONE
+    box.add_child(preview)
+    preview.setup_large_card_preview(
+        move_card,
+        _battle_damage_text,
+        _battle_coverage_text
+    )
+
+    var action_row := HBoxContainer.new()
+    action_row.alignment = BoxContainer.ALIGNMENT_CENTER
+    action_row.add_theme_constant_override("separation", 12)
+    box.add_child(action_row)
+
+    var close_button := Button.new()
+    close_button.text = LocalizationService.tr_key(
+        "common.close",
+        "Close"
+    )
+    close_button.custom_minimum_size = Vector2(160.0, 50.0)
+    close_button.pressed.connect(popup.hide)
+    action_row.add_child(close_button)
+
+    if _web_popup_allow_use:
+        var use_button := Button.new()
+        use_button.text = LocalizationService.tr_key(
+            "common.use",
+            "Use"
+        )
+        use_button.custom_minimum_size = Vector2(160.0, 50.0)
+        use_button.disabled = not _battle_usable
+        if not _battle_usable and not _battle_unavailable_reason.is_empty():
+            use_button.tooltip_text = _battle_unavailable_reason
+        use_button.pressed.connect(_on_web_popup_use_pressed)
+        action_row.add_child(use_button)
+
+    popup.popup_centered(
+        Vector2i(
+            int(card_width + 20.0),
+            int(card_height + 88.0)
+        )
+    )
+
+
+func _on_web_popup_use_pressed() -> void:
+    if not _battle_usable or move_card == null:
+        return
+    if _web_info_popup != null and is_instance_valid(_web_info_popup):
+        _web_info_popup.hide()
+    web_move_use_requested.emit(StringName(move_card.id))
+
+
+func _on_web_info_popup_hidden() -> void:
+    if _web_info_popup != null and is_instance_valid(_web_info_popup):
+        _web_info_popup.queue_free()
+    _web_info_popup = null
 
 
 func _add_card_label(
@@ -399,21 +516,45 @@ func _add_energy_cost_icons(
     costs.alignment = BoxContainer.ALIGNMENT_END
     costs.mouse_filter = Control.MOUSE_FILTER_IGNORE
     costs.add_theme_constant_override("separation", 1)
-    _set_fractional_rect(costs, Vector4(0.60, 0.02, 0.97, 0.17))
+
+    # Energy cost icons must reflect the real move cost. Older Web cards
+    # capped each energy type at four icons, which made 5-Energy moves look
+    # cheaper than they actually are. Give high-cost rows a little more room
+    # and render every required Energy icon.
+    var total_energy_icons: int = 0
+    for raw_cost: Variant in move_card.energy_costs:
+        if raw_cost != null:
+            total_energy_icons += maxi(0, int(raw_cost.count))
+
+    var cost_left_anchor: float = 0.60
+    if total_energy_icons >= 5:
+        cost_left_anchor = 0.52
+    if total_energy_icons >= 7:
+        cost_left_anchor = 0.44
+
+    _set_fractional_rect(
+        costs,
+        Vector4(cost_left_anchor, 0.02, 0.97, 0.17)
+    )
     parent.add_child(costs)
 
     for raw_cost: Variant in move_card.energy_costs:
         if raw_cost == null:
             continue
         var count: int = maxi(1, int(raw_cost.count))
-        for _index: int in range(mini(count, 4)):
+        for _index: int in range(count):
             var icon := TextureRect.new()
             icon.texture = ICONS.load_energy_icon(
                 StringName(raw_cost.energy_type)
             )
-            icon.custom_minimum_size = Vector2(
-                30.0 if large else (13.0 if compact else 16.0),
+            var icon_size: float = (
                 30.0 if large else (13.0 if compact else 16.0)
+            )
+            if total_energy_icons >= 7:
+                icon_size = 24.0 if large else (11.0 if compact else 14.0)
+            icon.custom_minimum_size = Vector2(
+                icon_size,
+                icon_size
             )
             icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
             icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -566,6 +707,8 @@ func set_battle_availability(
     reason: String,
     coverage_text: String
 ) -> void:
+    _battle_usable = usable
+    _battle_unavailable_reason = reason
     if _availability_label == null:
         return
 
@@ -573,14 +716,14 @@ func set_battle_availability(
         _availability_label.text = LocalizationService.tr_format(
             "battle.move_available",
             {"coverage": coverage_text},
-            "✓ Available • Success {coverage}"
+            "[OK] Available  |  Success {coverage}"
         )
         _availability_label.modulate = Color(0.72, 1.0, 0.78, 0.95)
         if _card_content_root != null:
             _card_content_root.modulate = Color.WHITE
     else:
         _availability_label.text = (
-            "✕"
+            "X"
             + (" " + reason if not reason.is_empty() else "")
         )
         _availability_label.modulate = Color(1.0, 0.68, 0.68, 0.95)
@@ -589,6 +732,10 @@ func set_battle_availability(
 
 
 func _on_battle_hover_entered() -> void:
+    if OS.has_feature("web"):
+        _hover_request_serial += 1
+        _hide_manual_battle_hover_popup()
+        return
     if move_card == null:
         return
 
@@ -610,11 +757,18 @@ func _on_battle_hover_entered() -> void:
 
 
 func _on_battle_hover_exited() -> void:
+    if OS.has_feature("web"):
+        _hover_request_serial += 1
+        _hide_manual_battle_hover_popup()
+        return
     _hover_request_serial += 1
     _hide_manual_battle_hover_popup()
 
 
 func _show_manual_battle_hover_popup() -> void:
+    if OS.has_feature("web"):
+        _hide_manual_battle_hover_popup()
+        return
     _hide_manual_battle_hover_popup()
 
     var screen_size: Vector2i = DisplayServer.screen_get_size()

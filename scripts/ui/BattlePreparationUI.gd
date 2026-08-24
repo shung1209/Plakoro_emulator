@@ -138,6 +138,7 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 
 @onready var move_container: GridContainer = %MoveContainer
 @onready var dice_icon_summary_container: HBoxContainer = %DiceIconSummaryContainer
+@onready var repeat_fixed_energy_toggle: CheckButton = %RepeatFixedEnergyToggle
 @onready var coverage_summary_label: Label = %CoverageSummaryLabel
 @onready var overall_rating_label: Label = %OverallRatingLabel
 @onready var overall_probability_label: Label = %OverallProbabilityLabel
@@ -228,6 +229,14 @@ func _ready() -> void:
 	)
 	configure_battle_button.pressed.connect(
 		_open_battle_setup
+	)
+	repeat_fixed_energy_toggle.visible = GameFlow.free_mode
+	repeat_fixed_energy_toggle.button_pressed = (
+		GameFlow.free_mode
+		and GameFlow.free_mode_allow_repeated_fixed_energy
+	)
+	repeat_fixed_energy_toggle.toggled.connect(
+		_on_repeat_fixed_energy_toggled
 	)
 	resolution_mode_option.item_selected.connect(
 		_on_resolution_mode_selected
@@ -355,6 +364,10 @@ func _apply_localized_text() -> void:
 		"preparation.enerkoro",
         "Enerkoro"
 	)
+	repeat_fixed_energy_toggle.text = LocalizationService.tr_key(
+		"preparation.allow_repeated_fixed_energy",
+		"Allow repeated Fixed Energy"
+	)
 	coverage_title.text = LocalizationService.tr_key(
 		"preparation.loadout_analysis",
         "Loadout Analysis"
@@ -412,7 +425,7 @@ func _populate_resolution_modes() -> void:
 	resolution_mode_option.add_item(
 		LocalizationService.tr_key(
 			"preparation.resolution.quick",
-            "Quick — show final result"
+            "Quick - show final result"
 		)
 	)
 	resolution_mode_option.set_item_metadata(
@@ -422,7 +435,7 @@ func _populate_resolution_modes() -> void:
 	resolution_mode_option.add_item(
 		LocalizationService.tr_key(
 			"preparation.resolution.step",
-            "Step-by-step — Move → Effect → Weakness"
+            "Step-by-step - Move -> Effect -> Weakness"
 		)
 	)
 	resolution_mode_option.set_item_metadata(
@@ -560,26 +573,37 @@ func _open_battle_setup() -> void:
 	_refresh_battle_setup_state()
 	_apply_encounter_setup_lock()
 
-	battle_setup_dialog.popup_centered(
-		Vector2i(
-			1180,
-			720
-		)
-	)
+	var setup_dialog_size: Vector2i = Vector2i(1180, 720)
+	if OS.has_feature("web"):
+		# Give the Web loadout editor more room for a permanently visible
+		# scrollbar and a taller Move viewport. itch.io fullscreen is the
+		# primary target, so this intentionally stays desktop-oriented.
+		setup_dialog_size = Vector2i(1380, 840)
+		battle_setup_dialog.min_size = setup_dialog_size
+		battle_setup_dialog.max_size = setup_dialog_size
+	battle_setup_dialog.popup_centered(setup_dialog_size)
 
 
 func _configure_setup_dialog_for_mode() -> void:
 	var configure_opponent: bool = GameFlow.free_mode
 	ai_setup_panel.visible = configure_opponent
-	setup_player_move_scroll.custom_minimum_size.x = (
-		530.0 if configure_opponent else 1080.0
-	)
+	# Let the dialog columns determine width. Keep a bounded vertical viewport
+	# so the Move list scrolls instead of expanding the dialog content.
+	setup_player_move_scroll.custom_minimum_size.x = 0.0
+	setup_ai_move_scroll.custom_minimum_size.x = 0.0
+	var move_viewport_height: float = 300.0
+	if OS.has_feature("web"):
+		move_viewport_height = 390.0
+		setup_player_move_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_ALWAYS
+		setup_ai_move_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_ALWAYS
+	setup_player_move_scroll.custom_minimum_size.y = move_viewport_height
+	setup_ai_move_scroll.custom_minimum_size.y = move_viewport_height
 	setup_hint.text = LocalizationService.tr_key(
 		"preparation.setup_hint_free"
 		if configure_opponent
 		else "preparation.setup_hint",
 		"Choose both Pokémon, their four Moves, and AI difficulty. "
-		+ "Your current Enerkoro setup is used automatically."
+		+ "Each Pokémon automatically uses its own Default Enerkoro."
 		if configure_opponent
 		else "Choose your Pokémon and four Moves. Your current "
 		+ "Enerkoro setup is used automatically. Opponent Loadout "
@@ -689,7 +713,7 @@ func _populate_setup_pokemon_options() -> void:
 				option_text += LocalizationService.tr_format(
 					"preparation.pokemon_level",
 					{"level": int(progress.pokemon_levels.get(pokemon_id, 1))},
-					"  •  LV{level}"
+					"   |   LV{level}"
 				)
 			option.add_item(option_text)
 			option.set_item_metadata(
@@ -1018,7 +1042,10 @@ func _build_inline_setup_move_card(
 ) -> PanelContainer:
 	var panel: PanelContainer = PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# Non-interactive card chrome must not swallow wheel/touch scrolling.
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 	var box: VBoxContainer = VBoxContainer.new()
+	box.mouse_filter = Control.MOUSE_FILTER_PASS
 	box.add_theme_constant_override("separation", 5)
 	panel.add_child(box)
 	box.add_child(check)
@@ -1028,6 +1055,7 @@ func _build_inline_setup_move_card(
 		return panel
 
 	var stats: HBoxContainer = HBoxContainer.new()
+	stats.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stats.add_theme_constant_override("separation", 12)
 	box.add_child(stats)
 	var cost_row: HBoxContainer = HBoxContainer.new()
@@ -1035,6 +1063,7 @@ func _build_inline_setup_move_card(
 	cost_row.setup(move_card, 20)
 	stats.add_child(cost_row)
 	var damage: Label = Label.new()
+	damage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	damage.text = "DMG " + _format_damage(move_card)
 	damage.modulate.a = 0.88
 	stats.add_child(damage)
@@ -1068,11 +1097,12 @@ func _build_inline_setup_move_card(
 			)
 		)
 		detail_lines.append(
-			"Charakoro %s → %s" % [" / ".join(orientation_names), effect_text]
+			"Charakoro %s -> %s" % [" / ".join(orientation_names), effect_text]
 		)
 	if detail_lines.is_empty():
-		detail_lines.append(String(preview.get("summary", "—")))
+		detail_lines.append(String(preview.get("summary", "-")))
 	var details: Label = Label.new()
+	details.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.text = "\n".join(detail_lines)
 	details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	details.modulate.a = 0.78
@@ -1109,6 +1139,14 @@ func _process(
 func _input(
 	event: InputEvent
 ) -> void:
+	# Web browsers can deliver wheel/touch events to CheckBox/Label children
+	# instead of the ScrollContainer. Forward them explicitly while the
+	# Configure Battle dialog is open.
+	if OS.has_feature("web") and battle_setup_dialog.visible:
+		if _forward_web_setup_move_scroll(event):
+			get_viewport().set_input_as_handled()
+			return
+
 	if (
 		setup_move_hover_preview == null
 		or not is_instance_valid(
@@ -1125,6 +1163,60 @@ func _input(
 		).pressed
 	):
 		_clear_setup_move_hover_preview()
+
+
+func _forward_web_setup_move_scroll(event: InputEvent) -> bool:
+	var pointer_position: Vector2 = Vector2.ZERO
+	var delta_y: float = 0.0
+
+	if event is InputEventMouseButton:
+		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
+		if not mouse_event.pressed:
+			return false
+		pointer_position = mouse_event.position
+		if mouse_event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			delta_y = -72.0 * max(mouse_event.factor, 1.0)
+		elif mouse_event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			delta_y = 72.0 * max(mouse_event.factor, 1.0)
+		else:
+			return false
+	elif event is InputEventPanGesture:
+		# Let Godot's ScrollContainer handle touch/trackpad panning natively.
+		# Manual forwarding here caused the same gesture to be applied twice on Web
+		# (and the old 48x multiplier made it extremely sensitive).
+		return false
+	elif event is InputEventScreenDrag:
+		# Native ScrollContainer drag already tracks the finger 1:1.
+		# Do not manually change scroll_vertical as that doubles movement.
+		return false
+	else:
+		return false
+
+	var target_scroll: ScrollContainer = null
+	if (
+		setup_player_move_scroll.visible
+		and setup_player_move_scroll.get_global_rect().has_point(pointer_position)
+	):
+		target_scroll = setup_player_move_scroll
+	elif (
+		setup_ai_move_scroll.visible
+		and setup_ai_move_scroll.get_global_rect().has_point(pointer_position)
+	):
+		target_scroll = setup_ai_move_scroll
+
+	if target_scroll == null:
+		return false
+
+	var bar: VScrollBar = target_scroll.get_v_scroll_bar()
+	if bar == null or bar.max_value <= bar.page:
+		return false
+
+	target_scroll.scroll_vertical = int(clamp(
+		float(target_scroll.scroll_vertical) + delta_y,
+		0.0,
+		max(0.0, bar.max_value - bar.page)
+	))
+	return true
 
 
 func _on_setup_move_scroll_input(
@@ -1171,6 +1263,9 @@ func _request_setup_move_hover_preview(
 	move_id: String,
 	move_data: Dictionary
 ) -> void:
+	if OS.has_feature("web"):
+		_clear_setup_move_hover_preview()
+		return
 	setup_move_hover_request_serial += 1
 	var request_serial: int = (
 		setup_move_hover_request_serial
@@ -1217,6 +1312,8 @@ func _show_setup_move_hover_preview(
 	move_data: Dictionary
 ) -> void:
 	_clear_setup_move_hover_preview()
+	if OS.has_feature("web"):
+		return
 
 	if owner == null or move_data.is_empty():
 		return
@@ -1713,6 +1810,13 @@ func _refresh_battle_setup_state() -> void:
 	)
 
 	var dice_ready: bool = CONTENT_PLAYTEST.has_player_custom_dice()
+	if GameFlow.free_mode and not player_id.is_empty():
+		var selected_player_pokemon: Dictionary = (
+			POKEMON_AUTHORING.load_by_id(player_id)
+		)
+		dice_ready = CONTENT_PLAYTEST.has_pokemon_default_dice(
+			selected_player_pokemon
+		)
 
 	var ready: bool = (
 		not player_id.is_empty()
@@ -1728,9 +1832,9 @@ func _refresh_battle_setup_state() -> void:
 				"preparation.ready_free_setup"
 				if GameFlow.free_mode
 				else "preparation.ready_player_setup",
-				"READY — Player and opponent Loadouts are valid."
+				"READY - Player and opponent Loadouts are valid."
 				if GameFlow.free_mode
-				else "READY — Player Loadout is valid. Opponent Loadout is hidden."
+				else "READY - Player Loadout is valid. Opponent Loadout is hidden."
 			)
 			+ (
 				LocalizationService.tr_key(
@@ -1745,7 +1849,7 @@ func _refresh_battle_setup_state() -> void:
 		setup_status_label.text = (
 			LocalizationService.tr_key(
 				"preparation.not_ready_dice",
-                "NOT READY — Selected Player Enerkoro source is unavailable."
+                "NOT READY - Selected Player Enerkoro source is unavailable."
 			)
 		)
 	else:
@@ -1753,7 +1857,7 @@ func _refresh_battle_setup_state() -> void:
 			LocalizationService.tr_format(
 				"preparation.not_ready_player_count",
 				{"player": player_count},
-				"NOT READY — Player {player}/4 Moves"
+				"NOT READY - Player {player}/4 Moves"
 			)
 			if player_count != 4
 			else LocalizationService.tr_key(
@@ -1832,11 +1936,16 @@ func _apply_battle_setup() -> void:
 		)
 	)
 
+	var player_dice_source: String = (
+		"pokemon_default"
+		if GameFlow.free_mode
+		else "player_custom"
+	)
 	var player_result: Dictionary = (
 		CONTENT_PLAYTEST.create_playtest_loadout(
 			player_pokemon,
 			player_moves,
-			"player_custom"
+			player_dice_source
 		)
 	)
 
@@ -2001,17 +2110,17 @@ func _refresh_loadout_summary() -> void:
 	else:
 		pokemon_type_label.text = LocalizationService.tr_format(
 			"preparation.type_value",
-			{"type": "—"},
+			{"type": "-"},
             "Type: {type}"
 		)
 		pokemon_hp_label.text = LocalizationService.tr_format(
 			"preparation.hp_value",
-			{"hp": "—"},
+			{"hp": "-"},
             "HP: {hp}"
 		)
 		pokemon_weakness_label.text = LocalizationService.tr_format(
 			"preparation.weakness_value",
-			{"value": "—"},
+			{"value": "-"},
             "Weakness: {value}"
 		)
 
@@ -2031,7 +2140,7 @@ func _format_pokemon_weakness(
 	if pokemon == null:
 		return LocalizationService.tr_format(
 			"preparation.weakness_value",
-			{"value": "—"},
+			{"value": "-"},
             "Weakness: {value}"
 		)
 
@@ -2180,7 +2289,7 @@ func _refresh_moves() -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 		var damage_text: String = _format_damage(move_card)
-		var coverage_text: String = "—"
+		var coverage_text: String = "-"
 		if player_loadout_data.energy_dice_setup != null:
 			var coverage: Variant = MOVE_COVERAGE_ANALYZER.analyze_move(
 				player_loadout_data.energy_dice_setup,
@@ -2198,6 +2307,11 @@ func _refresh_moves() -> void:
 			coverage_text
 		)
 		button.set_battle_availability(true, "", coverage_text)
+		if OS.has_feature("web"):
+			button.pressed.connect(
+				func() -> void:
+					button.call("_open_web_move_info_popup")
+			)
 		move_container.add_child(button)
 
 
@@ -2529,15 +2643,15 @@ func _refresh_overall_loadout_summary() -> void:
 	if player_loadout_data == null:
 		overall_rating_label.text = LocalizationService.tr_key(
 			"preparation.no_analysis",
-            "☆☆☆☆☆  No Analysis"
+            "-----  No Analysis"
 		)
 		overall_probability_label.text = LocalizationService.tr_key(
 			"preparation.overall_coverage_empty",
-            "Overall coverage: —"
+            "Overall coverage: -"
 		)
 		energy_usage_label.text = LocalizationService.tr_key(
 			"preparation.energy_usage_empty",
-            "Energy Usage\n—"
+            "Energy Usage\n-"
 		)
 		loadout_status_label.text = LocalizationService.tr_key(
 			"preparation.loadout_status_unavailable",
@@ -2552,15 +2666,15 @@ func _refresh_overall_loadout_summary() -> void:
 	if setup == null:
 		overall_rating_label.text = LocalizationService.tr_key(
 			"preparation.no_dice_setup",
-            "☆☆☆☆☆  No Dice Setup"
+            "-----  No Dice Setup"
 		)
 		overall_probability_label.text = LocalizationService.tr_key(
 			"preparation.overall_coverage_empty",
-            "Overall coverage: —"
+            "Overall coverage: -"
 		)
 		energy_usage_label.text = LocalizationService.tr_key(
 			"preparation.energy_usage_empty",
-            "Energy Usage\n—"
+            "Energy Usage\n-"
 		)
 		loadout_status_label.text = LocalizationService.tr_key(
 			"preparation.loadout_status_saved",
@@ -2637,7 +2751,7 @@ func _refresh_overall_loadout_summary() -> void:
 		if not MOVE_DRAFT_PROVIDER.has_draft()
 		else LocalizationService.tr_key(
 			"preparation.loadout_status_draft",
-            "Loadout Status: Saved • Move Draft Active"
+            "Loadout Status: Saved  |  Move Draft Active"
 		)
 	)
 
@@ -2721,7 +2835,7 @@ func _format_energy_usage_summary(
 					"energy": GameContentLocalizationService.localize_type(energy_type),
 					"count": int(energy_usage[raw_energy])
 				},
-                "{icon} {energy} × {count}"
+                "{icon} {energy} x {count}"
 			)
 		)
 
@@ -2734,9 +2848,9 @@ func _stars_text(
 
 	for index: int in range(5):
 		result += (
-            "★"
+            "*"
 			if index < filled_count
-			else "☆"
+			else "-"
 		)
 
 	return result
@@ -2777,7 +2891,7 @@ func _refresh_opponent_summary() -> void:
 		opponent_name_label.text = LocalizationService.tr_key("preparation.unknown_opponent", "Unknown Opponent")
 		opponent_loadout_label.text = LocalizationService.tr_key("preparation.no_ai_loadout", "No AI loadout.")
 		opponent_difficulty_label.text = ""
-		opponent_weakness_label.text = "Weakness: —"
+		opponent_weakness_label.text = "Weakness: -"
 		_refresh_opponent_portrait(null)
 		return
 
@@ -2833,12 +2947,21 @@ func _refresh_opponent_portrait(pokemon: Variant) -> void:
 func _refresh_move_draft_status() -> void:
 	if MOVE_DRAFT_PROVIDER.has_draft():
 		move_draft_status_label.text = (
-			LocalizationService.tr_key("preparation.move_config_draft", "Move Configuration: • Draft Active")
+			LocalizationService.tr_key("preparation.move_config_draft", "Move Configuration:  |  Draft Active")
 		)
 	else:
 		move_draft_status_label.text = (
-			LocalizationService.tr_key("preparation.move_config_saved", "Move Configuration: ✓ Saved Loadout")
+			LocalizationService.tr_key("preparation.move_config_saved", "Move Configuration: [OK] Saved Loadout")
 		)
+
+
+func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
+	if not GameFlow.free_mode:
+		repeat_fixed_energy_toggle.set_pressed_no_signal(false)
+		return
+	GameFlow.free_mode_allow_repeated_fixed_energy = enabled
+	PLAKORO_THEME.set_free_mode_allow_repeated_fixed_energy(enabled)
+	_refresh_validation()
 
 
 func _refresh_validation() -> void:
@@ -2888,14 +3011,18 @@ func _refresh_validation() -> void:
 	var result: Dictionary = (
 		PLAYER_LOADOUT_VALIDATOR.validate(
 			player_loadout_data,
-			database
+			database,
+			GameFlow.free_mode
+			and GameFlow.free_mode_allow_repeated_fixed_energy
 		)
 	)
 
 	var ai_result: Dictionary = (
 		AI_LOADOUT_VALIDATOR.validate(
 			ai_loadout_data,
-			database
+			database,
+			GameFlow.free_mode
+			and GameFlow.free_mode_allow_repeated_fixed_energy
 		)
 	)
 
@@ -2904,7 +3031,7 @@ func _refresh_validation() -> void:
 		and bool(ai_result["success"])
 	):
 		validation_label.text = (
-			LocalizationService.tr_key("preparation.validation_ready", "✓ READY — Player and AI loadouts are valid.")
+			LocalizationService.tr_key("preparation.validation_ready", "[OK] READY - Player and AI loadouts are valid.")
 		)
 		start_battle_button.disabled = false
 		return
@@ -2948,7 +3075,9 @@ func _start_battle() -> void:
 	var validation: Dictionary = (
 		PLAYER_LOADOUT_VALIDATOR.validate(
 			player_loadout_data,
-			database
+			database,
+			GameFlow.free_mode
+			and GameFlow.free_mode_allow_repeated_fixed_energy
 		)
 	)
 
@@ -2958,7 +3087,7 @@ func _start_battle() -> void:
 
 	if not PLAYER_LOADOUT_SAVE_SERVICE.save_loadout(
 		player_loadout_data,
-		PLAYER_LOADOUT_PROVIDER.USER_LOADOUT_PATH
+		PLAYER_LOADOUT_PROVIDER.get_user_loadout_path()
 	):
 		validation_label.text = (
 			LocalizationService.tr_key("preparation.loadout_save_failed", "Loadout is valid, but could not be saved.")
@@ -2991,7 +3120,6 @@ func _open_energy_dice_builder() -> void:
 		)
 		return
 
-	var target_path: String = CONTENT_PLAYTEST.PLAYER_CUSTOM_DICE_PATH
 	var mode: String = "player_custom"
 	var pokemon_id: String = String(
 		player_loadout_data.pokemon_id
@@ -3010,14 +3138,22 @@ func _open_energy_dice_builder() -> void:
 				"species_id",
                 ""
 			)
-		)
+		).strip_edges().to_lower()
 
-	if GameFlow.free_mode and not _ensure_free_mode_custom_dice():
-		validation_label.text = LocalizationService.tr_key(
-			"preparation.free_dice_init_failed",
-			"Free Mode could not prepare an editable Enerkoro setup."
+	var target_path: String = CONTENT_PLAYTEST.get_player_custom_dice_path()
+
+	# Free Mode edits the selected Pokémon's own default Enerkoro directly.
+	# Story Mode keeps the independent player-custom Enerkoro workflow.
+	if GameFlow.free_mode:
+		mode = "pokemon_default"
+		if pokemon.is_empty():
+			validation_label.text = (
+				"Selected Free Mode Pokémon is unavailable."
+			)
+			return
+		target_path = CONTENT_PLAYTEST.get_pokemon_default_dice_path(
+			pokemon
 		)
-		return
 
 	if target_path.is_empty() or not FileAccess.file_exists(target_path):
 		validation_label.text = (
@@ -3044,7 +3180,7 @@ func _open_energy_dice_builder() -> void:
 
 
 func _ensure_free_mode_custom_dice() -> bool:
-	var target_path: String = CONTENT_PLAYTEST.PLAYER_CUSTOM_DICE_PATH
+	var target_path: String = CONTENT_PLAYTEST.get_player_custom_dice_path()
 	if FileAccess.file_exists(target_path):
 		return true
 	if (
@@ -3075,7 +3211,7 @@ func _format_move_cost(
 			_energy_icon(energy_type)
 			+ " "
 			+ String(energy_type)
-			+ "×"
+			+ "x"
 			+ str(int(cost.count))
 		)
 
@@ -3086,7 +3222,7 @@ func _format_damage(
 	move_card: Variant
 ) -> String:
 	if move_card.printed_damage == null:
-		return "—"
+		return "-"
 
 	return str(int(move_card.printed_damage))
 
@@ -3116,7 +3252,7 @@ func _energy_icon(
 ) -> String:
 	match energy_type:
 		&"normal":
-			return "☆"
+			return "-"
 		&"grass":
 			return "Grass"
 		&"fire":
@@ -3136,4 +3272,4 @@ func _energy_icon(
 		&"flying":
 			return "Flying"
 		_:
-			return "•"
+			return " | "
