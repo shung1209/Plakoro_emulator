@@ -1,246 +1,171 @@
-# PLAKORO — Adventure-Driven Game V2
+# PLAKORO Adventures v2.3
 
-**PLAKORO** is an unofficial, fan-made adventure-driven PC game inspired
-by Bandai's Pokémon PLAKORO dice game.
+**PLAKORO Adventures** is an unofficial, fan-made game inspired by Bandai's
+Pokémon PLAKORO dice game. It builds on the stable **12.12k release-clean
+Official V1 Base**, turning the original emulator and content tools into an
+adventure-driven game with progression, collection building, save files, and
+two ways to play.
 
-Choose a partner, build an Enerkoro pool, unlock new Plakoro and Moves,
-and progress through a fixed sequence of opponents. Battles retain the
-physical-dice character of PLAKORO while adding progression, rewards,
-save files, and a clearer game-focused interface.
+Choose a Plakoro, build three Enerkoro, select four Moves, roll the dice, and
+advance through the arena.
 
-This version is built on the **12.12k release-clean Official V1 Base**.
-V1 remains the stable emulator and content-tool foundation; Game V2
-develops that foundation into a guided adventure rather than a pure
-sandbox simulation.
+## What's in v2.3
 
-------------------------------------------------------------------------
+- Story Mode with New Game, Continue, save deletion, sequential encounters,
+  battle rewards, collection unlocks, and Plakoro levels up to LV5.
+- Free Mode with all playable content available for unrestricted battles and
+  expanded Enerkoro rules.
+- 21 Pokémon, 126 Move cards, and 9 custom Kyokoro weight profiles.
+- New Gengar, Lucario, and Metagross data, Moves, images, and default dice
+  setups.
+- Three editable Enerkoro built from the player's owned Energy inventory.
+- Dynamic Move cards based on the PlakoroDB card background, including full
+  Energy costs, Kyokoro faces, effects, damage, and success probability.
+- Warm and Dark interface themes with distinct action-button colors.
+- Battle presentation improvements, attack feedback, UI motion, clearer dice
+  results, and Kyokoro orientation effects.
+- Windows, Linux, and Web/itch.io export presets.
+- English, Traditional Chinese, Spanish (Spain), and Japanese interfaces.
+- Bundled Noto Sans TC and Noto Sans JP fonts for reliable CJK display.
 
-## Features
+## Game Modes
 
--   **Adventure Progression** --- Defeat opponents in order and unlock
-    the next encounter.
--   **Starter Save File** --- Begin with Charmander, Squirtle, or
-    Bulbasaur and keep progress between sessions.
--   **Collection Growth** --- Winning unlocks the defeated Plakoro, its
-    available Moves, and additional Energy.
--   **Level-Based Energy Rewards** --- Plakoro can reach LV5 and gain a
-    player-selected Energy at each level.
--   **Enerkoro Inventory** --- Build three Enerkoro using only the Energy
-    currently owned by the player.
--   **PLAKORO Dice Battles** --- Roll Charakoro and Enerkoro, meet Move
-    requirements, trigger orientation effects, and fight an AI opponent.
--   **Weighted Charakoro Profiles** --- Supported models use their custom
-    roll-weight profiles; other Plakoro use an equal-weight profile.
--   **Multiple Languages** --- English, Traditional Chinese, Spanish
-    (Spain), and Japanese.
--   **Advanced Creation Tools** --- The V1 Content Studio and custom
-    content systems remain available for advanced use, but are kept out
-    of the normal adventure flow.
+### Story Mode
 
-------------------------------------------------------------------------
+Start a new adventure with Charmander, Squirtle, or Bulbasaur, or continue an
+existing save. Encounters unlock in a fixed order, and the active Plakoro
+cannot battle itself. Victory unlocks the defeated Plakoro, its Moves, and new
+Energy. Level rewards must be selected before continuing.
 
-## Getting Started
+Story Mode saves:
 
-1.  Download and extract the game.
-2.  Start **PLAKORO** and create a save file.
-3.  Choose Charmander, Squirtle, or Bulbasaur as your first partner.
-4.  Choose a starting Energy distribution and enter the adventure.
-5.  Select the first available encounter and prepare your Loadout.
-6.  Win battles to unlock the next opponent, new Plakoro, Moves, and
-    Energy.
+- completed encounters and career record;
+- unlocked Plakoro and Moves;
+- Plakoro levels and Energy rewards;
+- owned Energy and the active Enerkoro setup;
+- the current player Loadout.
 
-------------------------------------------------------------------------
+### Free Mode
 
-## Interface Overview
+Free Mode opens the full roster for immediate play. Choose the player and AI
+Plakoro, configure four Moves, edit Enerkoro directly, and battle without Story
+Mode progression restrictions. Free Mode also supports repeated Fixed Energy
+when enabled in the Enerkoro Builder.
 
-### Main Menu and Save File
+### Content Studio
 
-The Main Menu continues an existing adventure or starts a new save. A
-save records completed encounters, unlocked Plakoro and Moves, levels,
-Energy inventory, and the active player Loadout. Save files can also be
-deleted from the Main Menu.
+Content Studio remains hidden during normal play so the main menu stays
+game-focused. From the main menu, enter:
+
+```text
+↑ ↑ ↓ ↓ ← → ← → B A
+```
+
+This reveals Content Studio for the current session. The same code is required
+in both Story and Free Mode workflows.
+
+## Interface Guide
+
+### Main Menu
+
+Start or continue Story Mode, enter Free Mode, switch between Warm and Dark
+themes, delete a Story save, or quit. Content Studio appears only after the
+unlock code is entered.
 
 ### Encounter Select
 
-The adventure map presents a fixed sequence of opponents. Only the next
-valid encounter is available, and the player cannot battle the same
-Plakoro currently equipped in their Loadout.
+Shows Story Mode progress and the next available opponent. Winning the current
+encounter unlocks the next battle.
 
 ### Battle Preparation
 
-Battle Preparation summarizes both combatants, the player's selected
-Moves, the three Enerkoro, and Move coverage probabilities. Use the
-Loadout window to choose one unlocked Plakoro and four unlocked Moves.
-The current player Enerkoro setup is applied automatically.
+Displays the player and opponent, the active three-Enerkoro setup, four selected
+Move cards, and Loadout coverage. Configure the player Plakoro and Moves, edit
+Enerkoro, then start the battle when the Loadout is valid. The opponent's
+Loadout remains hidden before combat.
 
 ### Enerkoro Builder
 
-Click a face on any of the three Enerkoro to replace or remove its
-Energy. Every configuration is checked against the player's owned
-Energy inventory; incomplete or over-budget setups cannot be used.
-**Save & Use** stores the setup and returns to Battle Preparation.
+Select a face to remove or replace its Energy. The game checks every setup
+against the available Energy inventory and prevents incomplete or over-budget
+configurations. **Save & Use** applies the setup and returns to Battle
+Preparation.
 
 ### Battle
 
-The Battle screen combines the playmat, both Plakoro, HP, rolled Energy,
-Charakoro orientation, available Moves, action feedback, and a technical
-timeline. Click the opponent Charakoro to inspect its revealed Moves in
-a separate window without reducing the main battle space.
+The battle screen presents both combatants, HP, dice results, Charakoro
+orientation, Move cards, action feedback, and an optional technical timeline.
+Select a Move card to attack. Select the opponent Charakoro during battle to
+inspect its revealed Moves in a separate window.
 
 ### Battle Report
 
-When a battle ends, the game moves directly to the Battle Report. It
-shows the result, damage, remaining HP, career record, unlocks, and
-collection rewards. Level-up Energy must be selected before navigation
-buttons become available, ensuring rewards are saved before the next
-action.
+Victory and defeat are resolved on the Battle Report screen. It records turns,
+damage, remaining HP, milestones, collection rewards, unlocks, and level-up
+Energy before enabling the next navigation action.
 
-------------------------------------------------------------------------
+## Running the Project
 
-## Your `user_database`
+The project currently targets **Godot 4.7.1** with the GL Compatibility
+renderer.
 
-When PLAKORO is launched for the first time, it automatically
-creates a writable personal database under Godot's `user://` storage:
+1. Clone or download this repository.
+2. Open `project.godot` in Godot 4.7.1 or a compatible Godot 4 release.
+3. Allow Godot to import the bundled assets and fonts.
+4. Run the project from the editor.
 
-``` text
-user://user_database/
-```
+The included export presets provide:
 
-This database is separate from the packaged game content and is intended
-to store your editable PLAKORO content, including:
+- Windows Desktop: `Plakoro_Adventure_v2.3.exe`
+- Linux: `Plakoro_Adventure_v2.3.application`
+- Web: `web/index.html`
 
--   Pokémon / Charakoro data
--   Moves and Move effects
--   Move loadouts
--   Enerkoro configurations
--   Charakoro profiles and weight data
--   User-editable database content
--   Language/localization overrides
+Web export helpers are available in `tools/export_web.sh` and
+`tools/export_web.ps1`.
 
-The game copies required starter data into the user database when
-necessary, allowing the packaged game files to remain read-only.
+## User Data and Custom Content
 
-### Accessing the database
+On first launch, the game copies the editable starter database into Godot's
+`user://user_database/` location. This writable database is separate from the
+packaged files and stores custom Pokémon, Moves, Loadouts, Enerkoro setups,
+Kyokoro profiles, localization overrides, and other user-created content.
 
-The game provides a `user_database_link` so you can conveniently reach
-the actual user database from your PLAKORO installation.
+Do not edit packaged database files solely to create personal content. Back up
+the user database before replacing an installation or testing major changes.
+The local `user_database_link` shortcut is intentionally ignored by Git because
+its destination is machine-specific.
 
-Use this location when you want to inspect, back up, or manually work
-with your custom files.
+## Asset Conventions
 
-### Important
+- Plakoro portraits use PNG files under `assets/pokemon/images/`; names may use
+  a Pokémon ID such as `pikachu_standard.png`.
+- Optional 3D models belong under `assets/pokemon/models/`; the resolver accepts
+  GLB, GLTF, FBX, a full Pokémon ID, or a species filename.
+- Energy icons use the type filenames under `assets/ui/energy/`.
+- Kyokoro orientation icons use `face_up`, `face_down`, `head_up`, `head_down`,
+  `head_left`, and `head_right` under `assets/ui/kyokoro/`.
 
-**Do not edit the packaged game database just to create custom
-content.**
+## Credits and Attribution
 
-Use the generated `user_database` instead. This keeps your personal
-content separate from the distributed game files and makes updating the
-emulator safer.
-
-------------------------------------------------------------------------
-
-## Enerkoro Builder
-
-The **Enerkoro Builder** modifies the player's active three-die setup.
-Energy faces may be replaced or removed, but the final setup must fill
-all required faces without exceeding the player's inventory. The Move
-readiness analysis helps show how a distribution changes the chance of
-using each selected Move.
-
-------------------------------------------------------------------------
-
-## Languages
-
-PLAKORO currently includes:
-
-  Language              Locale
-  --------------------- ---------
-  English               `en_US`
-  Traditional Chinese   `zh_TW`
-  Spanish (Spain)       `es_ES`
-  Japanese              `ja_JP`
-
-The localization system also supports user-side language data through
-the user database.
-
-------------------------------------------------------------------------
-
-## Backing Up Your Content
-
-If you create custom Pokémon, Moves, Enerkoro configurations, Charakoro
-profiles, or other content, periodically back up your:
-
-``` text
-user_database
-```
-
-When upgrading PLAKORO Emulator, keep your existing user database unless
-the release notes for a future version specifically instruct you to
-migrate or replace it.
-
-------------------------------------------------------------------------
-
-## Project Foundation
-
-The **12.12k release-clean Official V1 Base** established the stable
-battle engine, localization, user database, custom content, Enerkoro,
-and model-weight systems.
-
-The adventure-driven version builds the following game loop on top of
-that base:
-
-``` text
-Create / Continue Save
-    ↓
-Choose Encounter
-    ↓
-Prepare Plakoro, Moves, and Enerkoro
-    ↓
-Battle
-    ↓
-Battle Report and Rewards
-    ↓
-Unlock the Next Opponent
-```
-
-------------------------------------------------------------------------
-
-## Special Thanks
-
-Thanks to everyone who contributed information, resources, testing
-material, and translation references for the project.
-
--   **InvestigatorFew7899 from Reddit** --- for allowing the project to
-    use their STL files for development and testing of the 3D model and
-    dice systems.
--   **Jollto** --- for providing a translation database used as a
-    localization reference.
--   **PLAKORO Chinese website** --- for providing valuable PLAKORO
-    information and reference material.
-
-And thanks to the PLAKORO community for preserving information about
-this unusual piece of Pokémon history.
-
-------------------------------------------------------------------------
+- **Jollto / PlakoroDB** — localization reference and the Move-card background
+  template from
+  [`database/cards/background.png`](https://github.com/Jollto/PlakoroDB/blob/main/database/cards/background.png).
+  PlakoroDB describes its original contributions as licensed under
+  [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). The template
+  is used here for non-commercial fan-project presentation; Move content is
+  rendered dynamically by Godot.
+- **InvestigatorFew7899** — permission to use their STL files for development
+  and testing of the 3D model and dice systems.
+- **PLAKORO Chinese website** — game information and reference material.
+- The PLAKORO community — preservation, testing, and research.
 
 ## Disclaimer
 
-PLAKORO is an **unofficial, fan-made project** created for
-experimentation, preservation, and enjoyment of the PLAKORO game system.
+PLAKORO Adventures is an unofficial, non-commercial fan project created for
+experimentation, preservation, and enjoyment of the PLAKORO game system. It is
+not affiliated with, endorsed by, or sponsored by Nintendo, The Pokémon
+Company, Game Freak, Creatures Inc., Bandai, or their affiliates.
 
-This project is not affiliated with, endorsed by, or sponsored by
-Nintendo, The Pokémon Company, Game Freak, Creatures Inc., Bandai, or
-their respective affiliates.
-
-Pokémon, PLAKORO, and related names, characters, trademarks, and
-intellectual property belong to their respective owners. No ownership of
-those properties is claimed by this project.
-
-------------------------------------------------------------------------
-
-## Have Fun!
-
-Build your collection, refine your Enerkoro, and find a Loadout that can
-complete the adventure.
-
-**Roll forward into the PLAKORO adventure.**
+Pokémon, PLAKORO, the original artwork, logos, card layouts, characters,
+trademarks, and related intellectual property belong to their respective
+rights holders. No ownership of those properties is claimed by this project.
