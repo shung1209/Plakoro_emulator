@@ -216,6 +216,7 @@ func _setup_generated_card_summary(
 ) -> void:
     var compact: bool = custom_minimum_size.x < 220.0
     var large: bool = custom_minimum_size.x >= 500.0
+    var phone_card: bool = GameFlow.phone_mode and not large
 
     _card_content_root = Control.new()
     _card_content_root.name = "GeneratedMoveCard"
@@ -275,7 +276,7 @@ func _setup_generated_card_summary(
         _card_content_root,
         GameContentLocalizationService.localize_move(move_card),
         Vector4(0.14, 0.15, 0.80, 0.43),
-        34 if large else (15 if compact else 18),
+        34 if large else (24 if phone_card else (15 if compact else 18)),
         HORIZONTAL_ALIGNMENT_CENTER,
         Color.WHITE,
         5 if large else 3,
@@ -293,7 +294,7 @@ func _setup_generated_card_summary(
     )
 
     _add_energy_cost_icons(_card_content_root, compact, large)
-    _add_effect_rows(_card_content_root, compact, large)
+    _add_effect_rows(_card_content_root, compact, large, phone_card)
 
     var card_code: String = String(
         move_card.source.get("card_code", "")
@@ -565,7 +566,8 @@ func _add_energy_cost_icons(
 func _add_effect_rows(
     parent: Control,
     compact: bool,
-    large: bool
+    large: bool,
+    phone_card: bool = false
 ) -> void:
     var preview: Dictionary = EFFECT_PRESENTATION.build_preview(move_card)
     var trigger_groups: Array = preview.get("trigger_groups", [])
@@ -574,7 +576,7 @@ func _add_effect_rows(
     effects.mouse_filter = Control.MOUSE_FILTER_IGNORE
     effects.add_theme_constant_override(
         "separation",
-        4 if large else 1
+        4 if large else (0 if phone_card else 1)
     )
     _set_fractional_rect(effects, Vector4(0.025, 0.52, 0.965, 0.92))
     parent.add_child(effects)
@@ -588,7 +590,7 @@ func _add_effect_rows(
         ).strip_edges()
         if description.text.is_empty():
             description.text = String(preview.get("detail", ""))
-        _style_effect_label(description, compact, large, 4)
+        _style_effect_label(description, compact, large, 4, phone_card)
         effects.add_child(description)
         return
 
@@ -612,10 +614,15 @@ func _add_effect_rows(
         icons.name = "EffectFaces"
         icons.columns = 3
         icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        icons.custom_minimum_size.x = 102.0 if large else 47.0
+        icons.custom_minimum_size.x = (
+            102.0 if large else (58.0 if phone_card else 47.0)
+        )
         icons.size_flags_vertical = Control.SIZE_SHRINK_CENTER
         icons.add_theme_constant_override("h_separation", 2 if large else 1)
-        icons.add_theme_constant_override("v_separation", 2 if large else 1)
+        icons.add_theme_constant_override(
+            "v_separation",
+            2 if large else (0 if phone_card else 1)
+        )
         row.add_child(icons)
 
         var orientations: Array = group.get("orientations", [])
@@ -627,7 +634,11 @@ func _add_effect_rows(
             icon.custom_minimum_size = (
                 Vector2(30.0, 30.0)
                 if large
-                else Vector2(13.0, 13.0)
+                else (
+                    Vector2(18.0, 18.0)
+                    if phone_card
+                    else Vector2(13.0, 13.0)
+                )
             )
             icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
             icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -647,7 +658,8 @@ func _add_effect_rows(
             effect_label,
             compact,
             large,
-            2 if group_count > 1 else 3
+            2 if group_count > 1 else 3,
+            phone_card
         )
         effect_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         row.add_child(effect_label)
@@ -657,7 +669,8 @@ func _style_effect_label(
     label: Label,
     compact: bool,
     large: bool,
-    max_lines: int
+    max_lines: int,
+    phone_card: bool = false
 ) -> void:
     label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
     label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -667,8 +680,10 @@ func _style_effect_label(
     label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
     label.add_theme_font_size_override(
         "font_size",
-        17 if large else (7 if compact else 8)
+        17 if large else (15 if phone_card else (7 if compact else 8))
     )
+    if phone_card:
+        label.add_theme_constant_override("line_spacing", -3)
     label.add_theme_color_override("font_color", Color.WHITE)
     label.add_theme_color_override(
         "font_outline_color",

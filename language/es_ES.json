@@ -57,7 +57,7 @@
     "delete_save.confirm": "Eliminar partida",
     "delete_save.success": "Partida eliminada. Ya puedes iniciar una nueva.",
     "delete_save.failed": "No se pudo eliminar la partida: {path}",
-    "main_menu.version": "V2 FOUNDATION",
+    "main_menu.version": "V2.3 FOUNDATION",
     "battle.title": "PLAKORO Combate",
     "battle.your_turn": "TU TURNO",
     "battle.ai_turn": "TURNO DE LA IA",

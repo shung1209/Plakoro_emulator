@@ -57,7 +57,7 @@
     "delete_save.confirm": "刪除存檔",
     "delete_save.success": "存檔已刪除，現在可以開始新遊戲。",
     "delete_save.failed": "無法刪除存檔：{path}",
-    "main_menu.version": "V2 基礎版本",
+    "main_menu.version": "V2.3 基礎版本",
     "battle.title": "PLAKORO 對戰",
     "battle.your_turn": "你的回合",
     "battle.ai_turn": "AI 回合",

@@ -1,6 +1,9 @@
 extends Control
 
 
+const DISPLAY_VERSION: String = "V2.3"
+
+
 const PLAKORO_THEME: Script = preload(
 	"res://scripts/ui/theme/PlakoroThemeFactory.gd"
 )
@@ -300,9 +303,11 @@ func _apply_localized_text() -> void:
 		"main_menu.delete_save",
 		"Delete Save File"
 	)
-	version_label.text = LocalizationService.tr_key(
-		"main_menu.version",
-		"V2 FOUNDATION"
+	version_label.text = _normalize_version_label(
+		LocalizationService.tr_key(
+			"main_menu.version",
+			DISPLAY_VERSION + " FOUNDATION"
+		)
 	)
 	quit_confirmation.title = LocalizationService.tr_key(
 		"global_quit.title",
@@ -336,6 +341,16 @@ func _apply_localized_text() -> void:
 		"common.cancel",
 		"Cancel"
 	)
+
+
+func _normalize_version_label(localized_text: String) -> String:
+	var value: String = localized_text.strip_edges()
+	if not value.begins_with("V2"):
+		return DISPLAY_VERSION + " FOUNDATION"
+	var suffix_position: int = value.find(" ")
+	if suffix_position < 0:
+		return DISPLAY_VERSION
+	return DISPLAY_VERSION + value.substr(suffix_position)
 
 
 func _apply_brand_title() -> void:

@@ -457,6 +457,9 @@ func _adapt_battle() -> void:
 		return
 	body.split_offset = 460
 	battle_scroll.visible = true
+	battle_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	column.custom_minimum_size.x = 0
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var tabs: HBoxContainer = HBoxContainer.new()
 	tabs.name = "PhoneBattleTabs"
 	tabs.add_theme_constant_override("separation", 6)
@@ -489,7 +492,13 @@ func _adapt_battle() -> void:
 	if roll_panel != null:
 		roll_panel.reparent(roll)
 		roll_panel.custom_minimum_size = Vector2(0, 380)
+		roll_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		roll_panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		var dice_presenter: Control = source.get_node_or_null(
+			"%BattleDiceRollPresenter"
+		) as Control
+		if dice_presenter != null and dice_presenter.has_method("set_compact_mode"):
+			dice_presenter.call("set_compact_mode", true)
 		var confirmation_panel: PanelContainer = PanelContainer.new()
 		confirmation_panel.name = "PhoneRollConfirmationPanel"
 		confirmation_panel.custom_minimum_size = Vector2(0, 210)
@@ -523,7 +532,7 @@ func _adapt_battle() -> void:
 	if move_buttons_value is Array:
 		for button: Variant in move_buttons_value:
 			if button is Button:
-				(button as Button).custom_minimum_size = Vector2(0, 126)
+				(button as Button).custom_minimum_size = Vector2(0, 150)
 				(button as Button).pressed.connect(_on_phone_move_pressed)
 	if source.has_signal("battle_phase_changed"):
 		source.connect("battle_phase_changed", _on_battle_phase_changed)
@@ -561,6 +570,26 @@ func _show_battle_view(view_id: StringName) -> void:
 	var scroll: ScrollContainer = source.get("battle_scroll") as ScrollContainer
 	if scroll != null:
 		scroll.scroll_vertical = 0
+		_update_phone_battle_scroll.call_deferred()
+
+
+func _update_phone_battle_scroll() -> void:
+	if source == null:
+		return
+	var scroll: ScrollContainer = source.get("battle_scroll") as ScrollContainer
+	if scroll == null:
+		return
+	var column: VBoxContainer = scroll.get_node_or_null("BattleColumn") as VBoxContainer
+	if column == null:
+		return
+	var needs_vertical_scroll: bool = (
+		column.get_combined_minimum_size().y > scroll.size.y + 1.0
+	)
+	scroll.vertical_scroll_mode = (
+		ScrollContainer.SCROLL_MODE_AUTO
+		if needs_vertical_scroll
+		else ScrollContainer.SCROLL_MODE_DISABLED
+	)
 
 
 func _on_phone_move_pressed() -> void:
@@ -649,6 +678,7 @@ func _clear_phone_roll_confirmations() -> void:
 		return
 	for child: Node in phone_roll_confirmation_list.get_children():
 		child.queue_free()
+	_update_phone_battle_scroll.call_deferred()
 
 
 func _append_phone_roll_confirmation(
@@ -674,6 +704,7 @@ func _append_phone_roll_confirmation(
 			line.modulate = Color(1.0, 0.42, 0.42, 1.0)
 		_:
 			line.modulate = Color(0.95, 0.78, 0.3, 1.0)
+	_update_phone_battle_scroll.call_deferred()
 
 
 func _fit_phone_popup(path: String, target_size: Vector2i) -> void:
