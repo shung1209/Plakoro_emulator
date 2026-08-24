@@ -334,7 +334,17 @@
     "type.normal.name": "Normal",
     "type.psychic.name": "Psíquico",
     "type.steel.name": "Acero",
-    "type.water.name": "Agua"
+    "type.water.name": "Agua",
+    "move_card.charmander_flamethrower_stw02_003.description": "Efecto de Kyokoro: Este ataque hace 20 puntos de daño adicionales.\nEfecto de Kyokoro: En tu próximo turno, reduce en 1 la cantidad de Enekoro que tiras.",
+    "move_card.charmander_flamethrower_stw02_003.effect_0": "Este ataque hace 20 puntos de daño adicionales.",
+    "move_card.charmander_flamethrower_stw02_003.effect_1": "En tu próximo turno, reduce en 1 la cantidad de Enekoro que tiras.",
+    "move_card.moltres_flamethrower_ebw01_013.description": "Efecto de Kyokoro: Este ataque hace 40 puntos de daño adicionales.\nEfecto de Kyokoro: En tu próximo turno, reduce en 2 la cantidad de Enekoro que tiras.",
+    "move_card.moltres_flamethrower_ebw01_013.effect_0": "Este ataque hace 40 puntos de daño adicionales.",
+    "move_card.moltres_flamethrower_ebw01_013.effect_1": "En tu próximo turno, reduce en 2 la cantidad de Enekoro que tiras.",
+    "move_card.pikachu_thunder_shock_stw04_002.description": "Efecto de Kyokoro: Este ataque hace 20 puntos de daño adicionales.",
+    "move_card.pikachu_thunder_shock_stw04_002.effect_0": "Este ataque hace 20 puntos de daño adicionales.",
+    "move_card.zapdos_thunder_shock_ebw01_032.description": "Efecto de Kyokoro: Este ataque hace 10 puntos de daño adicionales.",
+    "move_card.zapdos_thunder_shock_ebw01_032.effect_0": "Este ataque hace 10 puntos de daño adicionales."
   },
   "fallback": ""
 }

@@ -196,6 +196,12 @@ static func _validate_energy_dice(
 
 	var used_die_ids: Dictionary = {}
 	var used_fixed_energies: Dictionary = {}
+	var fixed_energies_must_be_unique: bool = bool(
+		rules.get(
+			"fixed_energies_across_dice_must_be_unique",
+			true
+		)
+	)
 
 	for index: int in range(
 		loadout.energy_dice.size()
@@ -250,8 +256,9 @@ static func _validate_energy_dice(
 				)
 				return false
 
-			if used_fixed_energies.has(
-				energy_type
+			if (
+				fixed_energies_must_be_unique
+				and used_fixed_energies.has(energy_type)
 			):
 				push_error(
 					"Team Builder: fixed energy '%s' appears on more than one die."
@@ -271,7 +278,8 @@ static func _validate_energy_dice(
 	)
 
 	if (
-		used_fixed_energies.size()
+		fixed_energies_must_be_unique
+		and used_fixed_energies.size()
 		!= required_unique_energy_count
 	):
 		push_error(

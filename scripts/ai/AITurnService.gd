@@ -128,12 +128,17 @@ func execute_ai_turn(
         )
     )
 
+    var forced_orientation: StringName = &""
+    if kyokoro_enabled:
+        forced_orientation = STATUS_RESOLVER.consume_forced_kyokoro_orientation(actor)
+
     var dice_result: Variant = (
         dice_engine.roll_battle_dice(
             profiles,
             actor.pokemon_data.kyokoro_profile,
             dice_modifier,
-            kyokoro_enabled
+            kyokoro_enabled,
+            forced_orientation
         )
     )
 

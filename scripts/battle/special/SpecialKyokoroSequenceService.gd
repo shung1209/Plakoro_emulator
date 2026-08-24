@@ -15,6 +15,7 @@ static func build_plan(
     var result: Dictionary = {
         "kind": KIND_NONE,
         "extra_roll_count": 0,
+        "roll_count": 1,
         "success_orientations": [],
         "actions_per_success": [],
         "source_text": ""
@@ -199,6 +200,7 @@ static func build_plan(
                 return result
 
             result["kind"] = KIND_OPPONENT_ROLL
+            result["roll_count"] = max(int(effect.get("roll_count", 1)), 1)
             result["success_orientations"] = (
                 _orientation_array(
                     effect.get(
@@ -445,36 +447,31 @@ static func populate_opponent_roll(
     ) != KIND_OPPONENT_ROLL:
         return result
 
-    var orientation: StringName = (
-        dice_engine.roll_kyokoro_only(
-            opponent_kyokoro_profile
-        )
+    var roll_count: int = max(int(plan.get("roll_count", 1)), 1)
+    var orientations: Array[StringName] = dice_engine.roll_kyokoro_count(
+        opponent_kyokoro_profile,
+        roll_count
     )
-
-    if orientation == &"":
+    if orientations.is_empty():
         return result
 
-    dice_result.opponent_kyokoro_orientation = (
-        orientation
-    )
+    dice_result.opponent_kyokoro_orientation = orientations[0]
+    dice_result.opponent_kyokoro_orientations = orientations.duplicate()
     dice_result.opponent_kyokoro_roll_triggered = true
 
     var success_orientations: Array[StringName] = (
-        _orientation_array(
-            plan.get(
-                "success_orientations",
-                []
-            )
-        )
+        _orientation_array(plan.get("success_orientations", []))
     )
+    var success_count: int = 0
+    for orientation: StringName in orientations:
+        if success_orientations.has(orientation):
+            success_count += 1
 
     result["generated"] = true
-    result["orientation"] = orientation
-    result["success"] = (
-        success_orientations.has(
-            orientation
-        )
-    )
+    result["orientation"] = orientations[0]
+    result["orientations"] = orientations
+    result["success"] = success_count > 0
+    result["success_count"] = success_count
     return result
 
 
@@ -520,23 +517,24 @@ static func get_opponent_roll_action_batch(
         )
     )
 
+    var orientations: Array = dice_result.opponent_kyokoro_orientations
+    if orientations.is_empty() and opponent_orientation != &"":
+        orientations = [opponent_orientation]
+
+    var actions: Array = []
+    var success_count: int = 0
+    var per_success: Array = _action_array(plan.get("actions_per_success", []))
+    for raw_orientation: Variant in orientations:
+        if success_orientations.has(StringName(raw_orientation)):
+            success_count += 1
+            actions.append_array(per_success.duplicate(true))
+
     return {
         "orientation": opponent_orientation,
-        "success": success_orientations.has(
-            opponent_orientation
-        ),
-        "actions": (
-            _action_array(
-                plan.get(
-                    "actions_per_success",
-                    []
-                )
-            )
-            if success_orientations.has(
-                opponent_orientation
-            )
-            else []
-        )
+        "orientations": orientations.duplicate(),
+        "success": success_count > 0,
+        "success_count": success_count,
+        "actions": actions
     }
 
 

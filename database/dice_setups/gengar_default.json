@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "gengar_die_1",
+      "fixed": [
+        "electric",
+        "steel"
+      ],
+      "double": [
+        [
+          "dark",
+          "electric"
+        ],
+        [
+          "dark",
+          "steel"
+        ]
+      ],
+      "single": [
+        "dark",
+        "steel"
+      ]
+    },
+    {
+      "die_id": "gengar_die_2",
+      "fixed": [
+        "water",
+        "fire"
+      ],
+      "double": [
+        [
+          "dark",
+          "water"
+        ],
+        [
+          "dark",
+          "fire"
+        ]
+      ],
+      "single": [
+        "dark",
+        "fire"
+      ]
+    },
+    {
+      "die_id": "gengar_die_3",
+      "fixed": [
+        "grass",
+        "psychic"
+      ],
+      "double": [
+        [
+          "dark",
+          "grass"
+        ],
+        [
+          "dark",
+          "psychic"
+        ]
+      ],
+      "single": [
+        "dark",
+        "psychic"
+      ]
+    }
+  ]
+}

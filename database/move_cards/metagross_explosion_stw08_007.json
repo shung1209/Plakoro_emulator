@@ -1,0 +1,90 @@
+{
+  "schema_version": "2.0",
+  "id": "metagross_explosion_stw08_007",
+  "move_name_id": "explosion",
+  "owner_id": "metagross",
+  "display_name": "Explosion",
+  "move_category": "attack",
+  "attack_type": "normal",
+  "energy_cost": [
+    {
+      "energy_type": "normal",
+      "count": 5
+    }
+  ],
+  "printed_damage": 100,
+  "base_actions": [
+    {
+      "opcode": "damage.create",
+      "args": {
+        "target": "opponent",
+        "amount": 100,
+        "damage_type": "normal",
+        "source": "printed_damage"
+      }
+    }
+  ],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP"
+        ]
+      },
+      "actions": [],
+      "raw_text": "Cancel the damage this move does to this Pokémon."
+    },
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_DOWN",
+          "FACE_UP",
+          "FACE_DOWN",
+          "HEAD_LEFT",
+          "HEAD_RIGHT"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.recoil",
+          "args": {
+            "target": "self",
+            "amount": 120
+          }
+        }
+      ],
+      "raw_text": "This Pokémon also takes 120 damage."
+    }
+  ],
+  "resolution": {
+    "outcome_match_mode": "zero_or_one",
+    "action_execution_mode": "sequential"
+  },
+  "source": {
+    "document": "ST07-ST09 preview / supplied workbook",
+    "page": null,
+    "card_code": "STW08-007",
+    "raw_text": "Move Effect: This Pokémon also takes 120 damage. Kyokoro Effect: Cancel the damage this move does to this Pokémon.",
+    "move_effect_text": [
+      "This Pokémon also takes 120 damage."
+    ],
+    "kyokoro_effect_text": [
+      "Cancel the damage this move does to this Pokémon."
+    ],
+    "mapping_source": "ST_EB01_Kyokoro_Orientation_Mapping_new(4).xlsx",
+    "reference_url": "https://pla-koro.com/moves?p=metagross"
+  },
+  "review": {
+    "status": "v2.2_new_user_mapping",
+    "orientation_mapping_confirmed": true,
+    "needs_manual_review": true,
+    "notes": [
+      "Move data and orientation mapping transcribed from the user-supplied workbook rows 127-148.",
+      "English move name is provisional unless it matches an established Pokémon move name or the public source.",
+      "Some newly revealed effects require runtime support and are preserved in special_effects for follow-up implementation."
+    ]
+  },
+  "special_effects": []
+}

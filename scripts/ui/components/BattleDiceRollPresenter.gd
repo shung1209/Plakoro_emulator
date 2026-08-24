@@ -4,6 +4,9 @@ extends HBoxContainer
 const ICONS: Script = preload(
     "res://scripts/presentation/PlakoroIconService.gd"
 )
+const THEME_FACTORY: Script = preload(
+    "res://scripts/ui/theme/PlakoroThemeFactory.gd"
+)
 
 const ENERGY_TYPES: Array[StringName] = [
     &"grass",
@@ -40,6 +43,8 @@ const SLOT_LANDED_BORDER: Color = Color(0.35, 0.86, 1.0, 1.0)
 var _slot_panels: Array[PanelContainer] = []
 var _icon_rows: Array[HBoxContainer] = []
 var _labels: Array[Label] = []
+var _slot_energy_colors: Array[Color] = []
+var _slot_states: Array[StringName] = []
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
@@ -62,6 +67,8 @@ func _build_slots() -> void:
     _slot_panels.clear()
     _icon_rows.clear()
     _labels.clear()
+    _slot_energy_colors.clear()
+    _slot_states.clear()
 
     for index: int in range(4):
         var panel: PanelContainer = PanelContainer.new()
@@ -73,8 +80,8 @@ func _build_slots() -> void:
         panel.add_theme_stylebox_override(
             "panel",
             _slot_style(
-                SLOT_IDLE_BACKGROUND,
-                SLOT_IDLE_BORDER,
+                _state_background(&"idle"),
+                _state_border(&"idle"),
                 1
             )
         )
@@ -109,7 +116,7 @@ func _build_slots() -> void:
         )
         label.add_theme_color_override(
             "font_color",
-            Color(0.78, 0.84, 0.94, 1.0)
+            THEME_FACTORY.COLOR_TEXT_MUTED
         )
         label.text = (
             LocalizationService.tr_format(
@@ -124,6 +131,27 @@ func _build_slots() -> void:
 
         _icon_rows.append(icon_row)
         _labels.append(label)
+        var slot_color: Color = Color(0.0, 0.0, 0.0, 0.0)
+        if index < 3:
+            slot_color = _element_background_color(
+                StringName(THEME_FACTORY.get_enerkoro_color_type(index))
+            )
+        _slot_energy_colors.append(slot_color)
+        _slot_states.append(&"idle")
+
+
+func set_custom_slot_color_types(color_types: Array[String]) -> void:
+    if _slot_panels.is_empty():
+        _build_slots()
+    for index: int in range(mini(3, color_types.size())):
+        _slot_energy_colors[index] = _element_background_color(
+            StringName(color_types[index])
+        )
+    for index: int in range(_slot_panels.size()):
+        var state: StringName = &"idle"
+        if index < _slot_states.size():
+            state = _slot_states[index]
+        _set_slot_visual(index, state)
 
 
 func reset_display() -> void:
@@ -336,7 +364,7 @@ func play_opponent_kyokoro_roll(
     )
 
     _labels[3].text = (
-        "Opponent Charakoro • "
+        "Opponent Charakoro  |  "
         + String(
             orientation
         ).replace(
@@ -500,7 +528,7 @@ func _animate_batch(
                             + str(
                                 extra_number_start + index
                             )
-                            + " • "
+                            + "  |  "
                             + _labels[index].text
                         )
                 else:
@@ -737,7 +765,7 @@ func _build_slots_from_energy_counts(
                 energy_type
             )
 
-    # A normal three-die roll has 3–6 energy symbols because HEAD_UP and
+    # A normal three-die roll has 3-6 energy symbols because HEAD_UP and
     # HEAD_DOWN are double-energy faces. Distribute them across exactly three
     # visual die slots while preserving the aggregate counts.
     var slots: Array[Array] = [
@@ -849,6 +877,8 @@ func _set_orientation_slot(
     index: int,
     orientation: StringName
 ) -> void:
+    if index >= 0 and index < _slot_energy_colors.size():
+        _slot_energy_colors[index] = Color(0.0, 0.0, 0.0, 0.0)
     var icon_row: HBoxContainer = _icon_rows[index]
     _clear_icon_row(icon_row)
 
@@ -913,18 +943,47 @@ func _set_slot_visual(index: int, state: StringName) -> void:
     if index < 0 or index >= _slot_panels.size():
         return
 
-    var background: Color = SLOT_IDLE_BACKGROUND
-    var border: Color = SLOT_IDLE_BORDER
-    var border_width: int = 1
+    if index < _slot_states.size():
+        _slot_states[index] = state
 
-    if state == &"rolling":
-        background = SLOT_ROLLING_BACKGROUND
-        border = SLOT_ROLLING_BORDER
+    var background: Color = _state_background(&"idle")
+    var border: Color = _state_border(&"idle")
+    var border_width: int = 1
+    var use_custom_color: bool = (
+        index < 3
+        and index < _slot_energy_colors.size()
+        and _slot_energy_colors[index].a > 0.0
+    )
+
+    if use_custom_color:
+        var custom: Color = _slot_energy_colors[index]
+        if state == &"rolling":
+            background = custom.lightened(0.05)
+            border = SLOT_ROLLING_BORDER
+            border_width = 2
+        elif state == &"landed":
+            background = custom
+            border = custom.lightened(0.34)
+            border_width = 2
+        else:
+            background = custom.darkened(0.10)
+            border = custom.lightened(0.24)
+    elif state == &"rolling":
+        background = _state_background(&"rolling")
+        border = _state_border(&"rolling")
         border_width = 2
     elif state == &"landed":
-        background = SLOT_LANDED_BACKGROUND
-        border = SLOT_LANDED_BORDER
+        background = _state_background(&"landed")
+        border = _state_border(&"landed")
         border_width = 2
+
+    if index < _labels.size():
+        _labels[index].add_theme_color_override(
+            "font_color",
+            Color(0.97, 0.985, 1.0, 1.0)
+            if use_custom_color
+            else THEME_FACTORY.COLOR_TEXT_MUTED
+        )
 
     _slot_panels[index].add_theme_stylebox_override(
         "panel",
@@ -943,9 +1002,72 @@ func _slot_style(
     style.set_border_width_all(border_width)
     style.set_corner_radius_all(12)
     style.set_content_margin_all(8.0)
-    style.shadow_color = Color(0.0, 0.0, 0.0, 0.45)
+    style.shadow_color = Color(0.11, 0.15, 0.25, 0.45)
     style.shadow_size = 6
     return style
+
+
+func _state_background(state: StringName) -> Color:
+    # This presenter is part of the fixed Dark battle arena, even when the
+    # surrounding application theme is Warm.
+    if state == &"rolling":
+        return SLOT_ROLLING_BACKGROUND
+    if state == &"landed":
+        return SLOT_LANDED_BACKGROUND
+    return SLOT_IDLE_BACKGROUND
+
+
+func _state_border(state: StringName) -> Color:
+    if state == &"rolling":
+        return SLOT_ROLLING_BORDER
+    if state == &"landed":
+        return SLOT_LANDED_BORDER
+    return SLOT_IDLE_BORDER
+
+
+func _blend_element_colors(energies: Array[StringName]) -> Color:
+    if energies.is_empty():
+        return Color(0.0, 0.0, 0.0, 0.0)
+
+    var total := Vector3.ZERO
+    var count: int = 0
+    for energy_type: StringName in energies:
+        var color: Color = _element_background_color(energy_type)
+        if color.a <= 0.0:
+            continue
+        total += Vector3(color.r, color.g, color.b)
+        count += 1
+
+    if count <= 0:
+        return Color(0.0, 0.0, 0.0, 0.0)
+
+    var blended := total / float(count)
+    return Color(blended.x, blended.y, blended.z, 0.98)
+
+
+func _element_background_color(energy_type: StringName) -> Color:
+    # Dark, saturated variants of the Energy colors keep white labels readable
+    # while still making each landed die immediately identifiable.
+    match energy_type:
+        &"fire":
+            return Color("7a2434")
+        &"water":
+            return Color("17517f")
+        &"grass":
+            return Color("265f3b")
+        &"electric":
+            return Color("6b5714")
+        &"psychic":
+            return Color("70275f")
+        &"fighting":
+            return Color("7b431f")
+        &"dark":
+            return Color("342a4f")
+        &"steel":
+            return Color("4f596b")
+        &"flying":
+            return Color("275b6b")
+    return Color(0.0, 0.0, 0.0, 0.0)
 
 
 func _random_energy_face() -> Array:

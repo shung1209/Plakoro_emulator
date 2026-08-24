@@ -286,8 +286,8 @@ func _turn_header(
     return (
         "TURN "
         + str(int(turn.turn_number))
-        + " — "
+        + " - "
         + actor_name
-        + " — "
+        + " - "
         + String(turn.move_name)
     )

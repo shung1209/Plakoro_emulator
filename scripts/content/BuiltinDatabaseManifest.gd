@@ -16,12 +16,16 @@ const FILES_BY_DIRECTORY: Dictionary = {
         "player_energy_dice_setup.json",
         "squirtle_default.json",
         "zapdos_default.json",
+        "gengar_default.json",
+        "metagross_default.json",
+        "lucario_default.json",
     ],
     "kyokoro_profiles": [
         "bulbasaur_stl_custom.json",
         "charmander_stl_custom.json",
         "eevee_stl_custom.json",
         "grimer_stl_custom.json",
+        "mew_model_custom.json",
         "mew_stl_custom.json",
         "pikachu_stl_custom.json",
         "squirtle_stl_custom.json",
@@ -135,6 +139,27 @@ const FILES_BY_DIRECTORY: Dictionary = {
         "zapdos_thunder_flash_ebw01_031.json",
         "zapdos_thunder_shock_ebw01_032.json",
         "zapdos_volt_rush_ebw01_033.json",
+        "gengar_sinister_shot_stw07_001.json",
+        "gengar_headstand_stw07_002.json",
+        "gengar_ghost_trick_stw07_003.json",
+        "gengar_shadow_bind_stw07_004.json",
+        "gengar_gas_surround_stw07_005.json",
+        "gengar_psywave_stw07_006.json",
+        "gengar_sludge_bomb_stw07_007.json",
+        "metagross_beam_stw08_001.json",
+        "metagross_arithmetic_stw08_002.json",
+        "metagross_area_suppression_stw08_003.json",
+        "metagross_direct_stamp_stw08_004.json",
+        "metagross_meteor_mash_stw08_005.json",
+        "metagross_heavy_slam_stw08_006.json",
+        "metagross_explosion_stw08_007.json",
+        "lucario_kick_stw09_001.json",
+        "lucario_force_palm_stw09_002.json",
+        "lucario_aura_knuckle_stw09_003.json",
+        "lucario_rolling_kick_stw09_004.json",
+        "lucario_aura_thrust_stw09_005.json",
+        "lucario_aura_sphere_stw09_006.json",
+        "lucario_metal_claw_stw09_007.json",
     ],
     "pokemon": [
         "articuno_eb01_a1.json",
@@ -155,6 +180,9 @@ const FILES_BY_DIRECTORY: Dictionary = {
         "squirtle_standard.json",
         "zapdos_eb01_a1.json",
         "zapdos_eb01_b1.json",
+        "gengar_standard.json",
+        "metagross_standard.json",
+        "lucario_standard.json",
     ],
     "loadouts": [
         "pikachu_default_loadout.json",
@@ -186,10 +214,10 @@ static func files_for(directory_name: String) -> Array[String]:
             result.append(String(item))
     return result
 
+
 static func ids_for(directory_name: String) -> Array[String]:
     var result: Array[String] = []
     for file_name: String in files_for(directory_name):
         if file_name.ends_with(".json"):
             result.append(file_name.trim_suffix(".json"))
     return result
-

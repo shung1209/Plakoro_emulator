@@ -15,12 +15,14 @@ const VALID_DIFFICULTIES: Array[StringName] = [
 
 static func validate(
     loadout_data: Variant,
-    database: Variant
+    database: Variant,
+    allow_repeated_fixed_energy: bool = false
 ) -> Dictionary:
     var result: Dictionary = (
         PLAYER_STYLE_VALIDATOR.validate(
             loadout_data,
-            database
+            database,
+            allow_repeated_fixed_energy
         )
     )
 

@@ -1,0 +1,31 @@
+{
+  "available_move_card_ids": [
+    "gengar_sinister_shot_stw07_001",
+    "gengar_headstand_stw07_002",
+    "gengar_ghost_trick_stw07_003",
+    "gengar_shadow_bind_stw07_004",
+    "gengar_gas_surround_stw07_005",
+    "gengar_psywave_stw07_006",
+    "gengar_sludge_bomb_stw07_007"
+  ],
+  "display_name": "Gengar",
+  "id": "gengar_standard",
+  "kyokoro_profile_id": "standard_equal",
+  "max_hp": 120,
+  "pokemon_type": "dark",
+  "schema_version": "2.0",
+  "species_id": "gengar",
+  "weaknesses": [
+    {
+      "attack_type": "psychic",
+      "bonus_damage": 20.0
+    }
+  ],
+  "review": {
+    "status": "v2.2_verified_weakness",
+    "notes": [
+      "Kyokoro uses standard_equal until a measured profile is available.",
+      "Gengar weakness verified as Psychic +20."
+    ]
+  }
+}

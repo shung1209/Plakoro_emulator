@@ -18,6 +18,7 @@ const HANDLER_SCRIPTS: Array[Script] = [
     preload("res://scripts/battle/opcode/handlers/damage/DamageRecoilHandler.gd"),
     preload("res://scripts/battle/opcode/handlers/damage/DamageSetHandler.gd"),
     preload("res://scripts/battle/opcode/handlers/dice/EnergyDiceModifyHandler.gd"),
+    preload("res://scripts/battle/opcode/handlers/dice/KyokoroForceNextOrientationHandler.gd"),
     preload("res://scripts/battle/opcode/handlers/hp/HpRestoreHandler.gd"),
     preload("res://scripts/battle/opcode/handlers/move/MoveLockHandler.gd"),
     preload("res://scripts/battle/opcode/handlers/move/MoveRepeatPermissionHandler.gd"),

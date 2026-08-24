@@ -1,0 +1,378 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/BattleResultUI.gd" id="1_result"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="2_language"]
+[ext_resource type="Script" path="res://scripts/ui/GlobalQuitConfirmation.gd" id="3_quit_guard"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_result"]
+bg_color = Color(0.035, 0.055, 0.078, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.68, 0.92, 0.8)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_stat"]
+bg_color = Color(0.055, 0.085, 0.115, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.34, 0.44, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_energy_reward"]
+bg_color = Color(0.12, 0.085, 0.025, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.72, 0.18, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 12
+
+[node name="BattleResultUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_result")
+
+[node name="QuitGuard" type="Node" parent="."]
+script = ExtResource("3_quit_guard")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.016, 0.027, 0.041, 1)
+
+[node name="Glow" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -580.0
+offset_top = -360.0
+offset_right = 580.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.025, 0.17, 0.24, 0.42)
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = -28.0
+offset_bottom = 70.0
+grow_horizontal = 2
+
+[node name="ReportBrand" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.32, 0.82, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "PLAKORO • BATTLE REPORT"
+
+[node name="LanguageSelector" parent="TopBar" instance=ExtResource("2_language")]
+layout_mode = 2
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = 82.0
+offset_right = -32.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResultPanel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(900, 650)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_result")
+
+[node name="Margin" type="MarginContainer" parent="Center/ResultPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 54
+theme_override_constants/margin_top = 42
+theme_override_constants/margin_right = 54
+theme_override_constants/margin_bottom = 42
+
+[node name="Content" type="VBoxContainer" parent="Center/ResultPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ResultTitle" type="Label" parent="Center/ResultPanel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "VICTORY"
+horizontal_alignment = 1
+
+[node name="MatchupLabel" type="Label" parent="Center/ResultPanel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.88, 1)
+theme_override_font_sizes/font_size = 24
+text = "PLAYER  VS  OPPONENT"
+horizontal_alignment = 1
+
+[node name="Divider" type="HSeparator" parent="Center/ResultPanel/Margin/Content"]
+layout_mode = 2
+
+[node name="Stats" type="HBoxContainer" parent="Center/ResultPanel/Margin/Content"]
+custom_minimum_size = Vector2(0, 155)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Turns" type="PanelContainer" parent="Center/ResultPanel/Margin/Content/Stats"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBox_stat")
+
+[node name="Box" type="VBoxContainer" parent="Center/ResultPanel/Margin/Content/Stats/Turns"]
+layout_mode = 2
+alignment = 1
+
+[node name="TurnsLabel" type="Label" parent="Center/ResultPanel/Margin/Content/Stats/Turns/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.58, 0.7, 0.78, 1)
+text = "TURNS"
+horizontal_alignment = 1
+
+[node name="TurnValue" type="Label" parent="Center/ResultPanel/Margin/Content/Stats/Turns/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "0"
+horizontal_alignment = 1
+
+[node name="Dealt" type="PanelContainer" parent="Center/ResultPanel/Margin/Content/Stats"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBox_stat")
+
+[node name="Box" type="VBoxContainer" parent="Center/ResultPanel/Margin/Content/Stats/Dealt"]
+layout_mode = 2
+alignment = 1
+
+[node name="DamageDealtLabel" type="Label" parent="Center/ResultPanel/Margin/Content/Stats/Dealt/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.58, 0.7, 0.78, 1)
+text = "DAMAGE DEALT"
+horizontal_alignment = 1
+
+[node name="DamageDealtValue" type="Label" parent="Center/ResultPanel/Margin/Content/Stats/Dealt/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.36, 0.92, 0.56, 1)
+theme_override_font_sizes/font_size = 38
+text = "0"
+horizontal_alignment = 1
+
+[node name="Taken" type="PanelContainer" parent="Center/ResultPanel/Margin/Content/Stats"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBox_stat")
+
+[node name="Box" type="VBoxContainer" parent="Center/ResultPanel/Margin/Content/Stats/Taken"]
+layout_mode = 2
+alignment = 1
+
+[node name="DamageTakenLabel" type="Label" parent="Center/ResultPanel/Margin/Content/Stats/Taken/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.58, 0.7, 0.78, 1)
+text = "DAMAGE TAKEN"
+horizontal_alignment = 1
+
+[node name="DamageTakenValue" type="Label" parent="Center/ResultPanel/Margin/Content/Stats/Taken/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.48, 0.44, 1)
+theme_override_font_sizes/font_size = 38
+text = "0"
+horizontal_alignment = 1
+
+[node name="Health" type="VBoxContainer" parent="Center/ResultPanel/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PlayerHpLabel" type="Label" parent="Center/ResultPanel/Margin/Content/Health"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "YOUR HP  0 / 0"
+horizontal_alignment = 1
+
+[node name="EnemyHpLabel" type="Label" parent="Center/ResultPanel/Margin/Content/Health"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "OPPONENT HP  0 / 0"
+horizontal_alignment = 1
+
+[node name="CareerPanel" type="PanelContainer" parent="Center/ResultPanel/Margin/Content"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_stat")
+
+[node name="CareerBox" type="VBoxContainer" parent="Center/ResultPanel/Margin/Content/CareerPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="CareerTitle" type="Label" parent="Center/ResultPanel/Margin/Content/CareerPanel/CareerBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.32, 0.82, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "CAREER RECORD"
+horizontal_alignment = 1
+
+[node name="CareerRecordLabel" type="Label" parent="Center/ResultPanel/Margin/Content/CareerPanel/CareerBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0 Battles  •  0 Wins  •  0 Losses"
+horizontal_alignment = 1
+
+[node name="StreakLabel" type="Label" parent="Center/ResultPanel/Margin/Content/CareerPanel/CareerBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.76, 0.82, 1)
+text = "Current Streak: 0  •  Best: 0"
+horizontal_alignment = 1
+
+[node name="MilestoneLabel" type="Label" parent="Center/ResultPanel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.78, 0.24, 1)
+theme_override_font_sizes/font_size = 18
+text = "NEW MILESTONE • FIRST VICTORY"
+horizontal_alignment = 1
+
+[node name="EncounterUnlockLabel" type="Label" parent="Center/ResultPanel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+theme_override_colors/font_color = Color(0.32, 0.82, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "NEXT ENCOUNTER UNLOCKED"
+horizontal_alignment = 1
+
+[node name="CollectionRewardLabel" type="Label" parent="Center/ResultPanel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+theme_override_colors/font_color = Color(0.48, 0.92, 0.72, 1)
+theme_override_font_sizes/font_size = 18
+text = "COLLECTION UPDATED"
+horizontal_alignment = 1
+
+[node name="EnergyRewardPanel" type="PanelContainer" parent="Center/ResultPanel/Margin/Content"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 138)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_energy_reward")
+
+[node name="EnergyRewardBox" type="VBoxContainer" parent="Center/ResultPanel/Margin/Content/EnergyRewardPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EnergyRewardLabel" type="Label" parent="Center/ResultPanel/Margin/Content/EnergyRewardPanel/EnergyRewardBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.36, 1)
+theme_override_font_sizes/font_size = 21
+text = "LEVEL UP • CHOOSE 1 ENERGY"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="EnergyRewardChoices" type="HBoxContainer" parent="Center/ResultPanel/Margin/Content/EnergyRewardPanel/EnergyRewardBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SaveWarningLabel" type="Label" parent="Center/ResultPanel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+theme_override_colors/font_color = Color(1, 0.48, 0.42, 1)
+text = "Progress could not be saved."
+horizontal_alignment = 1
+
+[node name="ActionSpacer" type="Control" parent="Center/ResultPanel/Margin/Content"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Actions" type="HBoxContainer" parent="Center/ResultPanel/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="RematchButton" type="Button" parent="Center/ResultPanel/Margin/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Rematch"
+
+[node name="PreparationButton" type="Button" parent="Center/ResultPanel/Margin/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Change Loadout"
+
+[node name="EncountersButton" type="Button" parent="Center/ResultPanel/Margin/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Choose Encounter"
+
+[node name="MainMenuButton" type="Button" parent="Center/ResultPanel/Margin/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Main Menu"

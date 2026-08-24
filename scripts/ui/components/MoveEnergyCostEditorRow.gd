@@ -99,7 +99,7 @@ func initialize(
     add_child(count_spin)
 
     up_button = Button.new()
-    up_button.text = "↑"
+    up_button.text = "^"
     up_button.tooltip_text = LocalizationService.tr_key(
         "content_studio.energy_cost_move_up",
         "Move this Energy Cost up."
@@ -108,7 +108,7 @@ func initialize(
     add_child(up_button)
 
     down_button = Button.new()
-    down_button.text = "↓"
+    down_button.text = "v"
     down_button.tooltip_text = LocalizationService.tr_key(
         "content_studio.energy_cost_move_down",
         "Move this Energy Cost down."

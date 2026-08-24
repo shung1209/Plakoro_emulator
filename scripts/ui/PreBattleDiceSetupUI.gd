@@ -133,7 +133,7 @@ func _refresh_summary() -> void:
 
     if bool(validation["success"]):
         validation_label.text = (
-            "VALID — Ready for battle."
+            "VALID - Ready for battle."
         )
         confirm_button.disabled = false
     else:

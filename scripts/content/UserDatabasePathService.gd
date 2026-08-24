@@ -240,6 +240,89 @@ static func migrate_legacy_user_files() -> Dictionary:
     return result
 
 
+# v2.2 data correction migration.
+# Built-in content is mirrored to user:// only when missing, so users who already
+# launched a previous v2.2 build may still have the provisional weakness values.
+# Patch only the exact known old values, preserving any other user edits.
+static func migrate_v22_corrected_weaknesses() -> Dictionary:
+    var result: Dictionary = {
+        "success": true,
+        "updated": [],
+        "skipped": [],
+        "errors": []
+    }
+
+    var corrections: Array[Dictionary] = [
+        {
+            "path": POKEMON + "/gengar_standard.json",
+            "old_type": "dark",
+            "new_type": "psychic",
+            "bonus": 20.0
+        },
+        {
+            "path": POKEMON + "/lucario_standard.json",
+            "old_type": "psychic",
+            "new_type": "fire",
+            "bonus": 20.0
+        }
+    ]
+
+    for correction: Dictionary in corrections:
+        var path: String = String(correction.get("path", ""))
+        if not FileAccess.file_exists(path):
+            result["skipped"].append(path)
+            continue
+
+        var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+        if file == null:
+            result["success"] = false
+            result["errors"].append("Could not read corrected Pokemon JSON: " + path)
+            continue
+
+        var parsed: Variant = JSON.parse_string(file.get_as_text())
+        file.close()
+        if not parsed is Dictionary:
+            result["success"] = false
+            result["errors"].append("Invalid corrected Pokemon JSON: " + path)
+            continue
+
+        var data: Dictionary = parsed as Dictionary
+        var weaknesses_variant: Variant = data.get("weaknesses", [])
+        if not weaknesses_variant is Array:
+            result["skipped"].append(path)
+            continue
+
+        var weaknesses: Array = weaknesses_variant as Array
+        if weaknesses.size() != 1 or not weaknesses[0] is Dictionary:
+            result["skipped"].append(path)
+            continue
+
+        var weakness: Dictionary = weaknesses[0] as Dictionary
+        var old_type: String = String(correction.get("old_type", ""))
+        var bonus: float = float(correction.get("bonus", 20.0))
+        if (
+            String(weakness.get("attack_type", "")).to_lower() != old_type
+            or not is_equal_approx(float(weakness.get("bonus_damage", 0.0)), bonus)
+        ):
+            result["skipped"].append(path)
+            continue
+
+        weakness["attack_type"] = String(correction.get("new_type", old_type))
+        weakness["bonus_damage"] = bonus
+        data["weaknesses"] = [weakness]
+
+        var output: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+        if output == null:
+            result["success"] = false
+            result["errors"].append("Could not update corrected Pokemon JSON: " + path)
+            continue
+        output.store_string(JSON.stringify(data, "  ") + "\n")
+        output.close()
+        result["updated"].append(path)
+
+    return result
+
+
 static func remove_retired_test_content() -> Dictionary:
     var result: Dictionary = {
         "success": true,

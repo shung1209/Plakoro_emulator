@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "dice": [
+    {
+      "die_id": "lucario_die_1",
+      "fixed": [
+        "electric",
+        "steel"
+      ],
+      "double": [
+        [
+          "fighting",
+          "electric"
+        ],
+        [
+          "fighting",
+          "steel"
+        ]
+      ],
+      "single": [
+        "fighting",
+        "steel"
+      ]
+    },
+    {
+      "die_id": "lucario_die_2",
+      "fixed": [
+        "water",
+        "fire"
+      ],
+      "double": [
+        [
+          "fighting",
+          "water"
+        ],
+        [
+          "fighting",
+          "fire"
+        ]
+      ],
+      "single": [
+        "fighting",
+        "fire"
+      ]
+    },
+    {
+      "die_id": "lucario_die_3",
+      "fixed": [
+        "grass",
+        "psychic"
+      ],
+      "double": [
+        [
+          "fighting",
+          "grass"
+        ],
+        [
+          "fighting",
+          "psychic"
+        ]
+      ],
+      "single": [
+        "fighting",
+        "psychic"
+      ]
+    }
+  ]
+}

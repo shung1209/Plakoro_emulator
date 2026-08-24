@@ -39,7 +39,7 @@ func setup(
         add_child(fallback)
 
     var count_label: Label = Label.new()
-    count_label.text = "×" + str(count)
+    count_label.text = "x" + str(count)
     count_label.add_theme_font_size_override(
         "font_size",
         max(15, icon_size - 9)

@@ -1,0 +1,22 @@
+{
+  "id": "mew_model_custom",
+  "model_analysis": {
+    "model_file": "Mew Plakoro.stl",
+    "normalized_max_size_mm": 25.0,
+    "source": "model_weight_generator",
+    "triangle_count": 386622,
+    "watertight": true
+  },
+  "orientation_weights": {
+    "FACE_DOWN": 2.28,
+    "FACE_UP": 1.98,
+    "HEAD_DOWN": 0.228,
+    "HEAD_LEFT": 0.372,
+    "HEAD_RIGHT": 0.384,
+    "HEAD_UP": 0.756
+  },
+  "physics_profile": {},
+  "roll_mode": "weighted",
+  "scene_path": "",
+  "schema_version": "2.0"
+}

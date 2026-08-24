@@ -11,7 +11,7 @@
   ],
   "display_name": "Charmander",
   "id": "charmander_standard",
-  "kyokoro_profile_id": "standard_equal",
+  "kyokoro_profile_id": "charmander_stl_custom",
   "max_hp": 120,
   "pokemon_type": "fire",
   "review": {

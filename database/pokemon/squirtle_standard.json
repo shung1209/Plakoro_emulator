@@ -11,7 +11,7 @@
   ],
   "display_name": "Squirtle",
   "id": "squirtle_standard",
-  "kyokoro_profile_id": "standard_equal",
+  "kyokoro_profile_id": "squirtle_stl_custom",
   "max_hp": 120,
   "pokemon_type": "water",
   "review": {

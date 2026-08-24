@@ -128,7 +128,7 @@ func _add_face_pair(
     )
 
     var divider: Label = Label.new()
-    divider.text = "↔"
+    divider.text = "<->"
     divider.modulate.a = 0.55
     row.add_child(divider)
 
@@ -172,7 +172,7 @@ func _add_face(
 
         if count > 1:
             var count_label: Label = Label.new()
-            count_label.text = "×" + str(count)
+            count_label.text = "x" + str(count)
             face_row.add_child(count_label)
         return
 

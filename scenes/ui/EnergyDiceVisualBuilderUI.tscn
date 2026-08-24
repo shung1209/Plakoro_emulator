@@ -71,7 +71,7 @@ layout_mode = 2
 [node name="BackButton" type="Button" parent="Margin/Main/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "← Back to Preparation"
+text = "<- Back to Preparation"
 
 [node name="ContentScroll" type="ScrollContainer" parent="Margin/Main"]
 layout_mode = 2
@@ -119,15 +119,22 @@ custom_minimum_size = Vector2(250, 0)
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
-text = "✓ Valid"
+text = "[OK] Valid"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="BuilderHint" type="Label" parent="Margin/Main/ContentScroll/Content"]
 layout_mode = 2
 autowrap_mode = 2
-text = "Select a face to change its 能量. Fixed faces must use unique 能量 types across all three Enerkoro."
+text = "Select a face to change its Energy. Fixed faces must use unique Energy types across all three Enerkoro."
 modulate = Color(1, 1, 1, 0.72)
+
+
+[node name="RepeatFixedEnergyToggle" type="CheckButton" parent="Margin/Main/ContentScroll/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Allow repeated Fixed Energy (Free Mode only)"
+visible = false
 
 [node name="DiceSectionHeader" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content"]
 layout_mode = 2
@@ -151,7 +158,7 @@ size_flags_horizontal = 3
 
 [node name="DiceSectionHint" type="Label" parent="Margin/Main/ContentScroll/Content/DiceSectionHeader"]
 layout_mode = 2
-text = "3 Enerkoro • 6 faces each"
+text = "3 Enerkoro  |  6 faces each"
 modulate = Color(1, 1, 1, 0.58)
 vertical_alignment = 1
 
@@ -173,7 +180,7 @@ theme_override_constants/separation = 18
 [node name="AdvancedToggle" type="Button" parent="Margin/Main/ContentScroll/Content"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Advanced ▸"
+text = "Advanced >"
 toggle_mode = true
 
 [node name="PreviewCoverageRow" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content"]
@@ -196,7 +203,7 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "能量 Preview"
+text = "Energy Preview"
 vertical_alignment = 2
 
 [node name="DiceIconPreviewContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel/PreviewBox"]
@@ -258,28 +265,18 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
-text = "能量 Probability"
+text = "Energy Probability"
 
 [node name="Actions" type="HBoxContainer" parent="Margin/Main"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="LoadDefaultButton" type="Button" parent="Margin/Main/Actions"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Reset to Default"
-
 [node name="SavePathEdit" type="LineEdit" parent="Margin/Main/Actions"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
-
-[node name="SaveButton" type="Button" parent="Margin/Main/Actions"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Save"
 
 [node name="ConfirmButton" type="Button" parent="Margin/Main/Actions"]
 unique_name_in_owner = true

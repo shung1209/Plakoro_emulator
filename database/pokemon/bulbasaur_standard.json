@@ -11,7 +11,7 @@
   ],
   "display_name": "Bulbasaur",
   "id": "bulbasaur_standard",
-  "kyokoro_profile_id": "standard_equal",
+  "kyokoro_profile_id": "bulbasaur_stl_custom",
   "max_hp": 120,
   "pokemon_type": "grass",
   "schema_version": "2.0",

@@ -254,7 +254,7 @@ func _populate_opcode_options() -> void:
 
 			type_option.add_item(
 				category
-				+ " — "
+				+ " - "
 				+ display_name
 			)
 			type_option.set_item_metadata(
@@ -265,7 +265,7 @@ func _populate_opcode_options() -> void:
 	type_option.add_separator()
 
 	type_option.add_item(
-        "Advanced — Custom JSON"
+        "Advanced - Custom JSON"
 	)
 	type_option.set_item_metadata(
 		type_option.item_count - 1,

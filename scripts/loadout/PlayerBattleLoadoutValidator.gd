@@ -21,7 +21,8 @@ const VALID_ENERGY_TYPES: Array[StringName] = [
 
 static func validate(
     loadout_data: Variant,
-    database: Variant
+    database: Variant,
+    allow_repeated_fixed_energy: bool = false
 ) -> Dictionary:
     var result: Dictionary = {
         "success": true,
@@ -99,7 +100,8 @@ static func validate(
         var dice_result: Dictionary = (
             ENERGY_DICE_VALIDATOR.validate(
                 loadout_data.energy_dice_setup,
-                energy_types
+                energy_types,
+                allow_repeated_fixed_energy
             )
         )
 

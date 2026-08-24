@@ -10,7 +10,7 @@
   ],
   "display_name": "Eevee",
   "id": "eevee_standard",
-  "kyokoro_profile_id": "standard_equal",
+  "kyokoro_profile_id": "eevee_stl_custom",
   "max_hp": 120,
   "pokemon_type": "normal",
   "schema_version": "2.0",

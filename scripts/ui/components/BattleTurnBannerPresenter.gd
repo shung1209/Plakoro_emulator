@@ -45,7 +45,7 @@ static func show_turn(
                 )
             )
         },
-        "TURN {turn}  •  {actor}"
+        "TURN {turn}   |   {actor}"
     )
 
     label.add_theme_color_override(

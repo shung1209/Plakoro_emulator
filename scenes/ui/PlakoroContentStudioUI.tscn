@@ -72,7 +72,7 @@ text = "Validate Database"
 [node name="BackButton" type="Button" parent="Margin/Main/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "← Back to Preparation"
+text = "<- Back to Preparation"
 
 [node name="Tabs" type="HBoxContainer" parent="Margin/Main"]
 layout_mode = 2
@@ -159,7 +159,7 @@ placeholder_text = "Search ID, name, owner, type..."
 unique_name_in_owner = true
 custom_minimum_size = Vector2(42, 0)
 layout_mode = 2
-text = "×"
+text = "x"
 tooltip_text = "Clear search"
 
 [node name="LibraryFilterRow" type="HBoxContainer" parent="Margin/Main/Body/LibraryPanel/LibraryBox"]
@@ -251,7 +251,7 @@ text = "New Pokémon"
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 2
-text = "New Content · ✓ Saved"
+text = "New Content  |  [OK] Saved"
 
 [node name="AuthoringDependencySummary" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/AuthoringSessionPanel/AuthoringSessionBox"]
 unique_name_in_owner = true
@@ -558,12 +558,12 @@ theme_override_constants/separation = 8
 [node name="AddMoveButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox/MoveLists/MoveActions"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Add →"
+text = "Add ->"
 
 [node name="RemoveMoveButton" type="Button" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox/MoveLists/MoveActions"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "← Remove"
+text = "<- Remove"
 
 [node name="SelectedMoveList" type="ItemList" parent="Margin/Main/Body/EditorScroll/EditorRoot/PokemonEditor/MovesPanel/MovesBox/MoveLists"]
 unique_name_in_owner = true
@@ -886,7 +886,7 @@ text = "Clear"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "+ Add 能量"
+text = "+ Add Energy"
 
 [node name="EnergyCostRows" type="VBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
 unique_name_in_owner = true
@@ -908,7 +908,7 @@ theme_override_constants/separation = 16
 [node name="EnergyCostTotalLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total 能量 Required: 0"
+text = "Total Energy Required: 0"
 
 [node name="BaseActionsHeader" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/ComplexPanel/ComplexBox"]
 layout_mode = 2
@@ -1075,17 +1075,17 @@ text = "Unnamed Move"
 [node name="MovePreviewMeta" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Normal • Attack"
+text = "Normal  |  Attack"
 
 [node name="MovePreviewDamage" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Damage: —"
+text = "Damage: -"
 
 [node name="EnergyLabel" type="Label" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
 layout_mode = 2
-text = "能量 Cost"
+text = "Energy Cost"
 
 [node name="MovePreviewEnergy" type="HBoxContainer" parent="Margin/Main/Body/EditorScroll/EditorRoot/MoveEditor/MovePresentationPanel/MovePresentationBox/PreviewMainRow/PreviewInfo"]
 unique_name_in_owner = true
@@ -1145,7 +1145,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
-text = "Ready — select content or create a new entry."
+text = "Ready - select content or create a new entry."
 
 [node name="Actions" type="HBoxContainer" parent="Margin/Main"]
 custom_minimum_size = Vector2(0, 54)
@@ -1156,7 +1156,7 @@ theme_override_constants/separation = 10
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Milestone 12.8g — Full Creation Workflow Regression"
+text = "Milestone 12.8g - Full Creation Workflow Regression"
 
 [node name="SaveButton" type="Button" parent="Margin/Main/Actions"]
 unique_name_in_owner = true

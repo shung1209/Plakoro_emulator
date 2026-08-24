@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="PLAKORO"
-run/main_scene="res://scenes/ui/BattlePreparationUI.tscn"
+config/name="PLAKORO Adventures"
+run/main_scene="res://scenes/game/MainMenuUI.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
@@ -21,13 +21,18 @@ config/icon="res://icon.svg"
 UserDatabaseBootstrap="*res://scripts/content/UserDatabaseBootstrap.gd"
 LocalizationService="*res://scripts/localization/LocalizationService.gd"
 GameContentLocalizationService="*res://scripts/localization/GameContentLocalizationService.gd"
+ContentStudioAccess="*res://scripts/game/ContentStudioAccess.gd"
+EncounterSession="*res://scripts/game/EncounterSession.gd"
+GameFlow="*res://scripts/game/GameFlow.gd"
+PlayerProgress="*res://scripts/game/PlayerProgress.gd"
+UIInteractionMotion="*res://scripts/ui/UIInteractionMotion.gd"
+WebUIUsability="*res://scripts/ui/WebUIUsability.gd"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
 
 [physics]
 

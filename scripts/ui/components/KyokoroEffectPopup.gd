@@ -7,6 +7,9 @@ const ICONS: Script = preload(
 const MOVE_ENERGY_COST_ROW: Script = preload(
     "res://scripts/ui/components/MoveEnergyCostRow.gd"
 )
+const THEME_FACTORY: Script = preload(
+    "res://scripts/ui/theme/PlakoroThemeFactory.gd"
+)
 
 
 func get_content_fitted_size() -> Vector2:
@@ -508,7 +511,7 @@ func _populate_move_content(
                 "damage": (
                     str(int(printed_damage))
                     if printed_damage != null
-                    else "—"
+                    else "-"
                 )
             },
             "Damage: {damage}"
@@ -612,18 +615,8 @@ func _build_panel_style() -> void:
     )
 
     var panel_style: StyleBoxFlat = StyleBoxFlat.new()
-    panel_style.bg_color = Color(
-        0.025,
-        0.030,
-        0.040,
-        0.995
-    )
-    panel_style.border_color = Color(
-        0.45,
-        0.49,
-        0.58,
-        1.0
-    )
+    panel_style.bg_color = THEME_FACTORY.get_color("surface")
+    panel_style.border_color = THEME_FACTORY.get_color("border_hover")
     panel_style.set_border_width_all(1)
     panel_style.corner_radius_top_left = 8
     panel_style.corner_radius_top_right = 8
@@ -712,7 +705,7 @@ func _format_energy_cost(
 
         parts.append(
             energy_type.capitalize()
-            + " ×"
+            + " x"
             + str(
                 count
             )

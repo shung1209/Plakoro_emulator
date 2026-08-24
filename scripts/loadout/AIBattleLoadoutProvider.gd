@@ -13,10 +13,17 @@ const ENERGY_SETUP_LOADER: Script = preload(
 const USER_DATABASE: Script = preload(
     "res://scripts/content/UserDatabasePathService.gd"
 )
+const POKEMON_AUTHORING: Script = preload(
+    "res://scripts/content/PokemonAuthoringService.gd"
+)
 
 
 const USER_LOADOUT_PATH: String = (
     "user://user_database/loadouts/ai_battle_loadout.json"
+)
+
+const FREE_MODE_USER_LOADOUT_PATH: String = (
+    "user://user_database/loadouts/free_mode_ai_battle_loadout.json"
 )
 
 const DEFAULT_DICE_PATH: String = (
@@ -32,21 +39,64 @@ const DEFAULT_MOVE_IDS: Array[StringName] = [
 ]
 
 
+static func get_user_loadout_path() -> String:
+    return (
+        FREE_MODE_USER_LOADOUT_PATH
+        if GameFlow.free_mode
+        else USER_LOADOUT_PATH
+    )
+
+
 static func load_ai_loadout() -> Variant:
+    if EncounterSession.has_active_encounter():
+        return EncounterSession.get_ai_loadout()
+
     USER_DATABASE.migrate_legacy_user_files()
+    var loadout_path: String = get_user_loadout_path()
     if FileAccess.file_exists(
-        USER_LOADOUT_PATH
+        loadout_path
     ):
         var saved_loadout: Variant = (
             SAVE_SERVICE.load_loadout(
-                USER_LOADOUT_PATH
+                loadout_path
             )
         )
 
         if saved_loadout != null:
+            if GameFlow.free_mode:
+                _apply_free_mode_pokemon_default_dice(saved_loadout)
             return saved_loadout
 
     return create_default_ai_loadout()
+
+
+static func _apply_free_mode_pokemon_default_dice(loadout: Variant) -> void:
+    if loadout == null:
+        return
+    var pokemon: Dictionary = POKEMON_AUTHORING.load_by_id(
+        String(loadout.pokemon_id)
+    )
+    if pokemon.is_empty():
+        return
+    var species_id: String = String(
+        pokemon.get("species_id", "")
+    ).strip_edges().to_lower()
+    if species_id.is_empty():
+        return
+    var user_path: String = (
+        USER_DATABASE.DICE_SETUPS + "/" + species_id + "_default.json"
+    )
+    var builtin_path: String = (
+        "res://database/dice_setups/" + species_id + "_default.json"
+    )
+    var dice_path: String = (
+        user_path if FileAccess.file_exists(user_path) else builtin_path
+    )
+    if not FileAccess.file_exists(dice_path):
+        return
+    var setup: Variant = ENERGY_SETUP_LOADER.load_setup(dice_path)
+    if setup != null:
+        loadout.energy_dice_setup = setup
 
 
 static func create_default_ai_loadout() -> Variant:

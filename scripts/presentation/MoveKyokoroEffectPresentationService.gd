@@ -276,13 +276,13 @@ static func build_preview(
         ):
             trigger_lines.append(
                 orientation_text
-                + " → "
+                + " -> "
                 + effect_text
             )
         elif not orientation_text.is_empty():
             trigger_lines.append(
                 orientation_text
-                + " → Effect"
+                + " -> Effect"
             )
         elif not effect_text.is_empty():
             trigger_lines.append(
@@ -326,7 +326,7 @@ static func build_preview(
                     "Charakoro: "
                     + orientation_text
                     + (
-                        " → " + effect_text
+                        " -> " + effect_text
                         if not effect_text.is_empty()
                         else ""
                     )
