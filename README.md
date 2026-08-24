@@ -15,8 +15,9 @@ advance through the arena.
 
 ## What's in v2.3
 
-- Story Mode with New Game, Continue, save deletion, sequential encounters,
-  battle rewards, collection unlocks, and Plakoro levels up to LV5.
+- Story Mode with New Game, Continue, save deletion, a randomized encounter
+  route unique to each save, battle rewards, collection unlocks, and Plakoro
+  levels up to LV5.
 - Free Mode with all playable content available for unrestricted battles and
   expanded Enerkoro rules.
 - 21 Pokémon, 126 Move cards, and 9 custom Kyokoro weight profiles.
@@ -27,7 +28,8 @@ advance through the arena.
   Energy costs, Kyokoro faces, effects, damage, and success probability.
 - Warm and Dark interface themes with distinct action-button colors.
 - Battle presentation improvements, attack feedback, UI motion, clearer dice
-  results, and Kyokoro orientation effects.
+  results, Kyokoro orientation effects, and an animated pre-battle coin toss
+  that determines whether the player or opponent takes the first turn.
 - Windows, Linux, and Web/itch.io export presets.
 - English, Traditional Chinese, Spanish (Spain), and Japanese interfaces.
 - Bundled Noto Sans TC and Noto Sans JP fonts for reliable CJK display.
@@ -37,13 +39,17 @@ advance through the arena.
 ### Story Mode
 
 Start a new adventure with Charmander, Squirtle, or Bulbasaur, or continue an
-existing save. Encounters unlock in a fixed order, and the active Plakoro
-cannot battle itself. Victory unlocks the defeated Plakoro, its Moves, and new
-Energy. Level rewards must be selected before continuing.
+existing save. When a new save is created, the game randomly generates its
+21-Pokémon encounter route. That route remains fixed for the lifetime of the
+save while encounters unlock one at a time; deleting the save and starting
+again generates a new route. The active Plakoro cannot battle itself. Victory
+unlocks the defeated Plakoro, its Moves, and new Energy. Level rewards must be
+selected before continuing.
 
 Story Mode saves:
 
 - completed encounters and career record;
+- the save's randomized encounter route;
 - unlocked Plakoro and Moves;
 - Plakoro levels and Energy rewards;
 - owned Energy and the active Enerkoro setup;
@@ -78,8 +84,8 @@ unlock code is entered.
 
 ### Encounter Select
 
-Shows Story Mode progress and the next available opponent. Winning the current
-encounter unlocks the next battle.
+Shows Story Mode progress and the next opponent on the save's generated route.
+Winning the current encounter unlocks the next battle in that route.
 
 ### Battle Preparation
 
@@ -99,8 +105,9 @@ Preparation.
 
 The battle screen presents both combatants, HP, dice results, Charakoro
 orientation, Move cards, action feedback, and an optional technical timeline.
-Select a Move card to attack. Select the opponent Charakoro during battle to
-inspect its revealed Moves in a separate window.
+Before turn one, an animated coin toss chooses whether the player or opponent
+acts first. Select a Move card to attack. Select the opponent Charakoro during
+battle to inspect its revealed Moves in a separate window.
 
 ### Battle Report
 
@@ -188,8 +195,8 @@ V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險�
 
 ## v2.3 收錄內容
 
-- Story Mode 提供 New Game、Continue、刪除存檔、固定順序關卡、戰鬥獎勵、
-  收藏解鎖，以及最高 LV5 的 Plakoro 等級。
+- Story Mode 提供 New Game、Continue、刪除存檔、每份存檔獨立的隨機
+  故事路線、戰鬥獎勵、收藏解鎖，以及最高 LV5 的 Plakoro 等級。
 - Free Mode 開放所有可玩內容，讓玩家自由對戰，並提供較寬鬆的 Enerkoro
   規則。
 - 收錄 21 隻 Pokémon、126 張招式卡及 9 組自訂 Kyokoro 權重設定。
@@ -199,6 +206,8 @@ V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險�
   骰面、效果、傷害及成功率。
 - 提供 Warm 與 Dark 兩種介面主題，並以不同按鈕色彩區分操作用途。
 - 改善戰鬥演出、攻擊回饋、介面動態效果、擲骰結果及 Kyokoro 方位效果。
+- 戰鬥前會擲出具有翻面動畫的硬幣，依 HEADS／TAILS 決定玩家或
+  對手先攻。
 - 提供 Windows、Linux 與 Web／itch.io 匯出設定。
 - 支援英文、繁體中文、西班牙文（西班牙）與日文介面。
 - 內含 Noto Sans TC 與 Noto Sans JP 字型，確保中日文字正常顯示。
@@ -208,13 +217,16 @@ V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險�
 ### Story Mode（故事模式）
 
 從 Charmander、Squirtle 或 Bulbasaur 中選擇第一隻夥伴開始冒險，也可以
-繼續既有存檔。關卡會依固定順序逐步解鎖，目前使用中的 Plakoro 不能和
+繼續既有存檔。新建存檔時，系統會隨機產生一條包含 21 隻 Pokémon 的
+故事路線，之後依該路線逐關解鎖。這個順序會在整份存檔期間保持不變；
+只有刪除存檔並重新開始，才會產生新路線。目前使用中的 Plakoro 不能和
 自己對戰。獲勝後可解鎖被擊敗的 Plakoro、其招式以及新的 Energy。升級時
 必須先選擇 Energy 獎勵才能繼續。
 
 Story Mode 會保存：
 
 - 已完成的關卡與生涯戰績；
+- 這份存檔專屬的隨機故事路線；
 - 已解鎖的 Plakoro 與招式；
 - Plakoro 等級與 Energy 獎勵；
 - 已擁有的 Energy 與目前使用中的 Enerkoro 配置；
@@ -248,8 +260,8 @@ Content Studio 在一般遊玩時會保持隱藏，讓主選單專注於遊戲�
 
 ### 關卡選擇
 
-顯示 Story Mode 的完成進度及下一位可挑戰對手。戰勝目前關卡後，即可解鎖
-下一場對戰。
+顯示 Story Mode 的完成進度，以及這份存檔故事路線上的下一位對手。
+戰勝目前關卡後，即可解鎖路線中的下一場對戰。
 
 ### 對戰準備
 
@@ -266,8 +278,9 @@ Content Studio 在一般遊玩時會保持隱藏，讓主選單專注於遊戲�
 ### 對戰
 
 對戰畫面會顯示雙方 Plakoro、HP、擲骰結果、Charakoro 方位、招式卡、
-行動回饋及可選用的技術時間軸。選擇招式卡即可發動攻擊；戰鬥中選擇對手的
-Charakoro，可在獨立視窗查看已公開的招式。
+行動回饋及可選用的技術時間軸。第一回合開始前，會擲硬幣決定玩家或對手
+先攻。選擇招式卡即可發動攻擊；戰鬥中選擇對手的 Charakoro，可在獨立視窗
+查看已公開的招式。
 
 ### 戰鬥報告
 
