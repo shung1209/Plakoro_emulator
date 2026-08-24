@@ -606,7 +606,7 @@ func _add_effect_rows(
             move_effect_label,
             compact,
             large,
-            0 if phone_card else 2,
+            4 if phone_card else 2,
             phone_card
         )
         if phone_card:
