@@ -18,6 +18,7 @@ var last_update: Dictionary = {}
 
 func _ready() -> void:
 	progress = SAVE_SERVICE.load_progress()
+	_ensure_saved_encounter_order()
 
 
 func record_battle(outcome: Variant) -> Dictionary:
@@ -27,6 +28,7 @@ func record_battle(outcome: Variant) -> Dictionary:
 
 	if progress == null:
 		progress = SAVE_SERVICE.load_progress()
+		_ensure_saved_encounter_order()
 
 	var completed_before: bool = progress.completed_encounter_ids.has(
 		String(outcome.encounter_id)
@@ -68,7 +70,17 @@ func record_battle(outcome: Variant) -> Dictionary:
 func get_progress() -> Variant:
 	if progress == null:
 		progress = SAVE_SERVICE.load_progress()
+		_ensure_saved_encounter_order()
 	return progress
+
+
+func _ensure_saved_encounter_order() -> void:
+	if progress == null or not progress.has_method("ensure_encounter_order"):
+		return
+	if not progress.has_profile():
+		return
+	if progress.ensure_encounter_order():
+		SAVE_SERVICE.save_progress(progress)
 
 
 func get_last_update() -> Dictionary:

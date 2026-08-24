@@ -1,10 +1,13 @@
 extends RefCounted
 
 
-const SCHEMA_VERSION: String = "3.3"
+const SCHEMA_VERSION: String = "3.4"
 const FIRST_VICTORY_MILESTONE: String = "first_victory"
 const ENERGY_CATALOG: Script = preload(
 	"res://scripts/game/EnergyProgressionCatalog.gd"
+)
+const ENCOUNTER_CATALOG: Script = preload(
+	"res://scripts/game/EncounterCatalog.gd"
 )
 
 
@@ -15,6 +18,7 @@ var current_win_streak: int = 0
 var best_win_streak: int = 0
 var unlocked_milestones: Array[String] = []
 var completed_encounter_ids: Array[String] = []
+var encounter_order_ids: Array[String] = []
 var starter_pokemon_id: StringName = &""
 var starter_energy_type: StringName = &""
 var unlocked_pokemon_ids: Array[String] = []
@@ -88,6 +92,7 @@ func to_dictionary() -> Dictionary:
 		"best_win_streak": best_win_streak,
 		"unlocked_milestones": unlocked_milestones.duplicate(),
 		"completed_encounter_ids": completed_encounter_ids.duplicate(),
+		"encounter_order_ids": encounter_order_ids.duplicate(),
 		"starter_pokemon_id": String(starter_pokemon_id),
 		"starter_energy_type": String(starter_energy_type),
 		"unlocked_pokemon_ids": unlocked_pokemon_ids.duplicate(),
@@ -131,6 +136,10 @@ static func from_dictionary(data: Dictionary) -> Variant:
 
 	result.starter_pokemon_id = StringName(data.get("starter_pokemon_id", ""))
 	result.starter_energy_type = StringName(data.get("starter_energy_type", ""))
+	_load_unique_strings(
+		data.get("encounter_order_ids", []),
+		result.encounter_order_ids
+	)
 	_load_unique_strings(data.get("unlocked_pokemon_ids", []), result.unlocked_pokemon_ids)
 	_load_unique_strings(data.get("unlocked_move_card_ids", []), result.unlocked_move_card_ids)
 	_load_nonnegative_counts(data.get("pokemon_levels", {}), result.pokemon_levels)
@@ -162,6 +171,9 @@ static func create_new_profile(
 	var result: Variant = new()
 	result.starter_pokemon_id = starter_id
 	result.starter_energy_type = starter_energy
+	result.encounter_order_ids = ENCOUNTER_CATALOG.create_random_order(
+		starter_id
+	)
 	result.unlocked_pokemon_ids.append(String(starter_id))
 	result.pokemon_levels[String(starter_id)] = 1
 	result.energy_inventory = ENERGY_CATALOG.create_starter_inventory(
@@ -172,6 +184,34 @@ static func create_new_profile(
 		if not move_id.is_empty() and not result.unlocked_move_card_ids.has(move_id):
 			result.unlocked_move_card_ids.append(move_id)
 	return result
+
+
+func ensure_encounter_order() -> bool:
+	var normalized: Array[String] = []
+	for pokemon_id: String in encounter_order_ids:
+		if (
+			ENCOUNTER_CATALOG.POKEMON_ORDER.has(pokemon_id)
+			and not normalized.has(pokemon_id)
+		):
+			normalized.append(pokemon_id)
+
+	if normalized.is_empty():
+		encounter_order_ids = ENCOUNTER_CATALOG.create_random_order(
+			starter_pokemon_id
+		)
+		return true
+
+	var randomized_catalog: Array[String] = (
+		ENCOUNTER_CATALOG.create_random_order(starter_pokemon_id)
+	)
+	for pokemon_id: String in randomized_catalog:
+		if not normalized.has(pokemon_id):
+			normalized.append(pokemon_id)
+
+	if normalized == encounter_order_ids:
+		return false
+	encounter_order_ids = normalized
+	return true
 
 
 func claim_energy_choice(
@@ -219,6 +259,7 @@ func _migrate_energy_progression(source_schema: String) -> void:
 		starter_pokemon_id != &""
 		and starter_energy_type != &""
 		and source_schema != SCHEMA_VERSION
+		and source_schema != "3.3"
 	):
 		var old_start: Dictionary = (
 			ENERGY_CATALOG.create_starter_inventory(

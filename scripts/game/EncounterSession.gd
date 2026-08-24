@@ -21,7 +21,8 @@ func select_encounter(encounter_id: StringName) -> bool:
 	var progress: Variant = PlayerProgress.get_progress()
 	var encounter: Dictionary = CATALOG.get_by_id(
 		encounter_id,
-		progress.starter_pokemon_id
+		progress.starter_pokemon_id,
+		progress.encounter_order_ids
 	)
 	if encounter.is_empty():
 		push_error("EncounterSession: unknown encounter " + String(encounter_id))
@@ -30,7 +31,8 @@ func select_encounter(encounter_id: StringName) -> bool:
 	if not CATALOG.is_unlocked(
 		encounter_id,
 		progress.completed_encounter_ids,
-		progress.starter_pokemon_id
+		progress.starter_pokemon_id,
+		progress.encounter_order_ids
 	):
 		push_warning("EncounterSession: encounter is locked: " + String(encounter_id))
 		return false

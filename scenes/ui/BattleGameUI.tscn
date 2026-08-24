@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/BattleGameUI.gd" id="1_ui"]
 [ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/components/BattleDiceRollPresenter.tscn" id="4_roll"]
 [ext_resource type="Script" path="res://scripts/ui/components/BattlePendingEffectIndicator.gd" id="5_pending_effect"]
 [ext_resource type="Script" path="res://scripts/ui/components/BattleArenaBackdrop.gd" id="6_backdrop"]
+[ext_resource type="Script" path="res://scripts/ui/components/CoinTossVisual.gd" id="7_coin"]
 
 [ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="lang_selector"]
 
@@ -597,6 +598,61 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Close"
+
+[node name="CoinTossWindow" type="PopupPanel" parent="."]
+unique_name_in_owner = true
+initial_position = 2
+size = Vector2i(500, 380)
+unresizable = true
+exclusive = true
+
+[node name="Margin" type="MarginContainer" parent="CoinTossWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="CoinTossWindow/Margin"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="CoinTossTitle" type="Label" parent="CoinTossWindow/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+text = "COIN TOSS"
+
+[node name="CoinTossVisual" type="Control" parent="CoinTossWindow/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+script = ExtResource("7_coin")
+
+[node name="CoinFlipLabel" type="Label" parent="CoinTossWindow/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+text = "Flipping..."
+
+[node name="CoinResultLabel" type="Label" parent="CoinTossWindow/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "You go first!"
 
 [node name="QuitConfirmation" type="ConfirmationDialog" parent="."]
 unique_name_in_owner = true

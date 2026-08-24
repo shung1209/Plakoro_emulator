@@ -54,7 +54,8 @@ func _rebuild_encounters() -> void:
 
 	var progress: Variant = PlayerProgress.get_progress()
 	var encounters: Array[Dictionary] = ENCOUNTER_CATALOG.get_all(
-		progress.starter_pokemon_id
+		progress.starter_pokemon_id,
+		progress.encounter_order_ids
 	)
 	var player_loadout: Variant = PLAYER_LOADOUT_PROVIDER.load_player_loadout()
 	var active_pokemon_id: String = (
@@ -75,7 +76,8 @@ func _rebuild_encounters() -> void:
 		var unlocked: bool = ENCOUNTER_CATALOG.is_unlocked(
 			encounter_id,
 			progress.completed_encounter_ids,
-			progress.starter_pokemon_id
+			progress.starter_pokemon_id,
+			progress.encounter_order_ids
 		)
 		var self_match: bool = active_pokemon_id == String(
 			encounter.get("pokemon_id", "")
