@@ -271,9 +271,19 @@ func _request_web_orientation(portrait: bool) -> void:
 	var script: String = ""
 	if portrait:
 		script = (
-			"if (screen.orientation && screen.orientation.lock) {"
-			+ "screen.orientation.lock('portrait').catch(function() {});"
+			"(async function () {"
+			+ "try {"
+			+ "if (!document.fullscreenElement "
+			+ "&& document.documentElement.requestFullscreen) {"
+			+ "await document.documentElement.requestFullscreen();"
 			+ "}"
+			+ "} catch (error) {}"
+			+ "try {"
+			+ "if (screen.orientation && screen.orientation.lock) {"
+			+ "await screen.orientation.lock('portrait-primary');"
+			+ "}"
+			+ "} catch (error) {}"
+			+ "})();"
 		)
 	else:
 		script = (
@@ -282,3 +292,9 @@ func _request_web_orientation(portrait: bool) -> void:
 			+ "}"
 		)
 	JavaScriptBridge.eval(script)
+
+
+func request_phone_orientation() -> void:
+	if not phone_mode or not OS.has_feature("web"):
+		return
+	_request_web_orientation(true)

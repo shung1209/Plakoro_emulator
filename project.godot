@@ -27,6 +27,7 @@ GameFlow="*res://scripts/game/GameFlow.gd"
 PlayerProgress="*res://scripts/game/PlayerProgress.gd"
 UIInteractionMotion="*res://scripts/ui/UIInteractionMotion.gd"
 WebUIUsability="*res://scripts/ui/WebUIUsability.gd"
+PhoneOrientationGuard="*res://scripts/ui/phone/PhoneOrientationGuard.gd"
 
 [display]
 
