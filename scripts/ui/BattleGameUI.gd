@@ -189,6 +189,11 @@ const RESOLUTION_STEP_QUEUE_BUILDER: Script = preload(
 @onready var enemy_move_window_hint: Label = %EnemyMoveWindowHint
 @onready var enemy_move_detail_grid: GridContainer = %EnemyMoveDetailGrid
 @onready var enemy_move_window_close_button: Button = %EnemyMoveWindowCloseButton
+@onready var coin_toss_window: PopupPanel = %CoinTossWindow
+@onready var coin_toss_title: Label = %CoinTossTitle
+@onready var coin_toss_visual: Control = %CoinTossVisual
+@onready var coin_flip_label: Label = %CoinFlipLabel
+@onready var coin_result_label: Label = %CoinResultLabel
 @onready var player_pending_effect_indicator: HBoxContainer = (
 	%PlayerPendingEffectIndicator
 )
@@ -1446,15 +1451,26 @@ func _start_new_battle() -> void:
 		" | Resolution: {resolution}"
 	)
 
-	battle = BATTLE_CONTROLLER.new(database)
-	battle.start_battle(
-		player_loadout,
-		enemy_loadout
-	)
-
 	var live_battle_seed: int = (
 		BATTLE_RANDOM_SEED.create_live_seed()
 	)
+	var coin_random: RandomNumberGenerator = RandomNumberGenerator.new()
+	coin_random.seed = BATTLE_RANDOM_SEED.derive_seed(
+		live_battle_seed,
+		73129
+	)
+	var coin_heads: bool = coin_random.randi_range(0, 1) == 0
+	var starting_participant_id: StringName = (
+		&"player" if coin_heads else &"enemy"
+	)
+
+	battle = BATTLE_CONTROLLER.new(database)
+	battle.start_battle(
+		player_loadout,
+		enemy_loadout,
+		starting_participant_id
+	)
+
 	var ai_battle_seed: int = (
 		BATTLE_RANDOM_SEED.derive_seed(
 			live_battle_seed,
@@ -1484,6 +1500,27 @@ func _start_new_battle() -> void:
 	_refresh_enemy_move_reveal()
 	_create_move_buttons()
 	_refresh_ui()
+	_set_battle_navigation_locked(true)
+	await _present_coin_toss(coin_heads)
+
+	if starting_participant_id == &"enemy":
+		TURN_BANNER.show_turn(
+			turn_banner_panel,
+			turn_banner_label,
+			int(battle.state.turn_number),
+			&"enemy"
+		)
+		MESSAGE_PRESENTER.show_ai(
+			message_label,
+			LocalizationService.tr_key(
+				"battle.ai_goes_first",
+				"AI won the coin toss and goes first."
+			)
+		)
+		await _hold_action_state(&"ai_thinking", 0.8)
+		await _execute_ai_turn()
+		return
+
 	TURN_BANNER.show_turn(
 		turn_banner_panel,
 		turn_banner_label,
@@ -1500,6 +1537,36 @@ func _start_new_battle() -> void:
 		)
 	)
 	_set_player_input_enabled(true)
+	_set_battle_navigation_locked(false)
+
+
+func _present_coin_toss(coin_heads: bool) -> void:
+	coin_toss_title.text = LocalizationService.tr_key(
+		"battle.coin_toss.title",
+		"COIN TOSS"
+	)
+	coin_flip_label.text = LocalizationService.tr_key(
+		"battle.coin_toss.flipping",
+		"Flipping to decide who goes first..."
+	)
+	coin_result_label.text = ""
+	coin_toss_window.popup_centered(Vector2i(500, 380))
+	await get_tree().process_frame
+	await coin_toss_visual.call("play_flip", coin_heads)
+	coin_flip_label.text = LocalizationService.tr_key(
+		"battle.coin_toss.heads"
+		if coin_heads
+		else "battle.coin_toss.tails",
+		"HEADS" if coin_heads else "TAILS"
+	)
+	coin_result_label.text = LocalizationService.tr_key(
+		"battle.coin_toss.player_first"
+		if coin_heads
+		else "battle.coin_toss.ai_first",
+		"You go first!" if coin_heads else "AI goes first!"
+	)
+	await get_tree().create_timer(1.25).timeout
+	coin_toss_window.hide()
 
 
 

@@ -94,7 +94,8 @@ func _init(database_service: Node) -> void:
 
 func start_battle(
 	player_loadout: Variant,
-	enemy_loadout: Variant
+	enemy_loadout: Variant,
+	starting_participant_id: StringName = &"player"
 ) -> Variant:
 	state = BATTLE_STATE_DATA.new()
 	event_bus.clear()
@@ -113,9 +114,17 @@ func start_battle(
 		enemy_loadout
 	)
 
-	state.current_participant_id = &"player"
+	state.current_participant_id = (
+		starting_participant_id
+		if starting_participant_id == &"enemy"
+		else &"player"
+	)
 	state.turn_number = 1
-	state.battle_log.append("Battle started.")
+	state.battle_log.append(
+		"Battle started. First turn: "
+		+ String(state.current_participant_id)
+		+ "."
+	)
 
 	event_bus.emit_event(
 		&"battle_started",

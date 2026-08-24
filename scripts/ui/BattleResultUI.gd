@@ -186,10 +186,16 @@ func _apply_progress_text() -> void:
 	encounter_unlock_label.visible = not newly_completed.is_empty()
 	encounter_unlock_label.text = LocalizationService.tr_key(
 		"battle_result.all_encounters_complete"
-		if progress.completed_encounter_ids.size() >= ENCOUNTER_CATALOG.get_all(progress.starter_pokemon_id).size()
+		if progress.completed_encounter_ids.size() >= ENCOUNTER_CATALOG.get_all(
+			progress.starter_pokemon_id,
+			progress.encounter_order_ids
+		).size()
 		else "battle_result.encounter_unlocked",
 		"ALL ENCOUNTERS COMPLETE"
-		if progress.completed_encounter_ids.size() >= ENCOUNTER_CATALOG.get_all(progress.starter_pokemon_id).size()
+		if progress.completed_encounter_ids.size() >= ENCOUNTER_CATALOG.get_all(
+			progress.starter_pokemon_id,
+			progress.encounter_order_ids
+		).size()
 		else "NEXT ENCOUNTER UNLOCKED"
 	)
 	var newly_unlocked_pokemon: Array = update.get(
