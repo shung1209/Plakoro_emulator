@@ -217,6 +217,8 @@ func _setup_generated_card_summary(
     var compact: bool = custom_minimum_size.x < 220.0
     var large: bool = custom_minimum_size.x >= 500.0
     var phone_card: bool = GameFlow.phone_mode and not large
+    if phone_card:
+        custom_minimum_size.y = get_phone_recommended_height()
 
     _card_content_root = Control.new()
     _card_content_root.name = "GeneratedMoveCard"
@@ -604,9 +606,13 @@ func _add_effect_rows(
             move_effect_label,
             compact,
             large,
-            2,
+            0 if phone_card else 2,
             phone_card
         )
+        if phone_card:
+            move_effect_label.text_overrun_behavior = (
+                TextServer.OVERRUN_NO_TRIMMING
+            )
         var move_effect_color: Color = _attack_type_card_color(
             StringName(move_card.attack_type)
         )
@@ -790,6 +796,15 @@ func _solid_energy_outline_color(background: Color) -> Color:
     if text_color == Color.WHITE:
         return Color(0.02, 0.03, 0.05, 0.95)
     return Color(1.0, 1.0, 1.0, 0.72)
+
+
+func get_phone_recommended_height() -> float:
+    if move_card == null:
+        return 150.0
+    var move_effects: Variant = move_card.source.get("move_effect_text", [])
+    if move_effects is Array and not move_effects.is_empty():
+        return 190.0
+    return 150.0
 
 
 

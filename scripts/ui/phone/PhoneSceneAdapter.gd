@@ -532,7 +532,19 @@ func _adapt_battle() -> void:
 	if move_buttons_value is Array:
 		for button: Variant in move_buttons_value:
 			if button is Button:
-				(button as Button).custom_minimum_size = Vector2(0, 150)
+				var phone_card_height: float = 150.0
+				if (button as Button).has_method(
+					"get_phone_recommended_height"
+				):
+					phone_card_height = float(
+						(button as Button).call(
+							"get_phone_recommended_height"
+						)
+					)
+				(button as Button).custom_minimum_size = Vector2(
+					0,
+					phone_card_height
+				)
 				(button as Button).pressed.connect(_on_phone_move_pressed)
 	if source.has_signal("battle_phase_changed"):
 		source.connect("battle_phase_changed", _on_battle_phase_changed)
