@@ -16,8 +16,10 @@ static func build_preview(
 ) -> Dictionary:
     var result: Dictionary = {
         "has_kyokoro_effect": false,
+        "has_move_effect": false,
         "summary": "Charakoro Effect: None",
         "detail": "No Charakoro-specific effect.",
+        "move_effect_lines": [],
         "trigger_groups": [],
         "trigger_lines": [],
         "orientations": [],
@@ -149,6 +151,17 @@ static func build_preview(
         {}
     )
 
+    var move_effect_lines: Array[String] = []
+    if source_data is Dictionary:
+        move_effect_lines = _to_text_array(
+            (source_data as Dictionary).get(
+                "move_effect_text",
+                []
+            )
+        )
+    result["move_effect_lines"] = move_effect_lines
+    result["has_move_effect"] = not move_effect_lines.is_empty()
+
     if (
         trigger_groups.is_empty()
         and source_data is Dictionary
@@ -229,7 +242,10 @@ static func build_preview(
             )
 
     trigger_groups = _dedupe_groups(
-        trigger_groups
+        _remove_move_effect_mirrors(
+            trigger_groups,
+            move_effect_lines
+        )
     )
 
     result["trigger_groups"] = trigger_groups
@@ -363,6 +379,39 @@ static func build_preview(
             + "Charakoro trigger mapping is not exposed by this MoveCardData."
         )
 
+    return result
+
+
+static func _to_text_array(value: Variant) -> Array[String]:
+    var result: Array[String] = []
+    var values: Array = value if value is Array else [value]
+    for raw_text: Variant in values:
+        var text_value: String = String(raw_text).strip_edges()
+        if text_value.is_empty() or result.has(text_value):
+            continue
+        result.append(text_value)
+    return result
+
+
+static func _remove_move_effect_mirrors(
+    groups: Array[Dictionary],
+    move_effect_lines: Array[String]
+) -> Array[Dictionary]:
+    if move_effect_lines.is_empty():
+        return groups
+    var normalized_move_effects: Array[String] = []
+    for move_effect: String in move_effect_lines:
+        normalized_move_effects.append(
+            _normalize_effect_text(move_effect)
+        )
+    var result: Array[Dictionary] = []
+    for group: Dictionary in groups:
+        var normalized_group: String = _normalize_effect_text(
+            String(group.get("effect_text", ""))
+        )
+        if normalized_move_effects.has(normalized_group):
+            continue
+        result.append(group)
     return result
 
 

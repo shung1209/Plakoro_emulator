@@ -115,6 +115,52 @@ func localize_effect_text(move_document: Variant, outcome_index: int, fallback: 
 	)
 
 
+func localize_move_effect_text(
+	move_document: Variant,
+	effect_index: int,
+	fallback: String = ""
+) -> String:
+	if move_document == null:
+		return fallback
+	var card_id: String = String(
+		move_document.id
+	) if _has_property(move_document, "id") else ""
+	if not card_id.is_empty():
+		var card_value: String = text(
+			"move_card",
+			card_id,
+			"move_effect_%d" % effect_index,
+			""
+		)
+		if not card_value.is_empty():
+			return _strip_move_effect_prefix(card_value)
+	return _strip_move_effect_prefix(text(
+		"move",
+		String(move_document.move_name_id),
+		"move_effect_%d" % effect_index,
+		fallback
+	))
+
+
+func _strip_move_effect_prefix(value: String) -> String:
+	var result: String = value.strip_edges()
+	for prefix: String in [
+		"Move Effect:",
+		"Move Effect：",
+		"招式效果：",
+		"招式效果:",
+		"わざ効果：",
+		"わざ効果:",
+		"ワザ効果：",
+		"ワザ効果:",
+		"Efecto del movimiento:",
+		"Efecto del movimiento：",
+	]:
+		if result.begins_with(prefix):
+			return result.trim_prefix(prefix).strip_edges()
+	return result
+
+
 func _has_property(source: Variant, property_name: String) -> bool:
 	if source == null:
 		return false

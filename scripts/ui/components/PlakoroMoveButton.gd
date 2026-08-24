@@ -570,6 +570,7 @@ func _add_effect_rows(
     phone_card: bool = false
 ) -> void:
     var preview: Dictionary = EFFECT_PRESENTATION.build_preview(move_card)
+    var move_effect_lines: Array = preview.get("move_effect_lines", [])
     var trigger_groups: Array = preview.get("trigger_groups", [])
     var effects := VBoxContainer.new()
     effects.name = "CardEffectGroups"
@@ -578,10 +579,69 @@ func _add_effect_rows(
         "separation",
         4 if large else (0 if phone_card else 1)
     )
-    _set_fractional_rect(effects, Vector4(0.025, 0.52, 0.965, 0.92))
+    _set_fractional_rect(
+        effects,
+        Vector4(0.025, 0.46, 0.965, 0.96)
+        if phone_card
+        else Vector4(0.025, 0.52, 0.965, 0.92)
+    )
     parent.add_child(effects)
 
-    if trigger_groups.is_empty():
+    for move_effect_index: int in range(move_effect_lines.size()):
+        var move_effect_text: String = (
+            GameContentLocalizationService.localize_move_effect_text(
+                move_card,
+                move_effect_index,
+                String(move_effect_lines[move_effect_index])
+            )
+        ).strip_edges()
+        if move_effect_text.is_empty():
+            continue
+        var move_effect_label := Label.new()
+        move_effect_label.name = "MoveEffect%d" % (move_effect_index + 1)
+        move_effect_label.text = move_effect_text
+        _style_effect_label(
+            move_effect_label,
+            compact,
+            large,
+            2,
+            phone_card
+        )
+        var move_effect_color: Color = _attack_type_card_color(
+            StringName(move_card.attack_type)
+        )
+        move_effect_label.add_theme_color_override(
+            "font_color",
+            _solid_energy_text_color(move_effect_color)
+        )
+        move_effect_label.add_theme_font_size_override(
+            "font_size",
+            20 if large else (15 if phone_card else (10 if compact else 12))
+        )
+        move_effect_label.add_theme_color_override(
+            "font_outline_color",
+            _solid_energy_outline_color(move_effect_color)
+        )
+        move_effect_label.add_theme_constant_override("outline_size", 2)
+
+        var move_effect_panel := PanelContainer.new()
+        move_effect_panel.name = (
+            "MoveEffectPanel%d" % (move_effect_index + 1)
+        )
+        move_effect_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        var move_effect_style := StyleBoxFlat.new()
+        move_effect_style.bg_color = move_effect_color
+        move_effect_style.set_content_margin_all(2.0)
+        move_effect_style.content_margin_left = 5.0
+        move_effect_style.content_margin_right = 5.0
+        move_effect_panel.add_theme_stylebox_override(
+            "panel",
+            move_effect_style
+        )
+        move_effect_panel.add_child(move_effect_label)
+        effects.add_child(move_effect_panel)
+
+    if trigger_groups.is_empty() and move_effect_lines.is_empty():
         var description := Label.new()
         description.text = (
             GameContentLocalizationService.localize_move_description(
@@ -714,6 +774,22 @@ func _attack_type_card_color(attack_type: StringName) -> Color:
             return Color("62b9cf")
         _:
             return Color("a8a8a8")
+
+
+func _solid_energy_text_color(background: Color) -> Color:
+    var luminance: float = (
+        background.r * 0.299
+        + background.g * 0.587
+        + background.b * 0.114
+    )
+    return Color("10182b") if luminance >= 0.48 else Color.WHITE
+
+
+func _solid_energy_outline_color(background: Color) -> Color:
+    var text_color: Color = _solid_energy_text_color(background)
+    if text_color == Color.WHITE:
+        return Color(0.02, 0.03, 0.05, 0.95)
+    return Color(1.0, 1.0, 1.0, 0.72)
 
 
 
