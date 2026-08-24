@@ -1,5 +1,9 @@
 # PLAKORO Adventures v2.3
 
+[English](#english) | [繁體中文](#繁體中文)
+
+## English
+
 **PLAKORO Adventures** is an unofficial, fan-made game inspired by Bandai's
 Pokémon PLAKORO dice game. It builds on the stable **12.12k release-clean
 Official V1 Base**, turning the original emulator and content tools into an
@@ -169,3 +173,167 @@ Company, Game Freak, Creatures Inc., Bandai, or their affiliates.
 Pokémon, PLAKORO, the original artwork, logos, card layouts, characters,
 trademarks, and related intellectual property belong to their respective
 rights holders. No ownership of those properties is claimed by this project.
+
+---
+
+## 繁體中文
+
+**PLAKORO Adventures** 是一款非官方粉絲遊戲，靈感來自 Bandai 推出的
+Pokémon PLAKORO 骰子遊戲。本作以穩定的 **12.12k release-clean Official
+V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險進度、收藏、
+存檔及兩種遊玩方式的完整遊戲。
+
+選擇一隻 Plakoro、配置三顆 Enerkoro、挑選四個招式、擲出骰子，然後在
+競技場中一路前進。
+
+## v2.3 收錄內容
+
+- Story Mode 提供 New Game、Continue、刪除存檔、固定順序關卡、戰鬥獎勵、
+  收藏解鎖，以及最高 LV5 的 Plakoro 等級。
+- Free Mode 開放所有可玩內容，讓玩家自由對戰，並提供較寬鬆的 Enerkoro
+  規則。
+- 收錄 21 隻 Pokémon、126 張招式卡及 9 組自訂 Kyokoro 權重設定。
+- 新增 Gengar、Lucario 及 Metagross 的資料、招式、圖片與預設骰子配置。
+- 可使用玩家目前擁有的 Energy 自由配置三顆 Enerkoro。
+- 使用 PlakoroDB 卡片背景動態產生招式卡，完整顯示 Energy 需求、Kyokoro
+  骰面、效果、傷害及成功率。
+- 提供 Warm 與 Dark 兩種介面主題，並以不同按鈕色彩區分操作用途。
+- 改善戰鬥演出、攻擊回饋、介面動態效果、擲骰結果及 Kyokoro 方位效果。
+- 提供 Windows、Linux 與 Web／itch.io 匯出設定。
+- 支援英文、繁體中文、西班牙文（西班牙）與日文介面。
+- 內含 Noto Sans TC 與 Noto Sans JP 字型，確保中日文字正常顯示。
+
+## 遊戲模式
+
+### Story Mode（故事模式）
+
+從 Charmander、Squirtle 或 Bulbasaur 中選擇第一隻夥伴開始冒險，也可以
+繼續既有存檔。關卡會依固定順序逐步解鎖，目前使用中的 Plakoro 不能和
+自己對戰。獲勝後可解鎖被擊敗的 Plakoro、其招式以及新的 Energy。升級時
+必須先選擇 Energy 獎勵才能繼續。
+
+Story Mode 會保存：
+
+- 已完成的關卡與生涯戰績；
+- 已解鎖的 Plakoro 與招式；
+- Plakoro 等級與 Energy 獎勵；
+- 已擁有的 Energy 與目前使用中的 Enerkoro 配置；
+- 玩家目前的 Loadout。
+
+### Free Mode（自由模式）
+
+Free Mode 會立即開放完整角色陣容。玩家可以選擇自己與 AI 使用的 Plakoro、
+設定四個招式、直接編輯 Enerkoro，並在不受 Story Mode 進度限制的情況下
+進行對戰。啟用 Enerkoro Builder 中的選項後，Free Mode 也允許不同
+Enerkoro 使用重複的固定 Energy。
+
+### Content Studio（內容工作室）
+
+Content Studio 在一般遊玩時會保持隱藏，讓主選單專注於遊戲體驗。在主選單
+依序輸入：
+
+```text
+↑ ↑ ↓ ↓ ← → ← → B A
+```
+
+即可在本次執行期間解除 Content Studio 封印。無論 Story Mode 或 Free Mode
+流程，都必須使用相同密技才能開啟。
+
+## 介面導覽
+
+### 主選單
+
+開始或繼續 Story Mode、進入 Free Mode、切換 Warm／Dark 主題、刪除故事
+存檔或離開遊戲。輸入解除密技後才會顯示 Content Studio。
+
+### 關卡選擇
+
+顯示 Story Mode 的完成進度及下一位可挑戰對手。戰勝目前關卡後，即可解鎖
+下一場對戰。
+
+### 對戰準備
+
+顯示玩家與對手、目前的三顆 Enerkoro、四張已選招式卡及 Loadout 覆蓋率。
+設定玩家 Plakoro 與招式、編輯 Enerkoro，並在 Loadout 通過檢查後開始
+對戰。戰鬥開始前不會公開對手的 Loadout。
+
+### Enerkoro Builder
+
+選擇一個骰面即可移除或替換其中的 Energy。系統會依照玩家持有的 Energy
+檢查整套配置，缺少骰面或超出庫存時將無法使用。按下 **Save & Use
+（儲存並使用）** 後，系統會套用配置並返回對戰準備。
+
+### 對戰
+
+對戰畫面會顯示雙方 Plakoro、HP、擲骰結果、Charakoro 方位、招式卡、
+行動回饋及可選用的技術時間軸。選擇招式卡即可發動攻擊；戰鬥中選擇對手的
+Charakoro，可在獨立視窗查看已公開的招式。
+
+### 戰鬥報告
+
+勝利與失敗統一由戰鬥報告畫面結算。畫面會記錄回合數、傷害、剩餘 HP、
+里程碑、收藏獎勵、解鎖項目及升級 Energy；所有必要獎勵處理完成後，才會
+開放下一步操作。
+
+## 執行專案
+
+本專案目前以 **Godot 4.7.1** 與 GL Compatibility renderer 為目標環境。
+
+1. Clone 或下載此 repository。
+2. 使用 Godot 4.7.1 或相容的 Godot 4 版本開啟 `project.godot`。
+3. 等待 Godot 完成內附素材與字型的匯入。
+4. 從編輯器執行專案。
+
+專案內含以下匯出設定：
+
+- Windows Desktop：`Plakoro_Adventure_v2.3.exe`
+- Linux：`Plakoro_Adventure_v2.3.application`
+- Web：`web/index.html`
+
+Web 匯出輔助工具位於 `tools/export_web.sh` 與
+`tools/export_web.ps1`。
+
+## 使用者資料與自訂內容
+
+第一次啟動時，遊戲會將可編輯的初始資料庫複製至 Godot 的
+`user://user_database/`。此資料庫與封裝的遊戲檔案分開，可用來保存
+自訂 Pokémon、招式、Loadout、Enerkoro 配置、Kyokoro profile、語系覆寫
+及其他玩家建立的內容。
+
+若只是建立個人內容，請勿直接修改封裝資料庫。更換安裝版本或測試大型更新
+前，請先備份使用者資料庫。本機的 `user_database_link` 捷徑會被 Git
+忽略，因為每台電腦的實際位置不同。
+
+## 素材命名規則
+
+- Plakoro 圖片使用 `assets/pokemon/images/` 內的 PNG；檔名可使用
+  `pikachu_standard.png` 之類的 Pokémon ID。
+- 選用的 3D 模型放在 `assets/pokemon/models/`；系統支援 GLB、GLTF、
+  FBX，以及完整 Pokémon ID 或物種名稱檔名。
+- Energy 圖示依屬性名稱存放在 `assets/ui/energy/`。
+- Kyokoro 方位圖示使用 `face_up`、`face_down`、`head_up`、
+  `head_down`、`head_left` 及 `head_right`，並存放在
+  `assets/ui/kyokoro/`。
+
+## 致謝與素材來源
+
+- **Jollto / PlakoroDB**——提供語系參考及
+  [`database/cards/background.png`](https://github.com/Jollto/PlakoroDB/blob/main/database/cards/background.png)
+  招式卡背景模板。PlakoroDB 表示其原創貢獻採用
+  [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) 授權。
+  本專案僅將該模板用於非商業粉絲作品的介面呈現；實際招式內容由 Godot
+  動態產生。
+- **InvestigatorFew7899**——允許本專案使用其 STL 檔案進行 3D 模型與骰子
+  系統的開發測試。
+- **PLAKORO 中文資料站**——提供遊戲資訊與參考資料。
+- **PLAKORO 社群**——協助保存資料、測試與研究。
+
+## 免責聲明
+
+PLAKORO Adventures 是一個非官方、非商業的粉絲專案，目的為實驗、保存及
+體驗 PLAKORO 遊戲系統。本專案與 Nintendo、The Pokémon Company、
+Game Freak、Creatures Inc.、Bandai 或其關係企業均無從屬、授權、背書或
+贊助關係。
+
+Pokémon、PLAKORO、原始美術、Logo、卡片版面、角色、商標及其他相關智慧
+財產權均屬各自權利人所有。本專案不主張擁有上述內容。
