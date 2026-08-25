@@ -1450,7 +1450,10 @@
       "HEAD_LEFT",
       "HEAD_RIGHT"
     ],
-    "metagross_beam_stw08_001": [],
+    "metagross_beam_stw08_001": [
+      "HEAD_UP",
+      "FACE_UP"
+    ],
     "metagross_arithmetic_stw08_002": [
       "HEAD_UP",
       "FACE_UP",

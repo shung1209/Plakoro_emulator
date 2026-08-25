@@ -115,6 +115,9 @@ const DICE_ICON_SUMMARY: Script = preload(
 const PLAKORO_PORTRAIT: PackedScene = preload(
 	"res://scenes/ui/components/PlakoroPortrait.tscn"
 )
+const POKEMON_ATTRIBUTE_ICONS: Script = preload(
+	"res://scripts/ui/components/PokemonAttributeIconDisplay.gd"
+)
 const HP_PRESENTER: Script = preload(
 	"res://scripts/ui/components/BattleHPBarPresenter.gd"
 )
@@ -180,10 +183,10 @@ const RESOLUTION_STEP_QUEUE_BUILDER: Script = preload(
 @onready var enemy_header_label: Label = $Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox/EnemyHeader
 @onready var player_name_label: Label = %PlayerNameLabel
 @onready var enemy_name_label: Label = %EnemyNameLabel
-@onready var player_type_label: Label = %PlayerTypeLabel
-@onready var enemy_type_label: Label = %EnemyTypeLabel
-@onready var player_weakness_label: Label = %PlayerWeaknessLabel
-@onready var enemy_weakness_label: Label = %EnemyWeaknessLabel
+@onready var player_type_label: HBoxContainer = %PlayerTypeLabel
+@onready var enemy_type_label: HBoxContainer = %EnemyTypeLabel
+@onready var player_weakness_label: HBoxContainer = %PlayerWeaknessLabel
+@onready var enemy_weakness_label: HBoxContainer = %EnemyWeaknessLabel
 @onready var player_hp_bar: ProgressBar = %PlayerHpBar
 @onready var enemy_hp_bar: ProgressBar = %EnemyHpBar
 @onready var player_hp_label: Label = %PlayerHpLabel
@@ -3238,60 +3241,36 @@ func _format_battle_weakness(
 
 
 func _refresh_combatant_identity() -> void:
-	player_type_label.visible = not GameFlow.phone_mode
-	enemy_type_label.visible = not GameFlow.phone_mode
-	player_weakness_label.visible = not GameFlow.phone_mode
-	enemy_weakness_label.visible = not GameFlow.phone_mode
+	player_type_label.visible = true
+	enemy_type_label.visible = true
+	player_weakness_label.visible = true
+	enemy_weakness_label.visible = true
 
 	if battle == null or battle.state == null:
-		player_type_label.text = LocalizationService.tr_format(
-			"battle.type_value",
-			{"type": "-"},
-			"Type: {type}"
-		)
-		enemy_type_label.text = LocalizationService.tr_format(
-			"battle.type_value",
-			{"type": "-"},
-			"Type: {type}"
-		)
-		player_weakness_label.text = LocalizationService.tr_format(
-			"battle.weakness_value",
-			{"value": "-"},
-			"Weakness: {value}"
-		)
-		enemy_weakness_label.text = LocalizationService.tr_format(
-			"battle.weakness_value",
-			{"value": "-"},
-			"Weakness: {value}"
-		)
+		POKEMON_ATTRIBUTE_ICONS.show_type(player_type_label, &"")
+		POKEMON_ATTRIBUTE_ICONS.show_type(enemy_type_label, &"")
+		POKEMON_ATTRIBUTE_ICONS.show_weaknesses(player_weakness_label, null)
+		POKEMON_ATTRIBUTE_ICONS.show_weaknesses(enemy_weakness_label, null)
 		return
 
 	var state: Variant = battle.state
 	var player_pokemon: Variant = state.player.pokemon_data
 	var enemy_pokemon: Variant = state.enemy.pokemon_data
 
-	player_type_label.text = LocalizationService.tr_format(
-		"battle.type_value",
-		{
-			"type": GameContentLocalizationService.localize_type(
-				player_pokemon.pokemon_type
-			)
-		},
-		"Type: {type}"
+	POKEMON_ATTRIBUTE_ICONS.show_type(
+		player_type_label,
+		StringName(player_pokemon.pokemon_type)
 	)
-	enemy_type_label.text = LocalizationService.tr_format(
-		"battle.type_value",
-		{
-			"type": GameContentLocalizationService.localize_type(
-				enemy_pokemon.pokemon_type
-			)
-		},
-		"Type: {type}"
+	POKEMON_ATTRIBUTE_ICONS.show_type(
+		enemy_type_label,
+		StringName(enemy_pokemon.pokemon_type)
 	)
-	player_weakness_label.text = _format_battle_weakness(
+	POKEMON_ATTRIBUTE_ICONS.show_weaknesses(
+		player_weakness_label,
 		player_pokemon
 	)
-	enemy_weakness_label.text = _format_battle_weakness(
+	POKEMON_ATTRIBUTE_ICONS.show_weaknesses(
+		enemy_weakness_label,
 		enemy_pokemon
 	)
 
@@ -3310,16 +3289,6 @@ func _refresh_ui() -> void:
 	)
 
 	_refresh_combatant_identity()
-	if GameFlow.phone_mode:
-		player_name_label.text = "%s [%s]" % [
-			player_name_label.text,
-			player_weakness_label.text
-		]
-		enemy_name_label.text = "%s [%s]" % [
-			enemy_name_label.text,
-			enemy_weakness_label.text
-		]
-
 	HP_PRESENTER.refresh(
 		player_hp_bar,
 		player_hp_label,

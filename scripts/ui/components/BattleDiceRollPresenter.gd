@@ -7,6 +7,9 @@ const ICONS: Script = preload(
 const THEME_FACTORY: Script = preload(
     "res://scripts/ui/theme/PlakoroThemeFactory.gd"
 )
+const SPLIT_FACE_ICON: Script = preload(
+    "res://scripts/ui/components/EnergySplitFaceIcon.gd"
+)
 
 const ENERGY_TYPES: Array[StringName] = [
     &"grass",
@@ -30,7 +33,6 @@ const ORIENTATIONS: Array[StringName] = [
 ]
 
 const ICON_SIZE: int = 62
-const DOUBLE_ICON_SIZE: int = 42
 
 const SLOT_IDLE_BACKGROUND: Color = Color(0.030, 0.040, 0.065, 0.96)
 const SLOT_IDLE_BORDER: Color = Color(0.24, 0.33, 0.48, 0.88)
@@ -844,35 +846,44 @@ func _set_energy_slot(
         )
         return
 
-    var icon_size: int = (
-        (54 if _compact_mode else ICON_SIZE)
-        if known.size() == 1
-        else (35 if _compact_mode else DOUBLE_ICON_SIZE)
-    )
+    if known.size() == 2:
+        var split_icon: Control = SPLIT_FACE_ICON.new()
+        split_icon.setup(
+            known[0],
+            known[1],
+            54.0 if _compact_mode else float(ICON_SIZE)
+        )
+        split_icon.tooltip_text = (
+            GameContentLocalizationService.localize_type(known[0])
+            + " + "
+            + GameContentLocalizationService.localize_type(known[1])
+        )
+        icon_row.add_child(split_icon)
+    else:
+        var icon_size: int = 54 if _compact_mode else ICON_SIZE
+        for energy_type: StringName in known:
+            var texture: Texture2D = (
+                ICONS.load_energy_icon(
+                    energy_type
+                )
+            )
 
-    for energy_type: StringName in known:
-        var texture: Texture2D = (
-            ICONS.load_energy_icon(
+            var icon: TextureRect = TextureRect.new()
+            icon.texture = texture
+            icon.custom_minimum_size = Vector2(
+                icon_size,
+                icon_size
+            )
+            icon.expand_mode = (
+                TextureRect.EXPAND_IGNORE_SIZE
+            )
+            icon.stretch_mode = (
+                TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+            )
+            icon.tooltip_text = GameContentLocalizationService.localize_type(
                 energy_type
             )
-        )
-
-        var icon: TextureRect = TextureRect.new()
-        icon.texture = texture
-        icon.custom_minimum_size = Vector2(
-            icon_size,
-            icon_size
-        )
-        icon.expand_mode = (
-            TextureRect.EXPAND_IGNORE_SIZE
-        )
-        icon.stretch_mode = (
-            TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        )
-        icon.tooltip_text = GameContentLocalizationService.localize_type(
-            energy_type
-        )
-        icon_row.add_child(icon)
+            icon_row.add_child(icon)
 
     var localized_energy_names: Array[String] = []
     for energy_type: StringName in known:

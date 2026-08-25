@@ -24,7 +24,27 @@
       }
     }
   ],
-  "outcome_rules": [],
+  "outcome_rules": [
+    {
+      "condition": {
+        "type": "kyokoro_orientation_any",
+        "orientations": [
+          "HEAD_UP",
+          "FACE_UP"
+        ]
+      },
+      "actions": [
+        {
+          "opcode": "damage.add",
+          "args": {
+            "target": "opponent",
+            "amount": 20
+          }
+        }
+      ],
+      "raw_text": "This attack does 20 more damage."
+    }
+  ],
   "resolution": {
     "outcome_match_mode": "zero_or_one",
     "action_execution_mode": "sequential"

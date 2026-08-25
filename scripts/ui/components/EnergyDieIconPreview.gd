@@ -46,50 +46,7 @@ func setup(
         box.add_child(missing)
         return
 
-    if GameFlow.phone_mode:
-        _add_phone_face_grid(box, die_data, die_number - 1)
-        return
-
-    _add_face_pair(
-        box,
-        LocalizationService.tr_key(
-            "enerkoro_builder.preview_fixed",
-            "Fixed"
-        ),
-        StringName(die_data.fixed_a),
-        StringName(die_data.fixed_b),
-        1,
-        1,
-        compact
-    )
-
-    _add_face_pair(
-        box,
-        LocalizationService.tr_key(
-            "enerkoro_builder.preview_double",
-            "Double"
-        ),
-        StringName(die_data.double_a_first),
-        StringName(die_data.double_b_first),
-        2,
-        2,
-        compact,
-        StringName(die_data.double_a_second),
-        StringName(die_data.double_b_second)
-    )
-
-    _add_face_pair(
-        box,
-        LocalizationService.tr_key(
-            "enerkoro_builder.preview_single",
-            "Single"
-        ),
-        StringName(die_data.single_a),
-        StringName(die_data.single_b),
-        1,
-        1,
-        compact
-    )
+    _add_phone_face_grid(box, die_data, die_number - 1)
 
 
 func _add_phone_face_grid(

@@ -137,32 +137,35 @@ size_flags_horizontal = 3
 alignment = 1
 theme_override_constants/separation = 6
 
-[node name="PokemonNameLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
+[node name="PokemonNameRow" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="PokemonNameLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox/PokemonNameRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 25
 text = "Pokémon"
+
+[node name="PokemonTypeLabel" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox/PokemonNameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 5
 
 [node name="PokemonIdLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "pokemon_id"
 
-[node name="PokemonTypeLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Type: -"
-
 [node name="PokemonHpLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "HP: -"
 
-[node name="PokemonWeaknessLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
+[node name="PokemonWeaknessLabel" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow/PokemonInfoBox"]
 unique_name_in_owner = true
 layout_mode = 2
-autowrap_mode = 2
-text = "Weakness: -"
+theme_override_constants/separation = 5
 
 [node name="BattleReadyPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow"]
 custom_minimum_size = Vector2(0, 220)
@@ -215,11 +218,10 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Difficulty"
 
-[node name="OpponentWeaknessLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox/OpponentInfoBox"]
+[node name="OpponentWeaknessLabel" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox/OpponentInfoBox"]
 unique_name_in_owner = true
 layout_mode = 2
-autowrap_mode = 2
-text = "Weakness: -"
+theme_override_constants/separation = 5
 
 [node name="ResolutionModeBox" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox"]
 layout_mode = 2

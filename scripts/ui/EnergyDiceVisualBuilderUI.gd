@@ -544,8 +544,8 @@ func _apply_dice_builder_work_area(
         editor_height
     )
 
-    # DiceScroll only owns horizontal overflow. Never create a nested
-    # vertical scrollbar inside the three Enerkoro work areas.
+    # DiceScroll owns horizontal overflow for the three left-to-right desktop
+    # Enerkoro work areas. Phone Mode moves them into a vertical stack.
     dice_scroll.vertical_scroll_mode = (
         ScrollContainer.SCROLL_MODE_DISABLED
     )

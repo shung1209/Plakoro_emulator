@@ -13,6 +13,9 @@ const MOVE_ENERGY_COST_ROW: Script = preload(
 const ICONS: Script = preload(
     "res://scripts/presentation/PlakoroIconService.gd"
 )
+const NINJA_ATTACK_FONT = preload(
+	"res://assets/fonts/NinjaAttack/NinjaAttack-ALEaA.ttf"
+)
 
 const MOVE_CARD_ASSET_ROOT: String = "res://assets/move_cards"
 const FALLBACK_CARD_PATH: String = (
@@ -159,6 +162,7 @@ func setup_battle_summary(
         "font_size",
         17
     )
+    damage_label.add_theme_font_override("font", NINJA_ATTACK_FONT)
     damage_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     stat_row.add_child(
         damage_label
@@ -274,17 +278,18 @@ func _setup_generated_card_summary(
         HORIZONTAL_ALIGNMENT_LEFT,
         Color.WHITE
     )
-    _add_card_label(
+    var move_name_label: Label = _add_card_label(
         _card_content_root,
         GameContentLocalizationService.localize_move(move_card),
         Vector4(0.14, 0.15, 0.80, 0.43),
-        34 if large else (24 if phone_card else (15 if compact else 18)),
+        34 if large else (24 if phone_card else (20 if compact else 24)),
         HORIZONTAL_ALIGNMENT_CENTER,
         Color.WHITE,
         5 if large else 3,
         Color(0.02, 0.03, 0.05, 0.98)
     )
-    _add_card_label(
+    move_name_label.name = "MoveName"
+    var damage_label: Label = _add_card_label(
         _card_content_root,
         damage_text,
         Vector4(0.80, 0.13, 0.97, 0.43),
@@ -294,6 +299,8 @@ func _setup_generated_card_summary(
         5 if large else 3,
         Color.WHITE
     )
+    damage_label.name = "MoveDamage"
+    damage_label.add_theme_font_override("font", NINJA_ATTACK_FONT)
 
     _add_energy_cost_icons(_card_content_root, compact, large)
     _add_effect_rows(_card_content_root, compact, large, phone_card)
@@ -622,7 +629,7 @@ func _add_effect_rows(
         )
         move_effect_label.add_theme_font_size_override(
             "font_size",
-            20 if large else (15 if phone_card else (10 if compact else 12))
+            20 if large else (15 if phone_card else (13 if compact else 15))
         )
         move_effect_label.add_theme_color_override(
             "font_outline_color",
@@ -703,7 +710,10 @@ func _add_effect_rows(
                 else (
                     Vector2(18.0, 18.0)
                     if phone_card
-                    else Vector2(13.0, 13.0)
+                    else Vector2(
+                        16.0 if compact else 18.0,
+                        16.0 if compact else 18.0
+                    )
                 )
             )
             icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -746,7 +756,7 @@ func _style_effect_label(
     label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
     label.add_theme_font_size_override(
         "font_size",
-        17 if large else (15 if phone_card else (7 if compact else 8))
+        17 if large else (15 if phone_card else (12 if compact else 15))
     )
     if phone_card:
         label.add_theme_constant_override("line_spacing", -3)

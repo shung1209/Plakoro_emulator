@@ -59,6 +59,9 @@ const DICE_ICON_SUMMARY: Script = preload(
 const PLAKORO_PORTRAIT: PackedScene = preload(
     "res://scenes/ui/components/PlakoroPortrait.tscn"
 )
+const POKEMON_ATTRIBUTE_ICONS: Script = preload(
+	"res://scripts/ui/components/PokemonAttributeIconDisplay.gd"
+)
 const AI_LOADOUT_PROVIDER: Script = preload(
     "res://scripts/loadout/AIBattleLoadoutProvider.gd"
 )
@@ -131,9 +134,9 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var loadout_id_label: Label = %LoadoutIdLabel
 @onready var pokemon_name_label: Label = %PokemonNameLabel
 @onready var pokemon_id_label: Label = %PokemonIdLabel
-@onready var pokemon_type_label: Label = %PokemonTypeLabel
+@onready var pokemon_type_label: HBoxContainer = %PokemonTypeLabel
 @onready var pokemon_hp_label: Label = %PokemonHpLabel
-@onready var pokemon_weakness_label: Label = %PokemonWeaknessLabel
+@onready var pokemon_weakness_label: HBoxContainer = %PokemonWeaknessLabel
 @onready var hero_plakoro_container: VBoxContainer = %HeroPlakoroContainer
 
 @onready var move_container: GridContainer = %MoveContainer
@@ -153,7 +156,7 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var opponent_name_label: Label = %OpponentNameLabel
 @onready var opponent_loadout_label: Label = %OpponentLoadoutLabel
 @onready var opponent_difficulty_label: Label = %OpponentDifficultyLabel
-@onready var opponent_weakness_label: Label = %OpponentWeaknessLabel
+@onready var opponent_weakness_label: HBoxContainer = %OpponentWeaknessLabel
 @onready var opponent_portrait_container: VBoxContainer = %OpponentPortraitContainer
 
 @onready var refresh_button: Button = %RefreshButton
@@ -1078,45 +1081,76 @@ func _build_inline_setup_move_card(
 	damage.modulate.a = 0.88
 	stats.add_child(damage)
 
-	var detail_lines: Array[String] = []
-	var description: String = (
-		GameContentLocalizationService.localize_move_description(move_card)
-	)
-	if not description.is_empty():
-		detail_lines.append(description)
+	var details_box: VBoxContainer = VBoxContainer.new()
+	details_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	details_box.add_theme_constant_override("separation", 5)
+	box.add_child(details_box)
+	var has_details: bool = false
 	var preview: Dictionary = MOVE_EFFECT_PRESENTATION.build_preview(move_card)
+	var move_effect_lines: Array = preview.get("move_effect_lines", [])
+	for move_effect_index: int in range(move_effect_lines.size()):
+		var move_effect_text: String = (
+			GameContentLocalizationService.localize_move_effect_text(
+				move_card,
+				move_effect_index,
+				String(move_effect_lines[move_effect_index])
+			)
+		).strip_edges()
+		if not move_effect_text.is_empty():
+			var move_effect_label: Label = Label.new()
+			move_effect_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			move_effect_label.text = move_effect_text
+			move_effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			move_effect_label.modulate.a = 0.78
+			details_box.add_child(move_effect_label)
+			has_details = true
 	var groups: Array = preview.get("trigger_groups", [])
 	for group_index: int in range(groups.size()):
 		var raw_group: Variant = groups[group_index]
 		if not raw_group is Dictionary:
 			continue
 		var group: Dictionary = raw_group
-		var orientation_names: Array[String] = []
+		var orientations: Array[StringName] = []
 		for raw_orientation: Variant in group.get("orientations", []):
-			orientation_names.append(
-				LocalizationService.tr_key(
-					"orientation." + String(raw_orientation),
-					String(raw_orientation).replace("_", " ").capitalize()
-				)
-			)
+			orientations.append(StringName(raw_orientation))
 		var effect_text: String = (
 			GameContentLocalizationService.localize_effect_text(
 				move_card,
 				group_index,
 				String(group.get("effect_text", ""))
 			)
+			)
+		var effect_row: HBoxContainer = HBoxContainer.new()
+		effect_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		effect_row.add_theme_constant_override("separation", 8)
+		details_box.add_child(effect_row)
+		if not orientations.is_empty():
+			var trigger_row: HBoxContainer = HBoxContainer.new()
+			trigger_row.set_script(KYOKORO_TRIGGER_ROW)
+			trigger_row.setup(orientations, 24)
+			effect_row.add_child(trigger_row)
+		var effect_label: Label = Label.new()
+		effect_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		effect_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		effect_label.text = effect_text
+		effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		effect_label.modulate.a = 0.78
+		effect_row.add_child(effect_label)
+		has_details = true
+	if not has_details:
+		var description: String = (
+			GameContentLocalizationService.localize_move_description(move_card)
+		).strip_edges()
+		var fallback_label: Label = Label.new()
+		fallback_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fallback_label.text = (
+			description
+			if not description.is_empty()
+			else String(preview.get("summary", "-"))
 		)
-		detail_lines.append(
-			"Charakoro %s -> %s" % [" / ".join(orientation_names), effect_text]
-		)
-	if detail_lines.is_empty():
-		detail_lines.append(String(preview.get("summary", "-")))
-	var details: Label = Label.new()
-	details.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	details.text = "\n".join(detail_lines)
-	details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	details.modulate.a = 0.78
-	box.add_child(details)
+		fallback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		fallback_label.modulate.a = 0.78
+		details_box.add_child(fallback_label)
 	return panel
 
 
@@ -2103,12 +2137,9 @@ func _refresh_loadout_summary() -> void:
 	)
 
 	if pokemon != null:
-		pokemon_type_label.text = LocalizationService.tr_format(
-			"preparation.type_value",
-			{
-				"type": GameContentLocalizationService.localize_type(pokemon.pokemon_type)
-			},
-            "Type: {type}"
+		POKEMON_ATTRIBUTE_ICONS.show_type(
+			pokemon_type_label,
+			StringName(pokemon.pokemon_type)
 		)
 		pokemon_hp_label.text = LocalizationService.tr_format(
 			"preparation.hp_value",
@@ -2117,22 +2148,20 @@ func _refresh_loadout_summary() -> void:
 			},
             "HP: {hp}"
 		)
-		pokemon_weakness_label.text = _format_pokemon_weakness(pokemon)
-	else:
-		pokemon_type_label.text = LocalizationService.tr_format(
-			"preparation.type_value",
-			{"type": "-"},
-            "Type: {type}"
+		POKEMON_ATTRIBUTE_ICONS.show_weaknesses(
+			pokemon_weakness_label,
+			pokemon
 		)
+	else:
+		POKEMON_ATTRIBUTE_ICONS.show_type(pokemon_type_label, &"")
 		pokemon_hp_label.text = LocalizationService.tr_format(
 			"preparation.hp_value",
 			{"hp": "-"},
             "HP: {hp}"
 		)
-		pokemon_weakness_label.text = LocalizationService.tr_format(
-			"preparation.weakness_value",
-			{"value": "-"},
-            "Weakness: {value}"
+		POKEMON_ATTRIBUTE_ICONS.show_weaknesses(
+			pokemon_weakness_label,
+			null
 		)
 
 	_refresh_hero_plakoro(
@@ -2902,7 +2931,10 @@ func _refresh_opponent_summary() -> void:
 		opponent_name_label.text = LocalizationService.tr_key("preparation.unknown_opponent", "Unknown Opponent")
 		opponent_loadout_label.text = LocalizationService.tr_key("preparation.no_ai_loadout", "No AI loadout.")
 		opponent_difficulty_label.text = ""
-		opponent_weakness_label.text = "Weakness: -"
+		POKEMON_ATTRIBUTE_ICONS.show_weaknesses(
+			opponent_weakness_label,
+			null
+		)
 		_refresh_opponent_portrait(null)
 		return
 
@@ -2934,7 +2966,8 @@ func _refresh_opponent_summary() -> void:
         "Difficulty: {difficulty}"
 	)
 
-	opponent_weakness_label.text = _format_pokemon_weakness(
+	POKEMON_ATTRIBUTE_ICONS.show_weaknesses(
+		opponent_weakness_label,
 		pokemon
 	)
 
@@ -3229,7 +3262,9 @@ func _format_move_cost(
 		parts.append(
 			_energy_icon(energy_type)
 			+ " "
-			+ String(energy_type)
+			+ GameContentLocalizationService.localize_type(
+				energy_type
+			)
 			+ "x"
 			+ str(int(cost.count))
 		)

@@ -129,7 +129,7 @@ func _build_ui() -> void:
     root_box.add_child(subtitle)
 
     var net: GridContainer = GridContainer.new()
-    net.columns = 2 if GameFlow.phone_mode else 3
+    net.columns = 2
     net.add_theme_constant_override("h_separation", 8)
     net.add_theme_constant_override("v_separation", 8)
 
@@ -138,26 +138,12 @@ func _build_ui() -> void:
     net_center.add_child(net)
     root_box.add_child(net_center)
 
-    if GameFlow.phone_mode:
-        _add_face_button(net, &"fixed_a", &"FACE_UP", &"fixed")
-        _add_face_button(net, &"fixed_b", &"FACE_DOWN", &"fixed")
-        _add_face_button(net, &"double_a", &"HEAD_UP", &"double")
-        _add_face_button(net, &"double_b", &"HEAD_DOWN", &"double")
-        _add_face_button(net, &"single_a", &"HEAD_LEFT", &"single")
-        _add_face_button(net, &"single_b", &"HEAD_RIGHT", &"single")
-    else:
-        _add_empty_cell(net)
-        _add_face_button(net, &"fixed_a", &"FACE_UP", &"fixed")
-        _add_empty_cell(net)
-        _add_face_button(net, &"single_a", &"HEAD_LEFT", &"single")
-        _add_face_button(net, &"double_a", &"HEAD_UP", &"double")
-        _add_face_button(net, &"single_b", &"HEAD_RIGHT", &"single")
-        _add_empty_cell(net)
-        _add_face_button(net, &"fixed_b", &"FACE_DOWN", &"fixed")
-        _add_empty_cell(net)
-        _add_empty_cell(net)
-        _add_face_button(net, &"double_b", &"HEAD_DOWN", &"double")
-        _add_empty_cell(net)
+    _add_face_button(net, &"fixed_a", &"FACE_UP", &"fixed")
+    _add_face_button(net, &"fixed_b", &"FACE_DOWN", &"fixed")
+    _add_face_button(net, &"double_a", &"HEAD_UP", &"double")
+    _add_face_button(net, &"double_b", &"HEAD_DOWN", &"double")
+    _add_face_button(net, &"single_a", &"HEAD_LEFT", &"single")
+    _add_face_button(net, &"single_b", &"HEAD_RIGHT", &"single")
 
     _palette_host = VBoxContainer.new()
     _palette_host.add_theme_constant_override(

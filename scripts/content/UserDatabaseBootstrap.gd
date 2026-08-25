@@ -38,6 +38,19 @@ func _ready() -> void:
             " user JSON file(s)."
         )
 
+    var beam_migration: Dictionary = (
+        USER_DATABASE.migrate_v23_metagross_beam_orientation()
+    )
+    if not bool(beam_migration.get("success", false)):
+        for message: Variant in beam_migration.get("errors", []):
+            push_error("UserDatabaseBootstrap Beam correction: " + String(message))
+    elif not (beam_migration.get("updated", []) as Array).is_empty():
+        print(
+            "UserDatabaseBootstrap: corrected Metagross Beam orientation data in ",
+            (beam_migration.get("updated", []) as Array).size(),
+            " user JSON file(s)."
+        )
+
     if not OS.has_feature("web"):
         var shortcut: Dictionary = USER_DATABASE_SHORTCUT.ensure_shortcut()
         if bool(shortcut.get("created", false)):

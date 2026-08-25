@@ -323,6 +323,91 @@ static func migrate_v22_corrected_weaknesses() -> Dictionary:
     return result
 
 
+# V2.3 hotfix: early Metagross data shipped Beam without its confirmed
+# Charakoro faces. Patch only the exact empty legacy value so custom mappings
+# remain untouched.
+static func migrate_v23_metagross_beam_orientation() -> Dictionary:
+    var result: Dictionary = {
+        "success": true,
+        "updated": [],
+        "skipped": [],
+        "errors": []
+    }
+    var card_path: String = MOVE_CARDS + "/metagross_beam_stw08_001.json"
+    if FileAccess.file_exists(card_path):
+        var card: Dictionary = _read_json_dictionary(card_path)
+        if card.is_empty():
+            result["success"] = false
+            result["errors"].append("Invalid Metagross Beam JSON: " + card_path)
+        elif (card.get("outcome_rules", []) as Array).is_empty():
+            card["outcome_rules"] = [_metagross_beam_outcome_rule()]
+            if _write_json_dictionary(card_path, card):
+                result["updated"].append(card_path)
+            else:
+                result["success"] = false
+                result["errors"].append("Could not update Metagross Beam JSON: " + card_path)
+        else:
+            result["skipped"].append(card_path)
+
+    var map_path: String = ROOT + "/kyokoro_orientation_map.json"
+    if FileAccess.file_exists(map_path):
+        var orientation_map: Dictionary = _read_json_dictionary(map_path)
+        var mappings: Dictionary = orientation_map.get(
+            "confirmed_effect_mappings",
+            {}
+        ) as Dictionary
+        var current_faces: Variant = mappings.get(
+            "metagross_beam_stw08_001",
+            null
+        )
+        if current_faces is Array and (current_faces as Array).is_empty():
+            mappings["metagross_beam_stw08_001"] = ["HEAD_UP", "FACE_UP"]
+            orientation_map["confirmed_effect_mappings"] = mappings
+            if _write_json_dictionary(map_path, orientation_map):
+                result["updated"].append(map_path)
+            else:
+                result["success"] = false
+                result["errors"].append("Could not update orientation map: " + map_path)
+        else:
+            result["skipped"].append(map_path)
+
+    return result
+
+
+static func _metagross_beam_outcome_rule() -> Dictionary:
+    return {
+        "condition": {
+            "type": "kyokoro_orientation_any",
+            "orientations": ["HEAD_UP", "FACE_UP"]
+        },
+        "actions": [
+            {
+                "opcode": "damage.add",
+                "args": {"target": "opponent", "amount": 20}
+            }
+        ],
+        "raw_text": "This attack does 20 more damage."
+    }
+
+
+static func _read_json_dictionary(path: String) -> Dictionary:
+    var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        return {}
+    var parsed: Variant = JSON.parse_string(file.get_as_text())
+    file.close()
+    return parsed as Dictionary if parsed is Dictionary else {}
+
+
+static func _write_json_dictionary(path: String, data: Dictionary) -> bool:
+    var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+    if file == null:
+        return false
+    file.store_string(JSON.stringify(data, "  ") + "\n")
+    file.close()
+    return true
+
+
 static func remove_retired_test_content() -> Dictionary:
     var result: Dictionary = {
         "success": true,

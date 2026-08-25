@@ -223,22 +223,25 @@ theme_override_constants/separation = 7
 layout_mode = 2
 text = "YOU"
 
-[node name="PlayerNameLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+[node name="PlayerNameRow" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="PlayerNameLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox/PlayerNameRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 23
 text = "Pikachu"
 
-[node name="PlayerTypeLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+[node name="PlayerTypeLabel" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox/PlayerNameRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Type: -"
+theme_override_constants/separation = 5
 
-[node name="PlayerWeaknessLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
+[node name="PlayerWeaknessLabel" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-autowrap_mode = 2
-text = "Weakness: -"
+theme_override_constants/separation = 5
 
 [node name="PlayerHpBar" type="ProgressBar" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/PlayerPanel/VBox"]
 unique_name_in_owner = true
@@ -279,22 +282,25 @@ theme_override_constants/separation = 7
 layout_mode = 2
 text = "AI"
 
-[node name="EnemyNameLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+[node name="EnemyNameRow" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="EnemyNameLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox/EnemyNameRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 23
 text = "Squirtle"
 
-[node name="EnemyTypeLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+[node name="EnemyTypeLabel" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox/EnemyNameRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Type: -"
+theme_override_constants/separation = 5
 
-[node name="EnemyWeaknessLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
+[node name="EnemyWeaknessLabel" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-autowrap_mode = 2
-text = "Weakness: -"
+theme_override_constants/separation = 5
 
 [node name="EnemyHpBar" type="ProgressBar" parent="Margin/Main/Body/BattleScroll/BattleColumn/Combatants/EnemyPanel/VBox"]
 unique_name_in_owner = true

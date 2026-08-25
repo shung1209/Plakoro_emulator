@@ -194,12 +194,14 @@ func _load_merged_entries(locale: String) -> Dictionary:
 	_merge_locale_documents(
 		merged,
 		BUILTIN_DIR,
-		locale
+		locale,
+		true
 	)
 	_merge_locale_documents(
 		merged,
 		USER_DIR,
-		locale
+		locale,
+		false
 	)
 
 	return merged
@@ -208,7 +210,8 @@ func _load_merged_entries(locale: String) -> Dictionary:
 func _merge_locale_documents(
 	target: Dictionary,
 	directory_path: String,
-	locale: String
+	locale: String,
+	override_existing: bool
 ) -> void:
 	var dir: DirAccess = DirAccess.open(
 		directory_path
@@ -247,8 +250,14 @@ func _merge_locale_documents(
 				{}
 			) as Dictionary
 		)
+		var document_overrides: bool = (
+			override_existing
+			or bool(document.get("override_builtin", false))
+		)
 		for raw_key: Variant in entries.keys():
-			target[String(raw_key)] = entries[raw_key]
+			var key: String = String(raw_key)
+			if document_overrides or not target.has(key):
+				target[key] = entries[raw_key]
 
 
 func _read_document(path: String) -> Dictionary:

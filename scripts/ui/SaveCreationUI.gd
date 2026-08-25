@@ -1,6 +1,11 @@
 extends Control
 
 
+const ICONS: Script = preload(
+	"res://scripts/presentation/PlakoroIconService.gd"
+)
+
+
 const PLAKORO_THEME: Script = preload(
 	"res://scripts/ui/theme/PlakoroThemeFactory.gd"
 )
@@ -54,15 +59,16 @@ func _apply_localized_text() -> void:
 	)
 	charmander_button.text = _starter_text(
 		"charmander",
-		"Charmander",
-		"Fire"
+		"Charmander"
 	)
-	squirtle_button.text = _starter_text("squirtle", "Squirtle", "Water")
+	squirtle_button.text = _starter_text("squirtle", "Squirtle")
 	bulbasaur_button.text = _starter_text(
 		"bulbasaur",
-		"Bulbasaur",
-		"Grass"
+		"Bulbasaur"
 	)
+	_set_starter_icon(charmander_button, &"fire")
+	_set_starter_icon(squirtle_button, &"water")
+	_set_starter_icon(bulbasaur_button, &"grass")
 	back_button.text = LocalizationService.tr_key("common.back", "Back")
 	energy_choice_label.text = LocalizationService.tr_key(
 		"save_creation.energy_choice",
@@ -70,23 +76,24 @@ func _apply_localized_text() -> void:
 	)
 
 
-func _starter_text(species_id: String, fallback: String, type_fallback: String) -> String:
+func _starter_text(species_id: String, fallback: String) -> String:
 	var name: String = GameContentLocalizationService.text(
 		"pokemon",
 		species_id,
 		"name",
 		fallback
 	)
-	var type_name: String = GameContentLocalizationService.text(
-		"type",
-		type_fallback.to_lower(),
-		"name",
-		type_fallback
-	)
-	return LocalizationService.tr_format(
-		"save_creation.starter",
-		{"name": name, "type": type_name},
-		"{name}\nType: {type}"
+	return name
+
+
+func _set_starter_icon(button: Button, energy_type: StringName) -> void:
+	button.icon = ICONS.load_energy_icon(energy_type)
+	button.add_theme_constant_override("icon_max_width", 44)
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	button.expand_icon = true
+	button.tooltip_text = GameContentLocalizationService.localize_type(
+		energy_type
 	)
 
 

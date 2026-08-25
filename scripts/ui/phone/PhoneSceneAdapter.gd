@@ -173,7 +173,9 @@ func _adapt_enerkoro_builder() -> void:
 	var dice_scroll: ScrollContainer = source.get_node_or_null(
 		"Margin/Main/ContentScroll/Content/DiceScroll"
 	) as ScrollContainer
-	var dice_row: HBoxContainer = source.get_node_or_null("%DiceContainer") as HBoxContainer
+	var dice_row: HBoxContainer = source.get_node_or_null(
+		"%DiceContainer"
+	) as HBoxContainer
 	var validation_panel: PanelContainer = source.get_node_or_null(
 		"Margin/Main/ContentScroll/Content/SummarySplit/ValidationPanel"
 	) as PanelContainer
@@ -623,7 +625,9 @@ func _update_phone_battle_responsive_layout() -> void:
 	var scroll: ScrollContainer = source.get("battle_scroll") as ScrollContainer
 	if scroll == null or scroll.size.y <= 0.0:
 		return
-	var portrait_size: float = clampf(scroll.size.y * 0.18, 104.0, 174.0)
+	# Keep both combatant cards and their icon identity rows visible without
+	# creating a scrollbar on common portrait phone heights.
+	var portrait_size: float = clampf(scroll.size.y * 0.16, 104.0, 164.0)
 	var player_hero: VBoxContainer = source.get_node_or_null(
 		"%PlayerHeroContainer"
 	) as VBoxContainer

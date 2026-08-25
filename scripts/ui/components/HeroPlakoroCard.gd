@@ -7,13 +7,16 @@ const PRESENTATION: Script = preload(
 const DICE_SUMMARY: Script = preload(
     "res://scripts/ui/components/EnergyDiceIconSummary.gd"
 )
+const POKEMON_ATTRIBUTE_ICONS: Script = preload(
+	"res://scripts/ui/components/PokemonAttributeIconDisplay.gd"
+)
 
 
 @onready var name_label: Label = %NameLabel
 @onready var id_label: Label = %IdLabel
 @onready var visual_slot: Control = %VisualSlot
 @onready var hp_label: Label = %HpLabel
-@onready var type_label: Label = %TypeLabel
+@onready var type_label: HBoxContainer = %TypeLabel
 @onready var dice_container: HBoxContainer = %DiceContainer
 @onready var source_label: Label = %SourceLabel
 
@@ -30,7 +33,7 @@ func setup(
         name_label.text = "Unknown PLAKORO"
         id_label.text = ""
         hp_label.text = "HP -"
-        type_label.text = "Type -"
+        POKEMON_ATTRIBUTE_ICONS.show_type(type_label, &"")
         source_label.text = "Presentation: unavailable"
         PRESENTATION.present(
             visual_slot,
@@ -88,11 +91,10 @@ func setup(
         null
     )
 
-    type_label.text = (
-        "Type: " + String(type_value)
-        if type_value != null
-        else "Type: -"
-    )
+    POKEMON_ATTRIBUTE_ICONS.show_type(
+		type_label,
+		StringName(type_value) if type_value != null else &""
+	)
 
     var presentation_result: Dictionary = (
         PRESENTATION.present(

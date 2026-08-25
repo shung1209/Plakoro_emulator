@@ -36,4 +36,5 @@ func setup(
             index + 1,
             compact
         )
+        preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         add_child(preview)

@@ -42,10 +42,16 @@ func setup(
             icon.stretch_mode = (
                 TextureRect.STRETCH_KEEP_ASPECT_CENTERED
             )
-            icon.tooltip_text = String(orientation)
+            icon.tooltip_text = LocalizationService.tr_key(
+                "orientation." + String(orientation),
+                String(orientation).replace("_", " ").capitalize()
+            )
             add_child(icon)
         else:
             var fallback: Label = Label.new()
-            fallback.text = String(orientation)
+            fallback.text = LocalizationService.tr_key(
+                "orientation." + String(orientation),
+                String(orientation).replace("_", " ").capitalize()
+            )
             fallback.modulate.a = 0.78
             add_child(fallback)

@@ -424,10 +424,11 @@ func _load_language_document(
 	):
 		builtin_document = {}
 
-	# User files are free-form filenames and override the matching locale by
-	# locale metadata. Merge user strings over bundled strings so newly-added
-	# application keys still exist after an update without overwriting the
-	# user's JSON file on disk.
+	# User files are free-form filenames. Legacy installs contain snapshots of
+	# the bundled language files, so treating every snapshot as an override
+	# keeps old English text alive after an update. Bundled keys stay current by
+	# default; an intentionally customized pack can opt in with
+	# `"override_builtin": true`.
 	var user_document: Dictionary = (
 		_find_language_document_in_directory(
 			USER_LANGUAGE_DIR,
@@ -455,8 +456,13 @@ func _load_language_document(
 		) as Dictionary
 	)
 
+	var override_builtin: bool = bool(
+		user_document.get("override_builtin", false)
+	)
 	for raw_key: Variant in user_strings.keys():
-		merged_strings[String(raw_key)] = user_strings[raw_key]
+		var key: String = String(raw_key)
+		if override_builtin or not merged_strings.has(key):
+			merged_strings[key] = user_strings[raw_key]
 
 	merged["strings"] = merged_strings
 	merged["display_name"] = String(

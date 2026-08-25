@@ -4,6 +4,9 @@ extends Button
 const ICONS: Script = preload(
     "res://scripts/presentation/PlakoroIconService.gd"
 )
+const SPLIT_FACE_ICON: Script = preload(
+    "res://scripts/ui/components/EnergySplitFaceIcon.gd"
+)
 
 
 signal edit_requested(
@@ -22,7 +25,6 @@ var primary_energy: StringName = &""
 var secondary_energy: StringName = &""
 
 var _content_box: VBoxContainer = null
-var _orientation_label: Label = null
 var _kind_text_label: Label = null
 var _energy_icon_row: HBoxContainer = null
 var _energy_text_label: Label = null
@@ -62,7 +64,6 @@ func refresh_visual() -> void:
     icon = null
     text = ""
 
-    _orientation_label.text = _orientation_label_text()
     _kind_text_label.text = _kind_label()
 
     if face_kind == &"double":
@@ -113,21 +114,6 @@ func _ensure_custom_content() -> void:
     )
     add_child(
         _content_box
-    )
-
-    _orientation_label = Label.new()
-    _orientation_label.mouse_filter = (
-        Control.MOUSE_FILTER_IGNORE
-    )
-    _orientation_label.horizontal_alignment = (
-        HORIZONTAL_ALIGNMENT_CENTER
-    )
-    _orientation_label.add_theme_font_size_override(
-        "font_size",
-        13
-    )
-    _content_box.add_child(
-        _orientation_label
     )
 
     _kind_text_label = Label.new()
@@ -189,31 +175,20 @@ func _rebuild_energy_icons() -> void:
     for child: Node in _energy_icon_row.get_children():
         child.queue_free()
 
-    _add_energy_icon(
-        primary_energy
-    )
-
     if (
         face_kind == &"double"
         and secondary_energy != &""
     ):
-        var plus_label: Label = Label.new()
-        plus_label.text = "+"
-        plus_label.mouse_filter = (
-            Control.MOUSE_FILTER_IGNORE
-        )
-        plus_label.add_theme_font_size_override(
-            "font_size",
-            12
-        )
-        plus_label.modulate.a = 0.72
+        var split_icon: Control = SPLIT_FACE_ICON.new()
+        split_icon.setup(primary_energy, secondary_energy)
         _energy_icon_row.add_child(
-            plus_label
+            split_icon
         )
+        return
 
-        _add_energy_icon(
-            secondary_energy
-        )
+    _add_energy_icon(
+        primary_energy
+    )
 
 
 func _add_energy_icon(
@@ -258,25 +233,9 @@ func _display_energy(energy_type: StringName) -> String:
             "enerkoro_builder.empty_energy",
             "EMPTY"
         )
-    return String(energy_type)
-
-
-func _orientation_label_text() -> String:
-    match orientation_id:
-        &"FACE_UP":
-            return LocalizationService.tr_key("orientation.FACE_UP", "Face Up")
-        &"FACE_DOWN":
-            return LocalizationService.tr_key("orientation.FACE_DOWN", "Face Down")
-        &"HEAD_LEFT":
-            return LocalizationService.tr_key("orientation.HEAD_LEFT", "Head Left")
-        &"HEAD_RIGHT":
-            return LocalizationService.tr_key("orientation.HEAD_RIGHT", "Head Right")
-        &"HEAD_UP":
-            return LocalizationService.tr_key("orientation.HEAD_UP", "Head Up")
-        &"HEAD_DOWN":
-            return LocalizationService.tr_key("orientation.HEAD_DOWN", "Head Down")
-        _:
-            return String(orientation_id).capitalize()
+    return GameContentLocalizationService.localize_type(
+        energy_type
+    )
 
 
 func _kind_label() -> String:
