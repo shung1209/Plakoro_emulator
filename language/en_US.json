@@ -57,7 +57,7 @@
     "delete_save.confirm": "Delete Save",
     "delete_save.success": "Save file deleted. You can now start a new game.",
     "delete_save.failed": "Could not delete the save file: {path}",
-    "main_menu.version": "V2.3 FOUNDATION",
+    "main_menu.version": "V2.3 HOTFIX",
     "battle.title": "PLAKORO Battle",
     "battle.your_turn": "YOUR TURN",
     "battle.ai_turn": "AI TURN",

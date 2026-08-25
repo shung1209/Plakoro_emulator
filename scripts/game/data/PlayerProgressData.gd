@@ -25,9 +25,11 @@ var unlocked_pokemon_ids: Array[String] = []
 var unlocked_move_card_ids: Array[String] = []
 var pokemon_levels: Dictionary = {}
 var energy_inventory: Dictionary = {}
+var energy_rewarded_pokemon_ids: Array[String] = []
 var pending_energy_choices: Array[Dictionary] = []
 var last_winner_participant_id: StringName = &""
 var last_played_unix_time: int = 0
+var needs_persistence_after_load: bool = false
 
 
 func record_battle(outcome: Variant) -> Array[String]:
@@ -59,10 +61,17 @@ func record_battle(outcome: Variant) -> Array[String]:
 		):
 			unlocked_pokemon_ids.append(reward_pokemon_id)
 			pokemon_levels[reward_pokemon_id] = 1
-			_add_energy_pack(
-				ENERGY_CATALOG.get_new_pokemon_pack(StringName(reward_pokemon_id))
-			)
 			_queue_level_energy_choice(StringName(reward_pokemon_id), 1)
+		if (
+			not reward_pokemon_id.is_empty()
+			and not energy_rewarded_pokemon_ids.has(reward_pokemon_id)
+		):
+			var reward_pack: Dictionary = ENERGY_CATALOG.get_new_pokemon_pack(
+				StringName(reward_pokemon_id)
+			)
+			if not reward_pack.is_empty():
+				_add_energy_pack(reward_pack)
+				energy_rewarded_pokemon_ids.append(reward_pokemon_id)
 		for raw_move_id: Variant in outcome.reward_move_card_ids:
 			var move_id: String = String(raw_move_id)
 			if not move_id.is_empty() and not unlocked_move_card_ids.has(move_id):
@@ -99,6 +108,9 @@ func to_dictionary() -> Dictionary:
 		"unlocked_move_card_ids": unlocked_move_card_ids.duplicate(),
 		"pokemon_levels": pokemon_levels.duplicate(true),
 		"energy_inventory": energy_inventory.duplicate(true),
+		"energy_rewarded_pokemon_ids": (
+			energy_rewarded_pokemon_ids.duplicate()
+		),
 		"pending_energy_choices": pending_energy_choices.duplicate(true),
 		"last_winner_participant_id": String(last_winner_participant_id),
 		"last_played_unix_time": last_played_unix_time
@@ -144,6 +156,13 @@ static func from_dictionary(data: Dictionary) -> Variant:
 	_load_unique_strings(data.get("unlocked_move_card_ids", []), result.unlocked_move_card_ids)
 	_load_nonnegative_counts(data.get("pokemon_levels", {}), result.pokemon_levels)
 	_load_nonnegative_counts(data.get("energy_inventory", {}), result.energy_inventory)
+	var has_energy_reward_tracking: bool = data.has(
+		"energy_rewarded_pokemon_ids"
+	)
+	_load_unique_strings(
+		data.get("energy_rewarded_pokemon_ids", []),
+		result.energy_rewarded_pokemon_ids
+	)
 	var raw_choices: Variant = data.get("pending_energy_choices", [])
 	if raw_choices is Array:
 		for raw_choice: Variant in raw_choices:
@@ -152,6 +171,7 @@ static func from_dictionary(data: Dictionary) -> Variant:
 				if not String(choice.get("pokemon_id", "")).is_empty():
 					result.pending_energy_choices.append(choice)
 	result._migrate_energy_progression(source_schema)
+	result._migrate_pokemon_energy_rewards(has_energy_reward_tracking)
 
 	result.last_winner_participant_id = StringName(
 		data.get("last_winner_participant_id", "")
@@ -175,6 +195,7 @@ static func create_new_profile(
 		starter_id
 	)
 	result.unlocked_pokemon_ids.append(String(starter_id))
+	result.energy_rewarded_pokemon_ids.append(String(starter_id))
 	result.pokemon_levels[String(starter_id)] = 1
 	result.energy_inventory = ENERGY_CATALOG.create_starter_inventory(
 		starter_id,
@@ -290,6 +311,30 @@ func _migrate_energy_progression(source_schema: String) -> void:
 	for pokemon_id: String in unlocked_pokemon_ids:
 		if not pokemon_levels.has(pokemon_id):
 			pokemon_levels[pokemon_id] = 1
+
+
+func _migrate_pokemon_energy_rewards(has_tracking: bool) -> void:
+	if has_tracking:
+		return
+	for pokemon_id: String in unlocked_pokemon_ids:
+		if energy_rewarded_pokemon_ids.has(pokemon_id):
+			continue
+		if (
+			pokemon_id == String(starter_pokemon_id)
+			or ENERGY_CATALOG.has_explicit_energy_options(
+				StringName(pokemon_id)
+			)
+		):
+			energy_rewarded_pokemon_ids.append(pokemon_id)
+			needs_persistence_after_load = true
+			continue
+		var missing_pack: Dictionary = ENERGY_CATALOG.get_new_pokemon_pack(
+			StringName(pokemon_id)
+		)
+		if not missing_pack.is_empty():
+			_add_energy_pack(missing_pack)
+			energy_rewarded_pokemon_ids.append(pokemon_id)
+			needs_persistence_after_load = true
 
 
 func _infer_starter_energy_if_missing() -> void:

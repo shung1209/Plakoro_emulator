@@ -303,12 +303,9 @@ func _apply_localized_text() -> void:
 		"main_menu.delete_save",
 		"Delete Save File"
 	)
-	version_label.text = _normalize_version_label(
-		LocalizationService.tr_key(
-			"main_menu.version",
-			DISPLAY_VERSION + " FOUNDATION"
-		)
-	)
+	# Product version metadata must not be replaced by an older user language
+	# override copied from a previous release.
+	version_label.text = DISPLAY_VERSION + " HOTFIX"
 	quit_confirmation.title = LocalizationService.tr_key(
 		"global_quit.title",
 		"Exit PLAKORO?"
@@ -341,16 +338,6 @@ func _apply_localized_text() -> void:
 		"common.cancel",
 		"Cancel"
 	)
-
-
-func _normalize_version_label(localized_text: String) -> String:
-	var value: String = localized_text.strip_edges()
-	if not value.begins_with("V2"):
-		return DISPLAY_VERSION + " FOUNDATION"
-	var suffix_position: int = value.find(" ")
-	if suffix_position < 0:
-		return DISPLAY_VERSION
-	return DISPLAY_VERSION + value.substr(suffix_position)
 
 
 func _apply_brand_title() -> void:

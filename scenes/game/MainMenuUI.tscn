@@ -208,7 +208,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.55, 0.64, 1)
 theme_override_font_sizes/font_size = 13
-text = "V2.3 FOUNDATION"
+text = "V2.3 HOTFIX"
 horizontal_alignment = 1
 
 [node name="QuitConfirmation" type="ConfirmationDialog" parent="."]

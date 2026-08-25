@@ -57,7 +57,7 @@
     "delete_save.confirm": "セーブを削除",
     "delete_save.success": "セーブデータを削除しました。新しいゲームを開始できます。",
     "delete_save.failed": "セーブデータを削除できませんでした：{path}",
-    "main_menu.version": "V2.3 FOUNDATION",
+    "main_menu.version": "V2.3 HOTFIX",
     "battle.title": "PLAKORO バトル",
     "battle.your_turn": "あなたのターン",
     "battle.ai_turn": "AIのターン",
