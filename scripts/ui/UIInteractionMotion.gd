@@ -415,6 +415,22 @@ func _replace_tween(id: int) -> Tween:
 
 
 func _cleanup_control(id: int) -> void:
+	# Reparenting briefly emits tree_exiting even though the same Control is
+	# immediately added back to the scene. Delay cleanup so portrait/phone
+	# layouts can reorganize existing controls without binding every signal a
+	# second time.
+	call_deferred("_cleanup_control_if_removed", id)
+
+
+func _cleanup_control_if_removed(id: int) -> void:
+	var instance: Object = instance_from_id(id)
+	if (
+		instance != null
+		and is_instance_valid(instance)
+		and instance is Node
+		and (instance as Node).is_inside_tree()
+	):
+		return
 	if _tweens.has(id):
 		var tween: Variant = _tweens[id]
 		if tween is Tween and tween.is_valid():

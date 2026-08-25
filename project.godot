@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="PLAKORO Adventures"
+config/version="2.3"
 run/main_scene="res://scenes/game/MainMenuUI.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/show_image=false
@@ -27,12 +28,14 @@ GameFlow="*res://scripts/game/GameFlow.gd"
 PlayerProgress="*res://scripts/game/PlayerProgress.gd"
 UIInteractionMotion="*res://scripts/ui/UIInteractionMotion.gd"
 WebUIUsability="*res://scripts/ui/WebUIUsability.gd"
+PhoneOrientationGuard="*res://scripts/ui/phone/PhoneOrientationGuard.gd"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
+window/handheld/orientation=6
 
 [physics]
 

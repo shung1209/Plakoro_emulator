@@ -4,6 +4,13 @@ extends Control
 signal special_move_target_selected(
 	move_name_id: StringName
 )
+signal battle_phase_changed(phase: StringName)
+signal phone_roll_confirmation_changed(
+	step: StringName,
+	succeeded: bool,
+	detail: String,
+	amount: int
+)
 
 
 const CHARAKORO_FEEDBACK: Script = preload(
@@ -1118,6 +1125,7 @@ func _configure_battle_tooltip_theme() -> void:
 func _set_battle_action_state(
 	phase: StringName
 ) -> void:
+	battle_phase_changed.emit(phase)
 	if turn_banner_label == null:
 		return
 
@@ -1619,6 +1627,8 @@ func _refresh_enemy_move_reveal() -> void:
 
 
 func _open_enemy_move_window() -> void:
+	if GameFlow.phone_mode:
+		return
 	if enemy_loadout == null:
 		return
 	_refresh_enemy_move_reveal()
@@ -1792,6 +1802,9 @@ func _refresh_current_energy_state(
 	dice_result: Variant,
 	actor_label: String = "USER"
 ) -> void:
+	if GameFlow.phone_mode:
+		energy_state_panel.visible = false
+		return
 	if move_card == null or dice_result == null:
 		energy_state_panel.visible = false
 		return
@@ -1821,7 +1834,8 @@ func _refresh_current_energy_state(
 func _clear_current_energy_state() -> void:
 	energy_payment_label.text = ""
 	energy_state_panel.visible = (
-		layout_prototype != null
+		not GameFlow.phone_mode
+		and layout_prototype != null
 		and layout_prototype.visible
 	)
 
@@ -2086,14 +2100,40 @@ func _on_move_pressed(
 		battle.state.player.current_hp
 	)
 
-	await _hold_action_state(
-		&"resolving",
-		1.0
-	)
+	if not GameFlow.phone_mode:
+		await _hold_action_state(
+			&"resolving",
+			1.0
+		)
 	var turn_result: Variant = battle.execute_turn(
 		move_card_id,
 		dice_result
 	)
+
+	await _present_phone_roll_confirmation(
+		GameContentLocalizationService.localize_pokemon(
+			battle.state.player.pokemon_data
+		),
+		GameContentLocalizationService.localize_move(move_card),
+		initial_energy_sufficient,
+		turn_result
+	)
+
+	if not turn_result.success:
+		message_label.text = (
+			turn_result.error_message
+		)
+		_refresh_ui()
+		_set_battle_action_state(&"choose_move")
+		_set_player_input_enabled(true)
+		_set_battle_navigation_locked(false)
+		return
+
+	if GameFlow.phone_mode:
+		await _hold_action_state(
+			&"resolving",
+			1.0
+		)
 
 	_show_prototype_battle_message(
 		GameContentLocalizationService.localize_pokemon(
@@ -2109,16 +2149,6 @@ func _on_move_pressed(
 		enemy_hp_before,
 		int(battle.state.enemy.current_hp)
 	)
-
-	if not turn_result.success:
-		message_label.text = (
-			turn_result.error_message
-		)
-		_refresh_ui()
-		_set_battle_action_state(&"choose_move")
-		_set_player_input_enabled(true)
-		_set_battle_navigation_locked(false)
-		return
 
 	_add_timeline_turn(
 		TIMELINE_BUILDER.build_turn(
@@ -2323,16 +2353,30 @@ func _execute_ai_turn() -> void:
 	)
 
 	if move_card != null:
-		await _hold_action_state(
-			&"ai_resolving",
-			1.0
-		)
+		if not GameFlow.phone_mode:
+			await _hold_action_state(
+				&"ai_resolving",
+				1.0
+			)
 		var ai_energy_sufficient: bool = (
 			ENERGY_RESOLVER.can_pay_cost(
 				move_card,
 				dice_result
 			)
 		)
+		await _present_phone_roll_confirmation(
+			GameContentLocalizationService.localize_pokemon(
+				battle.state.enemy.pokemon_data
+			),
+			GameContentLocalizationService.localize_move(move_card),
+			ai_energy_sufficient,
+			turn_result
+		)
+		if GameFlow.phone_mode:
+			await _hold_action_state(
+				&"ai_resolving",
+				1.0
+			)
 		_show_prototype_battle_message(
 			GameContentLocalizationService.localize_pokemon(
 				battle.state.enemy.pokemon_data
@@ -2423,9 +2467,78 @@ func _clear_charakoro_feedback() -> void:
 	charakoro_feedback_title.text = ""
 	charakoro_feedback_label.text = ""
 	charakoro_feedback_panel.visible = (
-		layout_prototype != null
+		not GameFlow.phone_mode
+		and layout_prototype != null
 		and layout_prototype.visible
 	)
+
+
+func _present_phone_roll_confirmation(
+	actor_name: String,
+	move_name: String,
+	enerkoro_succeeded: bool,
+	turn_result: Variant
+) -> void:
+	if not GameFlow.phone_mode:
+		return
+	phone_roll_confirmation_changed.emit(
+		&"move",
+		true,
+		actor_name + "\n" + move_name,
+		0
+	)
+
+	var damage_context: Variant = turn_result.damage_context
+	var base_damage: int = 0
+	var charakoro_damage: int = 0
+	var weakness_damage: int = 0
+	if damage_context != null:
+		base_damage = int(damage_context.base_damage)
+		charakoro_damage = int(damage_context.outcome_bonus)
+		weakness_damage = int(damage_context.weakness_bonus)
+
+	phone_roll_confirmation_changed.emit(
+		&"enerkoro",
+		enerkoro_succeeded,
+		"",
+		base_damage
+	)
+	await get_tree().create_timer(1.0).timeout
+	if not enerkoro_succeeded:
+		phone_roll_confirmation_changed.emit(
+			&"attack",
+			false,
+			"",
+			0
+		)
+		await get_tree().create_timer(2.0).timeout
+		return
+
+	phone_roll_confirmation_changed.emit(
+		&"charakoro",
+		true,
+		"",
+		charakoro_damage
+	)
+	await get_tree().create_timer(1.0).timeout
+	phone_roll_confirmation_changed.emit(
+		&"weakness",
+		true,
+		"",
+		weakness_damage
+	)
+	await get_tree().create_timer(1.0).timeout
+	var attack_succeeded: bool = (
+		turn_result.success
+		and _turn_attack_executed(turn_result, true)
+	)
+	phone_roll_confirmation_changed.emit(
+		&"attack",
+		attack_succeeded,
+		"",
+		int(turn_result.applied_damage) if attack_succeeded else 0
+	)
+	await get_tree().create_timer(2.0).timeout
 
 
 func _show_charakoro_feedback(
@@ -2478,7 +2591,7 @@ func _show_charakoro_feedback(
 		},
 		"Effect: {effect}"
 	)
-	charakoro_feedback_panel.visible = true
+	charakoro_feedback_panel.visible = not GameFlow.phone_mode
 
 
 func _request_special_move_lock_target(
@@ -3125,6 +3238,11 @@ func _format_battle_weakness(
 
 
 func _refresh_combatant_identity() -> void:
+	player_type_label.visible = not GameFlow.phone_mode
+	enemy_type_label.visible = not GameFlow.phone_mode
+	player_weakness_label.visible = not GameFlow.phone_mode
+	enemy_weakness_label.visible = not GameFlow.phone_mode
+
 	if battle == null or battle.state == null:
 		player_type_label.text = LocalizationService.tr_format(
 			"battle.type_value",
@@ -3192,6 +3310,15 @@ func _refresh_ui() -> void:
 	)
 
 	_refresh_combatant_identity()
+	if GameFlow.phone_mode:
+		player_name_label.text = "%s [%s]" % [
+			player_name_label.text,
+			player_weakness_label.text
+		]
+		enemy_name_label.text = "%s [%s]" % [
+			enemy_name_label.text,
+			enemy_weakness_label.text
+		]
 
 	HP_PRESENTER.refresh(
 		player_hp_bar,

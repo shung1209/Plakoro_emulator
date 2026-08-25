@@ -531,6 +531,23 @@ func _apply_responsive_layout() -> void:
 
 
 func _open_battle_setup() -> void:
+	if GameFlow.phone_mode:
+		GameFlow.open_phone_battle_loadout()
+		return
+	_prepare_battle_setup_controls()
+
+	var setup_dialog_size: Vector2i = Vector2i(1180, 720)
+	if OS.has_feature("web"):
+		# Give the Web loadout editor more room for a permanently visible
+		# scrollbar and a taller Move viewport. itch.io fullscreen is the
+		# primary target, so this intentionally stays desktop-oriented.
+		setup_dialog_size = Vector2i(1380, 840)
+		battle_setup_dialog.min_size = setup_dialog_size
+		battle_setup_dialog.max_size = setup_dialog_size
+	battle_setup_dialog.popup_centered(setup_dialog_size)
+
+
+func _prepare_battle_setup_controls() -> void:
 	_clear_setup_move_hover_preview()
 	_configure_setup_dialog_for_mode()
 	_populate_setup_pokemon_options()
@@ -572,17 +589,6 @@ func _open_battle_setup() -> void:
 
 	_refresh_battle_setup_state()
 	_apply_encounter_setup_lock()
-
-	var setup_dialog_size: Vector2i = Vector2i(1180, 720)
-	if OS.has_feature("web"):
-		# Give the Web loadout editor more room for a permanently visible
-		# scrollbar and a taller Move viewport. itch.io fullscreen is the
-		# primary target, so this intentionally stays desktop-oriented.
-		setup_dialog_size = Vector2i(1380, 840)
-		battle_setup_dialog.min_size = setup_dialog_size
-		battle_setup_dialog.max_size = setup_dialog_size
-	battle_setup_dialog.popup_centered(setup_dialog_size)
-
 
 func _configure_setup_dialog_for_mode() -> void:
 	var configure_opponent: bool = GameFlow.free_mode
@@ -966,13 +972,17 @@ func _rebuild_setup_moves(
 					display_name
 				)
 			)
-			check.text = LocalizationService.tr_format(
-				"preparation.move_option",
-				{
-					"name": localized_move_name,
-					"id": move_id
-				},
-                "{name}  [{id}]"
+			check.text = (
+				localized_move_name
+				if GameFlow.phone_mode
+				else LocalizationService.tr_format(
+					"preparation.move_option",
+					{
+						"name": localized_move_name,
+						"id": move_id
+					},
+					"{name}  [{id}]"
+				)
 			)
 			check.size_flags_horizontal = (
 				Control.SIZE_EXPAND_FILL
@@ -1895,7 +1905,7 @@ func _collect_setup_move_ids(
 	return result
 
 
-func _apply_battle_setup() -> void:
+func _apply_battle_setup() -> bool:
 	_clear_setup_move_hover_preview()
 
 	var player_id: String = (
@@ -1928,7 +1938,7 @@ func _apply_battle_setup() -> void:
 		validation_label.text = (
 			LocalizationService.tr_key("preparation.setup_incomplete", "Battle Setup is incomplete.")
 		)
-		return
+		return false
 
 	var player_pokemon: Dictionary = (
 		POKEMON_AUTHORING.load_by_id(
@@ -1967,7 +1977,7 @@ func _apply_battle_setup() -> void:
 			},
             "Player setup failed:\n{errors}"
 		)
-		return
+		return false
 
 	var difficulty: StringName = StringName(
 		setup_ai_difficulty_option.get_item_metadata(
@@ -2004,7 +2014,7 @@ func _apply_battle_setup() -> void:
 			},
             "AI setup failed:\n{errors}"
 		)
-		return
+		return false
 
 	_reload_loadout()
 
@@ -2012,6 +2022,7 @@ func _apply_battle_setup() -> void:
 		"preparation.setup_applied",
         "Battle setup applied successfully. Review the summary or start the battle."
 	)
+	return true
 
 
 func _reload_database_and_loadout() -> void:
@@ -3165,7 +3176,11 @@ func _open_energy_dice_builder() -> void:
 	if not DICE_BUILDER_CONTEXT.set_context(
 		mode,
 		target_path,
-		"res://scenes/ui/BattlePreparationUI.tscn",
+		(
+			GameFlow.PHONE_PREPARATION_SCENE
+			if GameFlow.phone_mode
+			else "res://scenes/ui/BattlePreparationUI.tscn"
+		),
 		pokemon_id,
 		species_id
 	):
@@ -3175,7 +3190,11 @@ func _open_energy_dice_builder() -> void:
 		return
 
 	get_tree().change_scene_to_file(
-		ENERGY_DICE_BUILDER_SCENE_PATH
+		(
+			GameFlow.PHONE_ENERKORO_BUILDER_SCENE
+			if GameFlow.phone_mode
+			else ENERGY_DICE_BUILDER_SCENE_PATH
+		)
 	)
 
 

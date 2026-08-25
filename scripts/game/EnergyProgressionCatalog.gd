@@ -1,6 +1,9 @@
 extends RefCounted
 
 
+const JSON_LOADER: Script = preload("res://scripts/database/JsonLoader.gd")
+const POKEMON_DIRECTORY: String = "res://database/pokemon"
+const MOVE_CARD_DIRECTORY: String = "res://database/move_cards"
 const MAX_LEVEL: int = 5
 const NEW_POKEMON_ENERGY_COUNT: int = 6
 const STARTER_PRIMARY_BONUS: int = 3
@@ -46,8 +49,18 @@ static func get_energy_options(pokemon_id: StringName) -> Array[String]:
 	var result: Array[String] = []
 	if raw_options is Array:
 		for raw_energy: Variant in raw_options:
-			result.append(String(raw_energy))
+			var energy: String = String(raw_energy)
+			if ALL_ENERGY_TYPES.has(energy) and not result.has(energy):
+				result.append(energy)
+	if result.is_empty():
+		result = _infer_energy_options_from_pokemon(pokemon_id)
 	return result
+
+
+static func has_explicit_energy_options(pokemon_id: StringName) -> bool:
+	var species_id: String = _species_from_pokemon_id(String(pokemon_id))
+	var raw_options: Variant = SPECIES_ENERGY_OPTIONS.get(species_id, [])
+	return raw_options is Array and not raw_options.is_empty()
 
 
 static func get_new_pokemon_pack(pokemon_id: StringName) -> Dictionary:
@@ -55,6 +68,8 @@ static func get_new_pokemon_pack(pokemon_id: StringName) -> Dictionary:
 	if options.is_empty():
 		return {}
 	var primary: String = options[0]
+	if options.size() == 1:
+		return {primary: NEW_POKEMON_ENERGY_COUNT}
 	var secondary: String = options[1] if options.size() > 1 else primary
 	var tertiary_index: int = ALL_ENERGY_TYPES.find(primary) + 1
 	var tertiary: String = ALL_ENERGY_TYPES[tertiary_index % ALL_ENERGY_TYPES.size()]
@@ -180,6 +195,62 @@ static func _species_from_pokemon_id(pokemon_id: String) -> String:
 		if pokemon_id == species_id or pokemon_id.begins_with(species_id + "_"):
 			return species_id
 	return pokemon_id.get_slice("_", 0)
+
+
+static func _infer_energy_options_from_pokemon(
+	pokemon_id: StringName
+) -> Array[String]:
+	var pokemon_path: String = POKEMON_DIRECTORY.path_join(
+		String(pokemon_id) + ".json"
+	)
+	if not FileAccess.file_exists(pokemon_path):
+		return []
+	var pokemon: Dictionary = JSON_LOADER.load_dictionary(pokemon_path)
+	if pokemon.is_empty():
+		return []
+
+	var result: Array[String] = []
+	var pokemon_type: String = String(
+		pokemon.get("pokemon_type", "")
+	).strip_edges()
+	if ALL_ENERGY_TYPES.has(pokemon_type):
+		result.append(pokemon_type)
+
+	var move_type_counts: Dictionary = {}
+	var raw_move_ids: Variant = pokemon.get("available_move_card_ids", [])
+	if raw_move_ids is Array:
+		for raw_move_id: Variant in raw_move_ids:
+			var move_path: String = MOVE_CARD_DIRECTORY.path_join(
+				String(raw_move_id) + ".json"
+			)
+			if not FileAccess.file_exists(move_path):
+				continue
+			var move_card: Dictionary = JSON_LOADER.load_dictionary(move_path)
+			var attack_type: String = String(
+				move_card.get("attack_type", "")
+			).strip_edges()
+			if ALL_ENERGY_TYPES.has(attack_type):
+				move_type_counts[attack_type] = (
+					int(move_type_counts.get(attack_type, 0)) + 1
+				)
+
+	var ranked_types: Array[String] = []
+	for raw_type: Variant in move_type_counts.keys():
+		ranked_types.append(String(raw_type))
+	ranked_types.sort_custom(
+		func(a: String, b: String) -> bool:
+			var a_count: int = int(move_type_counts.get(a, 0))
+			var b_count: int = int(move_type_counts.get(b, 0))
+			if a_count == b_count:
+				return ALL_ENERGY_TYPES.find(a) < ALL_ENERGY_TYPES.find(b)
+			return a_count > b_count
+	)
+	for energy: String in ranked_types:
+		if not result.has(energy):
+			result.append(energy)
+		if result.size() >= 2:
+			break
+	return result
 
 
 static func _select_setup_energy_values(

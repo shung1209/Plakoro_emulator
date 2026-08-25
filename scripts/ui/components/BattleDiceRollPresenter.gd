@@ -46,6 +46,7 @@ var _labels: Array[Label] = []
 var _slot_energy_colors: Array[Color] = []
 var _slot_states: Array[StringName] = []
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _compact_mode: bool = false
 
 
 func _ready() -> void:
@@ -62,6 +63,7 @@ func _ready() -> void:
 
 func _build_slots() -> void:
     for child: Node in get_children():
+        remove_child(child)
         child.queue_free()
 
     _slot_panels.clear()
@@ -73,7 +75,7 @@ func _build_slots() -> void:
     for index: int in range(4):
         var panel: PanelContainer = PanelContainer.new()
         panel.custom_minimum_size = Vector2(
-            104,
+            92 if _compact_mode else 104,
             108
         )
         panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -98,7 +100,7 @@ func _build_slots() -> void:
 
         var icon_row: HBoxContainer = HBoxContainer.new()
         icon_row.custom_minimum_size = Vector2(
-            86,
+            74 if _compact_mode else 86,
             66
         )
         icon_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -138,6 +140,17 @@ func _build_slots() -> void:
             )
         _slot_energy_colors.append(slot_color)
         _slot_states.append(&"idle")
+
+
+func set_compact_mode(enabled: bool) -> void:
+    if _compact_mode == enabled:
+        return
+    _compact_mode = enabled
+    add_theme_constant_override(
+        "separation",
+        6 if _compact_mode else 14
+    )
+    _build_slots()
 
 
 func set_custom_slot_color_types(color_types: Array[String]) -> void:
@@ -832,9 +845,9 @@ func _set_energy_slot(
         return
 
     var icon_size: int = (
-        ICON_SIZE
+        (54 if _compact_mode else ICON_SIZE)
         if known.size() == 1
-        else DOUBLE_ICON_SIZE
+        else (35 if _compact_mode else DOUBLE_ICON_SIZE)
     )
 
     for energy_type: StringName in known:
@@ -891,8 +904,8 @@ func _set_orientation_slot(
     var icon: TextureRect = TextureRect.new()
     icon.texture = texture
     icon.custom_minimum_size = Vector2(
-        ICON_SIZE,
-        ICON_SIZE
+        54 if _compact_mode else ICON_SIZE,
+        54 if _compact_mode else ICON_SIZE
     )
     icon.expand_mode = (
         TextureRect.EXPAND_IGNORE_SIZE

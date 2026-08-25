@@ -4,6 +4,9 @@ extends PanelContainer
 const ENERGY_COST_CHIP: Script = preload(
     "res://scripts/ui/components/EnergyCostChip.gd"
 )
+const FACE_BUTTON: Script = preload(
+    "res://scripts/ui/components/EnergyFaceButton.gd"
+)
 const ICONS: Script = preload(
     "res://scripts/presentation/PlakoroIconService.gd"
 )
@@ -41,6 +44,10 @@ func setup(
         )
         missing.modulate.a = 0.70
         box.add_child(missing)
+        return
+
+    if GameFlow.phone_mode:
+        _add_phone_face_grid(box, die_data, die_number - 1)
         return
 
     _add_face_pair(
@@ -83,6 +90,66 @@ func setup(
         1,
         compact
     )
+
+
+func _add_phone_face_grid(
+    parent: VBoxContainer,
+    die_data: Variant,
+    die_index: int
+) -> void:
+    var center: CenterContainer = CenterContainer.new()
+    center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    parent.add_child(center)
+
+    var grid: GridContainer = GridContainer.new()
+    grid.columns = 2
+    grid.add_theme_constant_override("h_separation", 8)
+    grid.add_theme_constant_override("v_separation", 8)
+    center.add_child(grid)
+
+    _add_phone_face(
+        grid, die_index, &"fixed_a", &"FACE_UP", &"fixed",
+        StringName(die_data.fixed_a)
+    )
+    _add_phone_face(
+        grid, die_index, &"fixed_b", &"FACE_DOWN", &"fixed",
+        StringName(die_data.fixed_b)
+    )
+    _add_phone_face(
+        grid, die_index, &"double_a", &"HEAD_UP", &"double",
+        StringName(die_data.double_a_first),
+        StringName(die_data.double_a_second)
+    )
+    _add_phone_face(
+        grid, die_index, &"double_b", &"HEAD_DOWN", &"double",
+        StringName(die_data.double_b_first),
+        StringName(die_data.double_b_second)
+    )
+    _add_phone_face(
+        grid, die_index, &"single_a", &"HEAD_LEFT", &"single",
+        StringName(die_data.single_a)
+    )
+    _add_phone_face(
+        grid, die_index, &"single_b", &"HEAD_RIGHT", &"single",
+        StringName(die_data.single_b)
+    )
+
+
+func _add_phone_face(
+    parent: GridContainer,
+    die_index: int,
+    field_id: StringName,
+    orientation_id: StringName,
+    face_kind: StringName,
+    first_energy: StringName,
+    second_energy: StringName = &""
+) -> void:
+    var face: Button = FACE_BUTTON.new()
+    face.initialize(die_index, field_id, orientation_id, face_kind)
+    face.set_energy(first_energy, second_energy)
+    face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    face.focus_mode = Control.FOCUS_NONE
+    parent.add_child(face)
 
 
 func _add_face_pair(

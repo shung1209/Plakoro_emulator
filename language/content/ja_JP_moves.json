@@ -676,6 +676,16 @@
     "move.sinister_shot.effect_0": "この攻撃のダメージを20追加する。",
     "move.aura_sphere.description": "この Pokémon の残り HP が40以下なら、この攻撃のダメージを50追加する。",
     "move_card.lucario_aura_sphere_stw09_006.effect_0": "この Pokémon の残り HP が40以下なら、この攻撃のダメージを50追加する。",
-    "move.aura_sphere.effect_0": "この Pokémon の残り HP が40以下なら、この攻撃のダメージを50追加する。"
+    "move.aura_sphere.effect_0": "この Pokémon の残り HP が40以下なら、この攻撃のダメージを50追加する。",
+    "move_card.metagross_explosion_stw08_007.move_effect_0": "この Pokémon も120ダメージを受ける。",
+    "move_card.mew_reflection_stw06_007.move_effect_0": "相手が直前に選んだワザの印刷ダメージをコピーする。Charakoro 効果はコピーしない。",
+    "move_card.onix_rocky_tackle_ebw01_041.move_effect_0": "相手の次のターン、この Pokémon が攻撃から受けるダメージを10減らす。",
+    "move_card.pikachu_electric_rush_stw04_003.move_effect_0": "「でんこうせっか」のダメージは弱点の影響を受けない。",
+    "move_card.pikachu_volt_tackle_stw04_006.move_effect_0": "この Pokémon も自分に30ダメージを与える。",
+    "move_card.pinsir_endure_ebw01_002.move_effect_0": "相手の次のターン、この Pokémon が攻撃から受けるダメージを20減らす。",
+    "move_card.pinsir_submission_ebw01_010.move_effect_0": "この Pokémon も自分に20ダメージを与える。",
+    "move_card.squirtle_withdraw_stw03_002.move_effect_0": "相手の次のターン、この Pokémon が攻撃から受けるダメージを20減らす。",
+    "move_card.zapdos_dual_thunder_ebw01_036.move_effect_0": "Charakoro を2回振る。",
+    "move_card.zapdos_volt_rush_ebw01_033.move_effect_0": "Charakoro を3回振る。"
   }
 }

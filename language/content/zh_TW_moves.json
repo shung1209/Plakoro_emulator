@@ -676,6 +676,16 @@
     "move.sinister_shot.effect_0": "這次攻擊額外造成 20 點傷害。",
     "move.aura_sphere.description": "如果這隻 Pokémon 的剩餘 HP 為 40 或以下，這次攻擊額外造成 50 點傷害。",
     "move_card.lucario_aura_sphere_stw09_006.effect_0": "如果這隻 Pokémon 的剩餘 HP 為 40 或以下，這次攻擊額外造成 50 點傷害。",
-    "move.aura_sphere.effect_0": "如果這隻 Pokémon 的剩餘 HP 為 40 或以下，這次攻擊額外造成 50 點傷害。"
+    "move.aura_sphere.effect_0": "如果這隻 Pokémon 的剩餘 HP 為 40 或以下，這次攻擊額外造成 50 點傷害。",
+    "move_card.metagross_explosion_stw08_007.move_effect_0": "這隻 Pokémon 也受到 120 點傷害。",
+    "move_card.mew_reflection_stw06_007.move_effect_0": "複製對手上一個所選招式的印刷傷害；不複製其 Charakoro 效果。",
+    "move_card.onix_rocky_tackle_ebw01_041.move_effect_0": "對手下一回合，這隻 Pokémon 受到的攻擊傷害減少 10 點。",
+    "move_card.pikachu_electric_rush_stw04_003.move_effect_0": "「電光猛衝」的傷害不受弱點影響。",
+    "move_card.pikachu_volt_tackle_stw04_006.move_effect_0": "這隻 Pokémon 也會對自己造成 30 點傷害。",
+    "move_card.pinsir_endure_ebw01_002.move_effect_0": "對手下一回合，這隻 Pokémon 受到的攻擊傷害減少 20 點。",
+    "move_card.pinsir_submission_ebw01_010.move_effect_0": "這隻 Pokémon 也會對自己造成 20 點傷害。",
+    "move_card.squirtle_withdraw_stw03_002.move_effect_0": "對手下一回合，這隻 Pokémon 受到的攻擊傷害減少 20 點。",
+    "move_card.zapdos_dual_thunder_ebw01_036.move_effect_0": "擲 2 次 Charakoro。",
+    "move_card.zapdos_volt_rush_ebw01_033.move_effect_0": "擲 3 次 Charakoro。"
   }
 }

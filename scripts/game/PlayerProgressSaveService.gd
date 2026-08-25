@@ -69,7 +69,13 @@ static func load_progress(
 		)
 		return PROGRESS_DATA.new()
 
-	return PROGRESS_DATA.from_dictionary(json.data as Dictionary)
+	var progress: Variant = PROGRESS_DATA.from_dictionary(
+		json.data as Dictionary
+	)
+	if bool(progress.needs_persistence_after_load):
+		if save_progress(progress, file_path):
+			progress.needs_persistence_after_load = false
+	return progress
 
 
 static func delete_player_save() -> Dictionary:

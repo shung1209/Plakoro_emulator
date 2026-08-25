@@ -115,7 +115,11 @@ func _build_ui() -> void:
     add_child(root_box)
 
     var title: Label = Label.new()
-    title.text = LocalizationService.tr_format("enerkoro_builder.die_title", {"index": die_index + 1}, "Enerkoro {index}")
+    title.text = LocalizationService.tr_format(
+        "phone_mode.dice_title" if GameFlow.phone_mode else "enerkoro_builder.die_title",
+        {"index": die_index + 1},
+        "Dice {index}" if GameFlow.phone_mode else "Enerkoro {index}"
+    )
     title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     title.add_theme_font_size_override("font_size", 22)
     root_box.add_child(title)
@@ -125,7 +129,7 @@ func _build_ui() -> void:
     root_box.add_child(subtitle)
 
     var net: GridContainer = GridContainer.new()
-    net.columns = 3
+    net.columns = 2 if GameFlow.phone_mode else 3
     net.add_theme_constant_override("h_separation", 8)
     net.add_theme_constant_override("v_separation", 8)
 
@@ -134,51 +138,26 @@ func _build_ui() -> void:
     net_center.add_child(net)
     root_box.add_child(net_center)
 
-    _add_empty_cell(net)
-    _add_face_button(
-        net,
-        &"fixed_a",
-        &"FACE_UP",
-        &"fixed"
-    )
-    _add_empty_cell(net)
-
-    _add_face_button(
-        net,
-        &"single_a",
-        &"HEAD_LEFT",
-        &"single"
-    )
-    _add_face_button(
-        net,
-        &"double_a",
-        &"HEAD_UP",
-        &"double"
-    )
-    _add_face_button(
-        net,
-        &"single_b",
-        &"HEAD_RIGHT",
-        &"single"
-    )
-
-    _add_empty_cell(net)
-    _add_face_button(
-        net,
-        &"fixed_b",
-        &"FACE_DOWN",
-        &"fixed"
-    )
-    _add_empty_cell(net)
-
-    _add_empty_cell(net)
-    _add_face_button(
-        net,
-        &"double_b",
-        &"HEAD_DOWN",
-        &"double"
-    )
-    _add_empty_cell(net)
+    if GameFlow.phone_mode:
+        _add_face_button(net, &"fixed_a", &"FACE_UP", &"fixed")
+        _add_face_button(net, &"fixed_b", &"FACE_DOWN", &"fixed")
+        _add_face_button(net, &"double_a", &"HEAD_UP", &"double")
+        _add_face_button(net, &"double_b", &"HEAD_DOWN", &"double")
+        _add_face_button(net, &"single_a", &"HEAD_LEFT", &"single")
+        _add_face_button(net, &"single_b", &"HEAD_RIGHT", &"single")
+    else:
+        _add_empty_cell(net)
+        _add_face_button(net, &"fixed_a", &"FACE_UP", &"fixed")
+        _add_empty_cell(net)
+        _add_face_button(net, &"single_a", &"HEAD_LEFT", &"single")
+        _add_face_button(net, &"double_a", &"HEAD_UP", &"double")
+        _add_face_button(net, &"single_b", &"HEAD_RIGHT", &"single")
+        _add_empty_cell(net)
+        _add_face_button(net, &"fixed_b", &"FACE_DOWN", &"fixed")
+        _add_empty_cell(net)
+        _add_empty_cell(net)
+        _add_face_button(net, &"double_b", &"HEAD_DOWN", &"double")
+        _add_empty_cell(net)
 
     _palette_host = VBoxContainer.new()
     _palette_host.add_theme_constant_override(

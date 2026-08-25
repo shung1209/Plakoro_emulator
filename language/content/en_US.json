@@ -471,6 +471,16 @@
     "move.sinister_shot.effect_0": "This attack does 20 more damage.",
     "move.aura_sphere.description": "If this Pokémon has 40 HP or less, this attack does 50 more damage.",
     "move_card.lucario_aura_sphere_stw09_006.effect_0": "If this Pokémon has 40 HP or less, this attack does 50 more damage.",
-    "move.aura_sphere.effect_0": "If this Pokémon has 40 HP or less, this attack does 50 more damage."
+    "move.aura_sphere.effect_0": "If this Pokémon has 40 HP or less, this attack does 50 more damage.",
+    "move_card.metagross_explosion_stw08_007.move_effect_0": "This Pokémon also takes 120 damage.",
+    "move_card.mew_reflection_stw06_007.move_effect_0": "Copy the printed damage of the opponent's previous selected attack. Do not copy its Kyokoro effects.",
+    "move_card.onix_rocky_tackle_ebw01_041.move_effect_0": "During your opponent's next turn, this Pokémon takes 10 less damage from attacks.",
+    "move_card.pikachu_electric_rush_stw04_003.move_effect_0": "Electric Rush damage is not affected by Weakness.",
+    "move_card.pikachu_volt_tackle_stw04_006.move_effect_0": "This Pokémon also does 30 damage to itself.",
+    "move_card.pinsir_endure_ebw01_002.move_effect_0": "During your opponent's next turn, this Pokémon takes 20 less damage from attacks.",
+    "move_card.pinsir_submission_ebw01_010.move_effect_0": "This Pokémon also does 20 damage to itself.",
+    "move_card.squirtle_withdraw_stw03_002.move_effect_0": "During your opponent's next turn, this Pokémon takes 20 less damage from attacks.",
+    "move_card.zapdos_dual_thunder_ebw01_036.move_effect_0": "Roll your Kyokoro 2 times.",
+    "move_card.zapdos_volt_rush_ebw01_033.move_effect_0": "Roll your Kyokoro 3 times."
   }
 }

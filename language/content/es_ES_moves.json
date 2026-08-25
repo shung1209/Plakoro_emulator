@@ -344,7 +344,17 @@
     "move_card.pikachu_thunder_shock_stw04_002.description": "Efecto de Kyokoro: Este ataque hace 20 puntos de daño adicionales.",
     "move_card.pikachu_thunder_shock_stw04_002.effect_0": "Este ataque hace 20 puntos de daño adicionales.",
     "move_card.zapdos_thunder_shock_ebw01_032.description": "Efecto de Kyokoro: Este ataque hace 10 puntos de daño adicionales.",
-    "move_card.zapdos_thunder_shock_ebw01_032.effect_0": "Este ataque hace 10 puntos de daño adicionales."
+    "move_card.zapdos_thunder_shock_ebw01_032.effect_0": "Este ataque hace 10 puntos de daño adicionales.",
+    "move_card.metagross_explosion_stw08_007.move_effect_0": "Este Pokémon también recibe 120 puntos de daño.",
+    "move_card.mew_reflection_stw06_007.move_effect_0": "Copia el daño impreso del último ataque seleccionado por el rival. No copies sus efectos de Kyokoro.",
+    "move_card.onix_rocky_tackle_ebw01_041.move_effect_0": "Durante el próximo turno de tu rival, este Pokémon recibe 10 puntos menos de daño de los ataques.",
+    "move_card.pikachu_electric_rush_stw04_003.move_effect_0": "El daño de Embestida Eléctrica no se ve afectado por la debilidad.",
+    "move_card.pikachu_volt_tackle_stw04_006.move_effect_0": "Este Pokémon también se hace 30 puntos de daño a sí mismo.",
+    "move_card.pinsir_endure_ebw01_002.move_effect_0": "Durante el próximo turno de tu rival, este Pokémon recibe 20 puntos menos de daño de los ataques.",
+    "move_card.pinsir_submission_ebw01_010.move_effect_0": "Este Pokémon también se hace 20 puntos de daño a sí mismo.",
+    "move_card.squirtle_withdraw_stw03_002.move_effect_0": "Durante el próximo turno de tu rival, este Pokémon recibe 20 puntos menos de daño de los ataques.",
+    "move_card.zapdos_dual_thunder_ebw01_036.move_effect_0": "Tira tu Kyokoro 2 veces.",
+    "move_card.zapdos_volt_rush_ebw01_033.move_effect_0": "Tira tu Kyokoro 3 veces."
   },
   "fallback": ""
 }
