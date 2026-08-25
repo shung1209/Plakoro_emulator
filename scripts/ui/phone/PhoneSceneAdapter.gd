@@ -555,6 +555,12 @@ func _adapt_battle() -> void:
 		)
 	_fit_phone_popup("%CoinTossWindow", Vector2i(430, 410))
 	_fit_phone_popup("%EnemyMoveWindow", Vector2i(440, 790))
+	var viewport: Viewport = source.get_viewport()
+	if viewport != null and not viewport.size_changed.is_connected(
+		_on_phone_battle_viewport_size_changed
+	):
+		viewport.size_changed.connect(_on_phone_battle_viewport_size_changed)
+	_update_phone_battle_responsive_layout.call_deferred()
 	_show_battle_view(&"arena")
 
 
@@ -582,7 +588,10 @@ func _show_battle_view(view_id: StringName) -> void:
 	var scroll: ScrollContainer = source.get("battle_scroll") as ScrollContainer
 	if scroll != null:
 		scroll.scroll_vertical = 0
-		_update_phone_battle_scroll.call_deferred()
+		if view_id == &"arena":
+			_update_phone_battle_responsive_layout.call_deferred()
+		else:
+			_update_phone_battle_scroll.call_deferred()
 
 
 func _update_phone_battle_scroll() -> void:
@@ -602,6 +611,62 @@ func _update_phone_battle_scroll() -> void:
 		if needs_vertical_scroll
 		else ScrollContainer.SCROLL_MODE_DISABLED
 	)
+
+
+func _on_phone_battle_viewport_size_changed() -> void:
+	_update_phone_battle_responsive_layout.call_deferred()
+
+
+func _update_phone_battle_responsive_layout() -> void:
+	if source == null or layout_kind != "battle":
+		return
+	var scroll: ScrollContainer = source.get("battle_scroll") as ScrollContainer
+	if scroll == null or scroll.size.y <= 0.0:
+		return
+	var portrait_size: float = clampf(scroll.size.y * 0.18, 104.0, 174.0)
+	var player_hero: VBoxContainer = source.get_node_or_null(
+		"%PlayerHeroContainer"
+	) as VBoxContainer
+	var enemy_button: Button = source.get_node_or_null(
+		"%EnemyCharakoroButton"
+	) as Button
+	var enemy_hero: VBoxContainer = source.get_node_or_null(
+		"%EnemyHeroContainer"
+	) as VBoxContainer
+	if player_hero != null:
+		player_hero.custom_minimum_size.y = portrait_size
+		_resize_phone_portraits(player_hero, portrait_size)
+	if enemy_button != null:
+		enemy_button.custom_minimum_size.y = portrait_size
+	if enemy_hero != null:
+		_resize_phone_portraits(enemy_hero, portrait_size)
+	_update_phone_battle_scroll.call_deferred()
+
+
+func _resize_phone_portraits(root: Control, portrait_size: float) -> void:
+	var content_size: float = maxf(80.0, portrait_size - 24.0)
+	for child: Node in root.get_children():
+		if not child is Control:
+			continue
+		var control: Control = child as Control
+		control.custom_minimum_size = Vector2(portrait_size, portrait_size)
+		control.clip_contents = true
+		_fit_phone_portrait_content(control, content_size)
+
+
+func _fit_phone_portrait_content(root: Control, content_size: float) -> void:
+	for child: Node in root.get_children():
+		if not child is Control:
+			continue
+		var control: Control = child as Control
+		control.clip_contents = true
+		if control is TextureRect or control is Label:
+			control.custom_minimum_size = Vector2(content_size, content_size)
+		else:
+			# Containers should follow the outer frame without forcing their
+			# original 200 px minimum size back into the phone layout.
+			control.custom_minimum_size = Vector2.ZERO
+		_fit_phone_portrait_content(control, content_size)
 
 
 func _on_phone_move_pressed() -> void:

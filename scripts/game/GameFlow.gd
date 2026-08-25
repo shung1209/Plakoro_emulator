@@ -41,6 +41,7 @@ var free_mode: bool = false
 var free_mode_allow_repeated_fixed_energy: bool = false
 var advance_after_battle_result: bool = false
 var phone_mode: bool = false
+var landscape_mode: bool = false
 
 
 func open_main_menu() -> void:
@@ -52,6 +53,7 @@ func open_main_menu() -> void:
 
 func exit_phone_mode() -> void:
 	_set_phone_mode(false)
+	_set_landscape_mode(false)
 	battle_outcome = null
 	advance_after_battle_result = false
 	collection_mode = false
@@ -63,6 +65,7 @@ func exit_phone_mode() -> void:
 
 func start_game() -> void:
 	_set_phone_mode(false)
+	_set_landscape_mode(true)
 	battle_outcome = null
 	collection_mode = false
 	free_mode = false
@@ -151,6 +154,8 @@ func open_preparation() -> void:
 
 
 func open_collection() -> void:
+	_set_phone_mode(false)
+	_set_landscape_mode(true)
 	battle_outcome = null
 	collection_mode = true
 	free_mode = false
@@ -161,6 +166,7 @@ func open_collection() -> void:
 
 func open_free_mode() -> void:
 	_set_phone_mode(false)
+	_set_landscape_mode(true)
 	battle_outcome = null
 	advance_after_battle_result = false
 	collection_mode = false
@@ -251,6 +257,8 @@ func _change_scene(scene_path: String) -> void:
 
 func _set_phone_mode(enabled: bool) -> void:
 	phone_mode = enabled
+	if enabled:
+		landscape_mode = false
 	var window: Window = get_window()
 	if window != null:
 		window.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
@@ -264,12 +272,29 @@ func _set_phone_mode(enabled: bool) -> void:
 		else:
 			DisplayServer.screen_set_orientation(DisplayServer.SCREEN_SENSOR)
 	if OS.has_feature("web"):
-		_request_web_orientation(enabled)
+		_request_web_orientation(&"portrait" if enabled else &"")
 
 
-func _request_web_orientation(portrait: bool) -> void:
+func _set_landscape_mode(enabled: bool) -> void:
+	landscape_mode = enabled and not phone_mode
+	if OS.has_feature("web") or OS.has_feature("mobile"):
+		DisplayServer.screen_set_orientation(
+			DisplayServer.SCREEN_LANDSCAPE
+			if landscape_mode
+			else DisplayServer.SCREEN_SENSOR
+		)
+	if OS.has_feature("web"):
+		_request_web_orientation(&"landscape" if landscape_mode else &"")
+
+
+func _request_web_orientation(orientation: StringName) -> void:
 	var script: String = ""
-	if portrait:
+	if orientation != &"":
+		var web_orientation: String = (
+			"portrait-primary"
+			if orientation == &"portrait"
+			else "landscape-primary"
+		)
 		script = (
 			"(async function () {"
 			+ "try {"
@@ -280,7 +305,9 @@ func _request_web_orientation(portrait: bool) -> void:
 			+ "} catch (error) {}"
 			+ "try {"
 			+ "if (screen.orientation && screen.orientation.lock) {"
-			+ "await screen.orientation.lock('portrait-primary');"
+			+ "await screen.orientation.lock('"
+			+ web_orientation
+			+ "');"
 			+ "}"
 			+ "} catch (error) {}"
 			+ "})();"
@@ -294,7 +321,14 @@ func _request_web_orientation(portrait: bool) -> void:
 	JavaScriptBridge.eval(script)
 
 
-func request_phone_orientation() -> void:
-	if not phone_mode or not OS.has_feature("web"):
+func request_current_orientation() -> void:
+	if not OS.has_feature("web"):
 		return
-	_request_web_orientation(true)
+	if phone_mode:
+		_request_web_orientation(&"portrait")
+	elif landscape_mode:
+		_request_web_orientation(&"landscape")
+
+
+func request_phone_orientation() -> void:
+	request_current_orientation()
