@@ -131,6 +131,10 @@ func _build_slots() -> void:
             if index < 3
             else "Charakoro"
         )
+        # The rolled result is communicated by the face artwork itself.
+        # Keep type and orientation names available as tooltips only so the
+        # battle table stays visual and language independent.
+        label.visible = false
         box.add_child(label)
 
         _icon_rows.append(icon_row)

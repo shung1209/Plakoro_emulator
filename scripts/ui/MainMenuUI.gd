@@ -3,6 +3,10 @@ extends Control
 
 const DISPLAY_VERSION: String = "V2.3"
 
+const QUIT_DIALOG_LAYOUT: Script = preload(
+	"res://scripts/ui/QuitConfirmationLayout.gd"
+)
+
 
 const PLAKORO_THEME: Script = preload(
 	"res://scripts/ui/theme/PlakoroThemeFactory.gd"
@@ -322,6 +326,7 @@ func _apply_localized_text() -> void:
 		"common.cancel",
 		"Cancel"
 	)
+	QUIT_DIALOG_LAYOUT.apply(quit_confirmation)
 	delete_save_confirmation.title = LocalizationService.tr_key(
 		"delete_save.title",
 		"Delete Save File?"
@@ -433,7 +438,7 @@ func _reload_for_theme() -> void:
 
 
 func _request_quit() -> void:
-	quit_confirmation.popup_centered()
+	QUIT_DIALOG_LAYOUT.popup(quit_confirmation)
 
 
 func _confirm_quit() -> void:

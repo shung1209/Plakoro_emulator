@@ -25,6 +25,9 @@ const AI_LOADOUT_DATA: Script = preload(
 const AI_LOADOUT_SAVE: Script = preload(
     "res://scripts/loadout/AIBattleLoadoutSaveService.gd"
 )
+const AI_LOADOUT_STRATEGY: Script = preload(
+    "res://scripts/ai/AILoadoutStrategyService.gd"
+)
 
 
 const PLAYER_LOADOUT_PATH: String = (
@@ -450,15 +453,7 @@ static func create_playtest_opponent_loadout(
     )
     var raw_move_ids: Array[String] = []
 
-    if selected_move_ids.is_empty():
-        for move_id: String in available_move_ids:
-            raw_move_ids.append(
-                move_id
-            )
-
-            if raw_move_ids.size() == 4:
-                break
-    else:
+    if not selected_move_ids.is_empty():
         var selected_move_names: Dictionary = {}
 
         for raw_selected_id: String in selected_move_ids:
@@ -507,7 +502,7 @@ static func create_playtest_opponent_loadout(
                 selected_id
             )
 
-    if raw_move_ids.size() != 4:
+    if not raw_move_ids.is_empty() and raw_move_ids.size() != 4:
         return {
             "success": false,
             "errors": [
@@ -515,38 +510,24 @@ static func create_playtest_opponent_loadout(
             ]
         }
 
-    var dice_path: String = (
-        get_pokemon_default_dice_path(pokemon)
-        if GameFlow.free_mode
-        else _find_dice_setup_path(
-            pokemon,
-            false
-        )
+    var strategy: Dictionary = AI_LOADOUT_STRATEGY.build(
+        pokemon,
+        difficulty,
+        raw_move_ids
     )
-
-    if dice_path.is_empty():
+    if not bool(strategy.get("success", false)):
         return {
             "success": false,
-            "errors": [
-                "No compatible Enerkoro setup was found for opponent "
-                + normalized_id
-            ]
+            "errors": strategy.get(
+                "errors",
+                ["Opponent AI strategy could not be generated."]
+            )
         }
 
-    var dice_setup: Variant = (
-        ENERGY_SETUP_LOADER.load_setup(
-            dice_path
-        )
-    )
-
-    if dice_setup == null:
-        return {
-            "success": false,
-            "errors": [
-                "Opponent Enerkoro setup could not be loaded: "
-                + dice_path
-            ]
-        }
+    raw_move_ids.clear()
+    for raw_move_id: Variant in strategy.get("move_ids", []):
+        raw_move_ids.append(String(raw_move_id))
+    var dice_setup: Variant = strategy.get("energy_dice_setup", null)
 
     var loadout: Variant = (
         AI_LOADOUT_DATA.new()
@@ -560,6 +541,7 @@ static func create_playtest_opponent_loadout(
         normalized_id
     )
     loadout.difficulty = difficulty
+    loadout.uses_difficulty_dice = true
 
     for index: int in range(4):
         loadout.move_card_ids.append(
@@ -593,7 +575,15 @@ static func create_playtest_opponent_loadout(
         "success": true,
         "pokemon_id": normalized_id,
         "move_ids": loadout.move_card_ids,
-        "dice_path": dice_path,
+        "dice_path": "generated://ai/" + String(difficulty),
+        "main_energy": String(strategy.get("main_energy", "")),
+        "main_energy_faces_per_die": int(
+            strategy.get("main_energy_faces_per_die", 0)
+        ),
+        "move_success_probabilities": strategy.get(
+            "move_success_probabilities",
+            {}
+        ),
         "difficulty": String(
             difficulty
         ),
