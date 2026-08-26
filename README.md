@@ -1,4 +1,4 @@
-# PLAKORO Adventures v2.3
+# PLAKORO Adventures v2.3 Hotfix
 
 [English](#english) | [繁體中文](#繁體中文)
 
@@ -13,13 +13,16 @@ two ways to play.
 Choose a Plakoro, build three Enerkoro, select four Moves, roll the dice, and
 advance through the arena.
 
-## What's in v2.3
+## What's in v2.3 Hotfix
 
 - Story Mode with New Game, Continue, save deletion, a randomized encounter
   route unique to each save, battle rewards, collection unlocks, and Plakoro
   levels up to LV5.
 - Free Mode with all playable content available for unrestricted battles and
   expanded Enerkoro rules.
+- Phone Mode with dedicated portrait menus, simplified preparation and
+  Loadout scenes, a vertical Enerkoro Builder, and a focused touch-first
+  battle flow.
 - 21 Pokémon, 126 Move cards, and 9 custom Kyokoro weight profiles.
 - New Gengar, Lucario, and Metagross data, Moves, images, and default dice
   setups.
@@ -30,6 +33,21 @@ advance through the arena.
 - Battle presentation improvements, attack feedback, UI motion, clearer dice
   results, Kyokoro orientation effects, and an animated pre-battle coin toss
   that determines whether the player or opponent takes the first turn.
+- Step-by-step battle resolution: Enerkoro is checked first, Charakoro is
+  checked only after the Energy requirement succeeds, weakness is applied,
+  and the final attack result is then presented.
+- Icon-driven battle information for Pokémon types, weaknesses, Energy,
+  Enerkoro results, and Charakoro orientations.
+- Difficulty-aware AI Loadouts. Easy, Normal, and Hard AI use approximately
+  3/6, 4/6, and 5/6 main-Energy faces per die respectively. Automatic AI
+  Loadouts select four compatible Moves by success rate, damage, and effect
+  synergy; Free Mode preserves manually selected AI Moves while generating
+  difficulty-appropriate dice.
+- Responsive Web layouts with portrait Phone Mode, landscape guidance for the
+  full interface, fullscreen/orientation fallback handling, and scrollbars
+  that remain hidden when scrolling is unnecessary.
+- Consistent multilingual quit-confirmation dialogs whose dimensions no
+  longer change with the interface language.
 - Windows, Linux, and Web/itch.io export presets.
 - English, Traditional Chinese, Spanish (Spain), and Japanese interfaces.
 - Bundled Noto Sans TC and Noto Sans JP fonts for reliable CJK display.
@@ -61,6 +79,18 @@ Free Mode opens the full roster for immediate play. Choose the player and AI
 Plakoro, configure four Moves, edit Enerkoro directly, and battle without Story
 Mode progression restrictions. Free Mode also supports repeated Fixed Energy
 when enabled in the Enerkoro Builder.
+
+### Phone Mode
+
+Phone Mode provides separate Story and Free Mode entry points in a portrait
+layout. Its preparation flow focuses on choosing a Pokémon, selecting four
+Moves, editing three vertically arranged Enerkoro, validating the Loadout, and
+starting battle without desktop-only analysis panels.
+
+During battle, the player selects a Move, views the dice roll, and then sees
+staged Enerkoro, Charakoro, weakness, and attack confirmation before the
+attack animation. If the Energy requirement fails, Charakoro resolution is
+skipped.
 
 ### Content Studio
 
@@ -94,6 +124,11 @@ Move cards, and Loadout coverage. Configure the player Plakoro and Moves, edit
 Enerkoro, then start the battle when the Loadout is valid. The opponent's
 Loadout remains hidden before combat.
 
+AI difficulty changes both its Enerkoro and selected Move combination. Easy AI
+uses a lower main-Energy concentration, while Normal and Hard progressively
+improve Energy consistency and prioritize Move sets with better coverage and
+compatible effects.
+
 ### Enerkoro Builder
 
 Select a face to remove or replace its Energy. The game checks every setup
@@ -104,7 +139,9 @@ Preparation.
 ### Battle
 
 The battle screen presents both combatants, HP, dice results, Charakoro
-orientation, Move cards, action feedback, and an optional technical timeline.
+orientation icons, Move cards, action feedback, and an optional technical
+timeline. Enerkoro and Charakoro results are revealed one step at a time; a
+failed Energy check immediately stops Charakoro validation.
 Before turn one, an animated coin toss chooses whether the player or opponent
 acts first. Select a Move card to attack. Select the opponent Charakoro during
 battle to inspect its revealed Moves in a separate window.
@@ -193,12 +230,14 @@ V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險�
 選擇一隻 Plakoro、配置三顆 Enerkoro、挑選四個招式、擲出骰子，然後在
 競技場中一路前進。
 
-## v2.3 收錄內容
+## v2.3 Hotfix 收錄內容
 
 - Story Mode 提供 New Game、Continue、刪除存檔、每份存檔獨立的隨機
   故事路線、戰鬥獎勵、收藏解鎖，以及最高 LV5 的 Plakoro 等級。
 - Free Mode 開放所有可玩內容，讓玩家自由對戰，並提供較寬鬆的 Enerkoro
   規則。
+- Phone Mode 提供專用直立主選單、簡化版對戰準備與 Loadout 場景、垂直排列
+  的 Enerkoro Builder，以及適合觸控操作的精簡戰鬥流程。
 - 收錄 21 隻 Pokémon、126 張招式卡及 9 組自訂 Kyokoro 權重設定。
 - 新增 Gengar、Lucario 及 Metagross 的資料、招式、圖片與預設骰子配置。
 - 可使用玩家目前擁有的 Energy 自由配置三顆 Enerkoro。
@@ -206,6 +245,17 @@ V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險�
   骰面、效果、傷害及成功率。
 - 提供 Warm 與 Dark 兩種介面主題，並以不同按鈕色彩區分操作用途。
 - 改善戰鬥演出、攻擊回饋、介面動態效果、擲骰結果及 Kyokoro 方位效果。
+- 戰鬥採用逐步結算：先確認 Enerkoro，成功後才確認 Charakoro，接著套用
+  弱點並顯示最終攻擊結果；Energy 不足時會直接略過 Charakoro 判定。
+- Pokémon 屬性、弱點、Energy、Enerkoro 結果及 Charakoro 方位均以圖示為主，
+  減少不同語言造成的版面擁擠。
+- AI Loadout 會依難度產生不同的 Enerkoro 與招式組合。簡單、普通、困難
+  AI 每顆骰子的主能量面約為 3/6、4/6、5/6，並依成功率、傷害及效果配合度
+  自動挑選四個招式。Free Mode 手動指定 AI 招式時會保留選擇，只依難度
+  重新配置骰子。
+- Web 介面支援響應式版面、Phone Mode 直立顯示、完整介面的橫向提示、
+  全螢幕／方向鎖定 fallback，以及只在需要時顯示的 scrollbar。
+- 所有語言共用一致的離開遊戲確認視窗尺寸，切換語言時不再改變長寬。
 - 戰鬥前會擲出具有翻面動畫的硬幣，依 HEADS／TAILS 決定玩家或
   對手先攻。
 - 提供 Windows、Linux 與 Web／itch.io 匯出設定。
@@ -239,6 +289,16 @@ Free Mode 會立即開放完整角色陣容。玩家可以選擇自己與 AI 使
 進行對戰。啟用 Enerkoro Builder 中的選項後，Free Mode 也允許不同
 Enerkoro 使用重複的固定 Energy。
 
+### Phone Mode（手機模式）
+
+Phone Mode 提供獨立的 Story Mode 與 Free Mode 入口，並以直立介面呈現。
+對戰準備只保留選擇 Pokémon、挑選四個招式、編輯三顆垂直排列的 Enerkoro、
+Loadout 驗證及開始對戰等必要功能，不顯示桌面版的分析資訊。
+
+戰鬥時會依序呈現招式選擇、擲骰、Enerkoro 確認、Charakoro 確認、弱點與
+最終攻擊結果，再進入攻擊動畫。Enerkoro 能量不足時會直接略過 Charakoro
+判定。
+
 ### Content Studio（內容工作室）
 
 Content Studio 在一般遊玩時會保持隱藏，讓主選單專注於遊戲體驗。在主選單
@@ -269,6 +329,10 @@ Content Studio 在一般遊玩時會保持隱藏，讓主選單專注於遊戲�
 設定玩家 Plakoro 與招式、編輯 Enerkoro，並在 Loadout 通過檢查後開始
 對戰。戰鬥開始前不會公開對手的 Loadout。
 
+AI 難度會同時影響 Enerkoro 與招式組合。簡單 AI 的主能量集中度較低；
+普通與困難 AI 會逐步提高能量穩定度，並優先選擇覆蓋率較高、效果能互相
+配合的招式。
+
 ### Enerkoro Builder
 
 選擇一個骰面即可移除或替換其中的 Energy。系統會依照玩家持有的 Energy
@@ -277,9 +341,11 @@ Content Studio 在一般遊玩時會保持隱藏，讓主選單專注於遊戲�
 
 ### 對戰
 
-對戰畫面會顯示雙方 Plakoro、HP、擲骰結果、Charakoro 方位、招式卡、
-行動回饋及可選用的技術時間軸。第一回合開始前，會擲硬幣決定玩家或對手
-先攻。選擇招式卡即可發動攻擊；戰鬥中選擇對手的 Charakoro，可在獨立視窗
+對戰畫面會顯示雙方 Plakoro、HP、擲骰結果、Charakoro 方位圖示、招式卡、
+行動回饋及可選用的技術時間軸。Enerkoro 與 Charakoro 結果會逐步出現；
+Energy 判定失敗時會立即停止 Charakoro 驗證。第一回合開始前，會擲硬幣
+決定玩家或對手先攻。選擇招式卡即可發動攻擊；戰鬥中選擇對手的
+Charakoro，可在獨立視窗
 查看已公開的招式。
 
 ### 戰鬥報告
