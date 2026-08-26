@@ -121,8 +121,11 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var resolution_mode_label: Label = $Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/ResolutionModeBox/ResolutionModeLabel
 @onready var moves_title: Label = $Margin/Main/ContentScroll/Content/Body/LeftColumn/MovesPanel/MovesBox/MovesTitle
 @onready var dice_title: Label = $Margin/Main/ContentScroll/Content/Body/RightColumn/DicePanel/DiceBox/DiceTitle
-@onready var coverage_title: Label = $Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/CoverageTitle
-@onready var move_coverage_title: Label = $Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/MoveCoverageTitle
+@onready var coverage_title: Label = %CoverageTitle
+@onready var analysis_header: BoxContainer = %AnalysisHeader
+@onready var move_coverage_title: Label = %MoveCoverageTitle
+@onready var analysis_columns: BoxContainer = %AnalysisColumns
+@onready var analysis_divider: VSeparator = %AnalysisDivider
 @onready var setup_hint: Label = $BattleSetupDialog/SetupRoot/SetupHint
 @onready var player_setup_title: Label = $BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerSetupTitle
 @onready var player_move_hint: Label = $BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerMoveHeader/PlayerMoveHint
@@ -151,7 +154,8 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var loadout_signature_label: Label = %LoadoutSignatureLabel
 @onready var validation_label: Label = %ValidationLabel
 @onready var resolution_mode_option: OptionButton = %ResolutionModeOption
-@onready var move_draft_status_label: Label = %MoveDraftStatusLabel
+@onready var move_config_toast: PanelContainer = %MoveConfigToast
+@onready var move_config_toast_label: Label = %MoveConfigToastLabel
 
 @onready var opponent_name_label: Label = %OpponentNameLabel
 @onready var opponent_loadout_label: Label = %OpponentLoadoutLabel
@@ -159,7 +163,6 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var opponent_weakness_label: HBoxContainer = %OpponentWeaknessLabel
 @onready var opponent_portrait_container: VBoxContainer = %OpponentPortraitContainer
 
-@onready var refresh_button: Button = %RefreshButton
 @onready var edit_dice_button: Button = %EditDiceButton
 @onready var start_battle_button: Button = %StartBattleButton
 @onready var main_menu_button: Button = %MainMenuButton
@@ -189,9 +192,14 @@ var setup_move_hover_owner: Control = null
 var setup_move_hover_candidate: Control = null
 var setup_move_hover_request_serial: int = 0
 var setup_move_hover_anchor_mouse_position: Vector2i = Vector2i.ZERO
+var move_config_toast_tween: Tween = null
 
 const SETUP_MOVE_HOVER_DELAY_SECONDS: float = 1.0
 const SETUP_MOVE_HOVER_DISMISS_DISTANCE: float = 72.0
+const MOVE_CONFIG_TOAST_HOLD_SECONDS: float = 1.8
+const MOVE_CONFIG_TOAST_FADE_SECONDS: float = 0.45
+const PREPARATION_PORTRAIT_SIZE: float = 160.0
+const PREPARATION_PORTRAIT_SLOT_SIZE: float = 136.0
 
 
 func _ready() -> void:
@@ -215,9 +223,6 @@ func _ready() -> void:
 	# and start the scrollable content at the top.
 	content_scroll.scroll_vertical = 0
 
-	refresh_button.pressed.connect(
-		_reload_database_and_loadout
-	)
 	edit_dice_button.pressed.connect(
 		_open_energy_dice_builder
 	)
@@ -301,7 +306,6 @@ func _on_locale_changed(
 	if player_loadout_data != null:
 		_refresh_loadout_summary()
 		_refresh_opponent_summary()
-		_refresh_move_draft_status()
 		_refresh_validation()
 
 
@@ -321,10 +325,6 @@ func _apply_localized_text() -> void:
 	content_studio_button.text = LocalizationService.tr_key(
 		"preparation.content_studio",
         "Content Studio"
-	)
-	refresh_button.text = LocalizationService.tr_key(
-		"preparation.refresh",
-        "Refresh"
 	)
 	edit_dice_button.text = LocalizationService.tr_key(
 		"preparation.edit_enerkoro",
@@ -500,11 +500,6 @@ func _apply_responsive_layout() -> void:
 	)
 
 	RESPONSIVE_UI.apply_button(
-		refresh_button,
-		profile,
-		132
-	)
-	RESPONSIVE_UI.apply_button(
 		edit_dice_button,
 		profile,
 		165
@@ -531,6 +526,20 @@ func _apply_responsive_layout() -> void:
 		get_viewport_rect().size.x,
 		0.50
 	)
+
+	var stack_analysis: bool = (
+		profile == RESPONSIVE_PROFILE.PROFILE_HANDHELD
+	)
+	analysis_columns.vertical = stack_analysis
+	analysis_divider.visible = not stack_analysis
+	analysis_header.vertical = stack_analysis
+	var status_alignment: HorizontalAlignment = (
+		HORIZONTAL_ALIGNMENT_LEFT
+		if stack_analysis
+		else HORIZONTAL_ALIGNMENT_RIGHT
+	)
+	loadout_status_label.horizontal_alignment = status_alignment
+	loadout_signature_label.horizontal_alignment = status_alignment
 
 
 func _open_battle_setup() -> void:
@@ -2056,26 +2065,13 @@ func _apply_battle_setup() -> bool:
 		"preparation.setup_applied",
         "Battle setup applied successfully. Review the summary or start the battle."
 	)
+	_show_move_config_toast(
+		LocalizationService.tr_key(
+			"preparation.move_config_saved",
+			"Move Configuration: [OK] Saved Loadout"
+		)
+	)
 	return true
-
-
-func _reload_database_and_loadout() -> void:
-	if database == null:
-		validation_label.text = (
-			LocalizationService.tr_key("preparation.database_unavailable", "Database service is unavailable.")
-		)
-		start_battle_button.disabled = true
-		return
-
-	if not database.load_all():
-		validation_label.text = LocalizationService.tr_key(
-			"preparation.database_reload_failed",
-            "Database reload failed. Check recently edited JSON files."
-		)
-		start_battle_button.disabled = true
-		return
-
-	_reload_loadout()
 
 
 func _reload_loadout() -> void:
@@ -2110,7 +2106,6 @@ func _reload_loadout() -> void:
 
 	_refresh_loadout_summary()
 	_refresh_opponent_summary()
-	_refresh_move_draft_status()
 	_refresh_validation()
 
 
@@ -2293,6 +2288,7 @@ func _refresh_hero_plakoro(
 	var portrait: Control = (
 		PLAKORO_PORTRAIT.instantiate()
 	)
+	_apply_preparation_portrait_size(portrait)
 
 	portrait.size_flags_horizontal = (
 		Control.SIZE_SHRINK_CENTER
@@ -2303,8 +2299,24 @@ func _refresh_hero_plakoro(
 	)
 
 	portrait.setup(
-		pokemon
+		pokemon,
+		true
 	)
+
+
+func _apply_preparation_portrait_size(portrait: Control) -> void:
+	portrait.custom_minimum_size = Vector2(
+		PREPARATION_PORTRAIT_SIZE,
+		PREPARATION_PORTRAIT_SIZE
+	)
+	var visual_slot: Control = portrait.get_node_or_null(
+		"VisualSlot"
+	) as Control
+	if visual_slot != null:
+		visual_slot.custom_minimum_size = Vector2(
+			PREPARATION_PORTRAIT_SLOT_SIZE,
+			PREPARATION_PORTRAIT_SLOT_SIZE
+		)
 
 
 func _refresh_moves() -> void:
@@ -2982,21 +2994,40 @@ func _refresh_opponent_portrait(pokemon: Variant) -> void:
 		return
 
 	var portrait: Control = PLAKORO_PORTRAIT.instantiate()
-	portrait.custom_minimum_size = Vector2(100, 100)
+	_apply_preparation_portrait_size(portrait)
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	opponent_portrait_container.add_child(portrait)
-	portrait.setup(pokemon)
+	portrait.setup(pokemon, true)
 
 
-func _refresh_move_draft_status() -> void:
-	if MOVE_DRAFT_PROVIDER.has_draft():
-		move_draft_status_label.text = (
-			LocalizationService.tr_key("preparation.move_config_draft", "Move Configuration:  |  Draft Active")
-		)
-	else:
-		move_draft_status_label.text = (
-			LocalizationService.tr_key("preparation.move_config_saved", "Move Configuration: [OK] Saved Loadout")
-		)
+func _show_move_config_toast(message: String) -> void:
+	if message.is_empty():
+		return
+
+	if (
+		move_config_toast_tween != null
+		and move_config_toast_tween.is_valid()
+	):
+		move_config_toast_tween.kill()
+
+	move_config_toast_label.text = message
+	move_config_toast.modulate.a = 1.0
+	move_config_toast.visible = true
+
+	move_config_toast_tween = create_tween()
+	move_config_toast_tween.tween_interval(
+		MOVE_CONFIG_TOAST_HOLD_SECONDS
+	)
+	move_config_toast_tween.tween_property(
+		move_config_toast,
+		"modulate:a",
+		0.0,
+		MOVE_CONFIG_TOAST_FADE_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	move_config_toast_tween.tween_callback(
+		func() -> void:
+			move_config_toast.visible = false
+	)
 
 
 func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:

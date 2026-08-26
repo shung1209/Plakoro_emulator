@@ -127,6 +127,31 @@ static func set_enerkoro_color_type(index: int, color_type: String) -> void:
 	config.save(SETTINGS_PATH)
 
 
+static func get_enerkoro_background_color(color_type: StringName) -> Color:
+	# Dark, saturated colors keep white Energy labels readable and match the
+	# physical dice color shown by the battle roll presentation.
+	match color_type:
+		&"fire":
+			return Color("7a2434")
+		&"water":
+			return Color("17517f")
+		&"grass":
+			return Color("265f3b")
+		&"electric":
+			return Color("6b5714")
+		&"psychic":
+			return Color("70275f")
+		&"fighting":
+			return Color("7b431f")
+		&"dark":
+			return Color("342a4f")
+		&"steel":
+			return Color("4f596b")
+		&"flying":
+			return Color("275b6b")
+	return get_color("surface_elevated")
+
+
 static func get_free_mode_allow_repeated_fixed_energy() -> bool:
 	var config := ConfigFile.new()
 	if config.load(SETTINGS_PATH) != OK:
@@ -383,12 +408,12 @@ static func _configure_separators(theme: Theme) -> void:
 
 static func _configure_scrollbars(theme: Theme) -> void:
 	var grabber := StyleBoxFlat.new()
-	grabber.bg_color = Color(get_color("border_hover"), 0.9)
+	grabber.bg_color = Color(get_color("border_hover"), 0.58)
 	grabber.set_corner_radius_all(5)
 	var grabber_hover: StyleBoxFlat = grabber.duplicate()
-	grabber_hover.bg_color = get_color("accent")
+	grabber_hover.bg_color = Color(get_color("accent"), 0.78)
 	var scroll := StyleBoxFlat.new()
-	scroll.bg_color = Color(get_color("border"), 0.38)
+	scroll.bg_color = Color(get_color("border"), 0.12)
 	scroll.set_corner_radius_all(5)
 	for type_name in ["VScrollBar", "HScrollBar"]:
 		theme.set_stylebox("scroll", type_name, scroll)

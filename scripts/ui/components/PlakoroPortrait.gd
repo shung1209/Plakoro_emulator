@@ -6,16 +6,29 @@ const PRESENTATION: Script = preload(
 
 @onready var visual_slot: Control = %VisualSlot
 
-func setup(pokemon: Variant) -> void:
+func setup(
+    pokemon: Variant,
+    compact: bool = false
+) -> void:
     if not is_node_ready():
         await ready
     if pokemon == null:
-        PRESENTATION.present(visual_slot, &"", "Unknown PLAKORO")
+        PRESENTATION.present(
+            visual_slot,
+            &"",
+            "Unknown PLAKORO",
+            compact
+        )
         return
 
     var pokemon_id: StringName = StringName(_get_property(pokemon, &"id", &""))
     var display_name: String = String(_get_property(pokemon, &"display_name", pokemon_id))
-    PRESENTATION.present(visual_slot, pokemon_id, display_name)
+    PRESENTATION.present(
+        visual_slot,
+        pokemon_id,
+        display_name,
+        compact
+    )
 
 static func _get_property(object: Variant, property_name: StringName, default_value: Variant) -> Variant:
     if object == null:

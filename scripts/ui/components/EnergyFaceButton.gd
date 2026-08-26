@@ -7,6 +7,9 @@ const ICONS: Script = preload(
 const SPLIT_FACE_ICON: Script = preload(
     "res://scripts/ui/components/EnergySplitFaceIcon.gd"
 )
+const THEME_FACTORY: Script = preload(
+    "res://scripts/ui/theme/PlakoroThemeFactory.gd"
+)
 
 
 signal edit_requested(
@@ -23,6 +26,7 @@ var face_kind: StringName = &""
 
 var primary_energy: StringName = &""
 var secondary_energy: StringName = &""
+var invalid: bool = false
 
 var _content_box: VBoxContainer = null
 var _kind_text_label: Label = null
@@ -56,6 +60,11 @@ func set_energy(
     refresh_visual()
 
 
+func set_invalid(value: bool) -> void:
+    invalid = value
+    _refresh_validation_style()
+
+
 func refresh_visual() -> void:
     _ensure_custom_content()
     _rebuild_energy_icons()
@@ -84,6 +93,40 @@ func refresh_visual() -> void:
                 "Click to edit this face. {energy}"
             )
         )
+    _refresh_validation_style()
+
+
+func _refresh_validation_style() -> void:
+    if not invalid:
+        for state: StringName in [
+            &"normal", &"hover", &"pressed", &"focus"
+        ]:
+            remove_theme_stylebox_override(state)
+        return
+
+    var normal: StyleBoxFlat = _invalid_style(0.42)
+    var hover: StyleBoxFlat = _invalid_style(0.56)
+    var pressed: StyleBoxFlat = _invalid_style(0.68)
+    add_theme_stylebox_override("normal", normal)
+    add_theme_stylebox_override("hover", hover)
+    add_theme_stylebox_override("pressed", pressed)
+    add_theme_stylebox_override("focus", hover)
+
+
+func _invalid_style(alpha: float) -> StyleBoxFlat:
+    var style: StyleBoxFlat = StyleBoxFlat.new()
+    style.bg_color = Color(
+        THEME_FACTORY.get_color("danger"),
+        alpha
+    )
+    style.border_color = THEME_FACTORY.get_color("danger")
+    style.set_border_width_all(2)
+    style.set_corner_radius_all(10)
+    style.content_margin_left = 8.0
+    style.content_margin_top = 8.0
+    style.content_margin_right = 8.0
+    style.content_margin_bottom = 8.0
+    return style
 
 
 func _ensure_custom_content() -> void:

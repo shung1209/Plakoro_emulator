@@ -183,38 +183,14 @@ layout_mode = 2
 text = "Advanced >"
 toggle_mode = true
 
-[node name="PreviewCoverageRow" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content"]
+[node name="PreviewCoverageRow" type="BoxContainer" parent="Margin/Main/ContentScroll/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 14
 visible = false
 
-[node name="PreviewPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow"]
-custom_minimum_size = Vector2(620, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="PreviewBox" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="DiceIconPreviewTitle" type="Label" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel/PreviewBox"]
-custom_minimum_size = Vector2(0, 34)
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Energy Preview"
-vertical_alignment = 2
-
-[node name="DiceIconPreviewContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel/PreviewBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-alignment = 1
-theme_override_constants/separation = 12
-
 [node name="CoveragePanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow"]
-custom_minimum_size = Vector2(560, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -242,30 +218,22 @@ columns = 2
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
 
-[node name="SummarySplit" type="HSplitContainer" parent="Margin/Main/ContentScroll/Content"]
-unique_name_in_owner = true
+[node name="ProbabilityPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 210)
-split_offset = 560
-visible = false
+size_flags_horizontal = 3
 
-[node name="ValidationPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/SummarySplit"]
-layout_mode = 2
-
-[node name="ValidationLabel" type="Label" parent="Margin/Main/ContentScroll/Content/SummarySplit/ValidationPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-autowrap_mode = 2
-text = "Setup Validation"
-
-[node name="ProbabilityPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/SummarySplit"]
-layout_mode = 2
-
-[node name="ProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/SummarySplit/ProbabilityPanel"]
+[node name="ProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/PreviewCoverageRow/ProbabilityPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 text = "Energy Probability"
+
+[node name="ValidationLabel" type="Label" parent="Margin/Main/ContentScroll/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+autowrap_mode = 2
+text = "Setup Validation"
 
 [node name="Actions" type="HBoxContainer" parent="Margin/Main"]
 custom_minimum_size = Vector2(0, 52)

@@ -47,12 +47,10 @@ func _apply_node(node: Node) -> void:
 	if node is ScrollContainer:
 		_bound[id] = true
 		var scroll_container: ScrollContainer = node as ScrollContainer
-		# Web users should always have a visible, draggable vertical scrollbar
-		# whenever the container is configured for vertical scrolling. This is
-		# much easier to operate with a mouse or a thumb in landscape mode than
-		# relying only on wheel/touch gestures.
+		# Preserve each scene's AUTO/ALWAYS policy. AUTO keeps the bar hidden
+		# when all content fits, while explicitly configured long lists may still
+		# choose SHOW_ALWAYS for mouse/touch operation.
 		if scroll_container.vertical_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED:
-			scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_ALWAYS
 			var vertical_bar: VScrollBar = scroll_container.get_v_scroll_bar()
 			if vertical_bar != null:
 				vertical_bar.custom_minimum_size.x = maxf(
