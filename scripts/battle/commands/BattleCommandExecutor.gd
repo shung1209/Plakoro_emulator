@@ -59,15 +59,19 @@ static func execute_command(
                 requested_amount
             )
 
-            turn_result.applied_damage += applied_amount
+            var is_self_damage: bool = (
+                StringName(command.source_participant_id)
+                == StringName(command.target_participant_id)
+            )
+            # applied_damage represents damage dealt to an opposing target.
+            # Recoil/self-damage is tracked separately below and must not be
+            # added to attack feedback, timeline, history, or replay totals.
+            if not is_self_damage:
+                turn_result.applied_damage += applied_amount
 
             if (
                 applied_amount > 0
-                and StringName(
-                    command.source_participant_id
-                ) == StringName(
-                    command.target_participant_id
-                )
+                and is_self_damage
                 and turn_result.has_method(
                     "add_resolution_self_damage_event"
                 )
