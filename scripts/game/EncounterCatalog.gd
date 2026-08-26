@@ -142,6 +142,7 @@ static func _build_encounter(pokemon_id: String, stage_number: int) -> Dictionar
 		"difficulty": _difficulty_for_stage(stage_number),
 		"dice_path": DICE_DIRECTORY.path_join(species_id + "_default.json"),
 		"move_ids": selected_move_ids,
+		"available_move_ids": reward_move_ids,
 		"reward_move_ids": reward_move_ids
 	}
 

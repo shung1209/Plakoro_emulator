@@ -1,5 +1,9 @@
 extends Node
 
+const QUIT_DIALOG_LAYOUT: Script = preload(
+    "res://scripts/ui/QuitConfirmationLayout.gd"
+)
+
 var confirmation: ConfirmationDialog = null
 
 
@@ -26,7 +30,7 @@ func _notification(what: int) -> void:
     if confirmation == null or confirmation.visible:
         return
     _apply_localized_text()
-    confirmation.popup_centered()
+    QUIT_DIALOG_LAYOUT.popup(confirmation)
 
 
 func _apply_localized_text() -> void:
@@ -49,6 +53,7 @@ func _apply_localized_text() -> void:
         "common.cancel",
         "Cancel"
     )
+    QUIT_DIALOG_LAYOUT.apply(confirmation)
 
 
 func _on_locale_changed(

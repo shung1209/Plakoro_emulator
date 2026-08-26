@@ -16,6 +16,9 @@ const USER_DATABASE: Script = preload(
 const POKEMON_AUTHORING: Script = preload(
     "res://scripts/content/PokemonAuthoringService.gd"
 )
+const AI_LOADOUT_STRATEGY: Script = preload(
+    "res://scripts/ai/AILoadoutStrategyService.gd"
+)
 
 
 const USER_LOADOUT_PATH: String = (
@@ -63,8 +66,7 @@ static func load_ai_loadout() -> Variant:
         )
 
         if saved_loadout != null:
-            if GameFlow.free_mode:
-                _apply_free_mode_pokemon_default_dice(saved_loadout)
+            _apply_difficulty_strategy(saved_loadout, true)
             return saved_loadout
 
     return create_default_ai_loadout()
@@ -106,6 +108,9 @@ static func create_default_ai_loadout() -> Variant:
     result.pokemon_id = &"squirtle_standard"
     result.difficulty = &"hard"
 
+    if _apply_difficulty_strategy(result, false):
+        return result
+
     for move_id: StringName in DEFAULT_MOVE_IDS:
         result.move_card_ids.append(move_id)
 
@@ -116,3 +121,34 @@ static func create_default_ai_loadout() -> Variant:
     )
 
     return result
+
+
+static func _apply_difficulty_strategy(
+    loadout: Variant,
+    preserve_selected_moves: bool
+) -> bool:
+    if loadout == null:
+        return false
+    var pokemon: Dictionary = POKEMON_AUTHORING.load_by_id(
+        String(loadout.pokemon_id)
+    )
+    if pokemon.is_empty():
+        return false
+
+    var requested_moves: Array = []
+    if preserve_selected_moves:
+        requested_moves = loadout.move_card_ids.duplicate()
+    var strategy: Dictionary = AI_LOADOUT_STRATEGY.build(
+        pokemon,
+        StringName(loadout.difficulty),
+        requested_moves
+    )
+    if not bool(strategy.get("success", false)):
+        return false
+
+    loadout.move_card_ids.clear()
+    for raw_move_id: Variant in strategy.get("move_ids", []):
+        loadout.move_card_ids.append(StringName(raw_move_id))
+    loadout.energy_dice_setup = strategy.get("energy_dice_setup", null)
+    loadout.uses_difficulty_dice = true
+    return loadout.is_complete()

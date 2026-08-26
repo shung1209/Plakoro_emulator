@@ -14,6 +14,7 @@ var move_card_ids: Array[StringName] = []
 
 var energy_dice_setup: Variant = null
 var difficulty: StringName = &"hard"
+var uses_difficulty_dice: bool = false
 
 
 func is_complete() -> bool:
@@ -41,6 +42,7 @@ func to_dictionary() -> Dictionary:
         "pokemon_id": String(pokemon_id),
         "move_card_ids": serialized_moves,
         "difficulty": String(difficulty),
+        "uses_difficulty_dice": uses_difficulty_dice,
         "energy_dice_setup": (
             energy_dice_setup.to_dictionary()
             if energy_dice_setup != null
@@ -65,6 +67,9 @@ static func from_dictionary(
     )
     result.difficulty = StringName(
         data.get("difficulty", "hard")
+    )
+    result.uses_difficulty_dice = bool(
+        data.get("uses_difficulty_dice", false)
     )
 
     var raw_moves: Variant = data.get(

@@ -16,6 +16,12 @@ signal phone_roll_confirmation_changed(
 const CHARAKORO_FEEDBACK: Script = preload(
 	"res://scripts/presentation/CharakoroBattleFeedbackService.gd"
 )
+const ICONS: Script = preload(
+	"res://scripts/presentation/PlakoroIconService.gd"
+)
+const QUIT_DIALOG_LAYOUT: Script = preload(
+	"res://scripts/ui/QuitConfirmationLayout.gd"
+)
 
 
 const PLAKORO_THEME: Script = preload(
@@ -215,6 +221,7 @@ const RESOLUTION_STEP_QUEUE_BUILDER: Script = preload(
 @onready var message_label: Label = %MessageLabel
 @onready var charakoro_feedback_panel: MarginContainer = %CharakoroFeedbackPanel
 @onready var charakoro_feedback_title: Label = %CharakoroFeedbackTitle
+@onready var charakoro_feedback_icon_row: HBoxContainer = %CharakoroFeedbackIconRow
 @onready var charakoro_feedback_label: Label = %CharakoroFeedbackLabel
 @onready var action_row: HBoxContainer = (
 	%ActionRow
@@ -457,6 +464,7 @@ func _apply_localized_text() -> void:
 		"common.cancel",
 		"Cancel"
 	)
+	QUIT_DIALOG_LAYOUT.apply(quit_confirmation)
 
 
 func _apply_battle_visual_style() -> void:
@@ -1078,7 +1086,7 @@ func _show_quit_confirmation() -> void:
 	if quit_confirmation.visible:
 		return
 
-	quit_confirmation.popup_centered()
+	QUIT_DIALOG_LAYOUT.popup(quit_confirmation)
 
 
 func _on_quit_confirmed() -> void:
@@ -2022,6 +2030,7 @@ func _on_move_pressed(
 		dice_result,
 		"USER"
 	)
+	await _wait_desktop_resolution_step()
 
 	if bool(
 		opponent_enerkoro_roll.get(
@@ -2061,6 +2070,7 @@ func _on_move_pressed(
 			dice_result,
 			&"player"
 		)
+		await _wait_desktop_resolution_step()
 	else:
 		_clear_charakoro_feedback()
 
@@ -2285,11 +2295,12 @@ func _execute_ai_turn() -> void:
 			"AI Charakoro feedback"
 		)
 	)
-
-	_refresh_current_energy_state(
-		feedback_move_card,
-		dice_result,
-		"AI"
+	var ai_energy_sufficient: bool = (
+		feedback_move_card != null
+		and ENERGY_RESOLVER.can_pay_cost(
+			feedback_move_card,
+			dice_result
+		)
 	)
 
 	# The AI dice presentation must explicitly enter the AI rolling phase.
@@ -2308,11 +2319,20 @@ func _execute_ai_turn() -> void:
 		ai_energy_profiles,
 		ai_roll_record
 	)
+	_refresh_current_energy_state(
+		feedback_move_card,
+		dice_result,
+		"AI"
+	)
+	await _wait_desktop_resolution_step()
 
-	if bool(
+	if (
+		ai_energy_sufficient
+		and bool(
 		ai_opponent_enerkoro_roll.get(
 			"generated",
 			false
+		)
 		)
 	):
 		await battle_dice_roll_presenter.play_opponent_enerkoro_result(
@@ -2327,8 +2347,11 @@ func _execute_ai_turn() -> void:
 			)
 		)
 
-	if bool(
+	if (
+		ai_energy_sufficient
+		and bool(
 		dice_result.opponent_kyokoro_roll_triggered
+		)
 	):
 		await battle_dice_roll_presenter.play_opponent_kyokoro_roll(
 			StringName(
@@ -2336,16 +2359,23 @@ func _execute_ai_turn() -> void:
 			)
 		)
 
-	if not dice_result.additional_kyokoro_orientations.is_empty():
+	if (
+		ai_energy_sufficient
+		and not dice_result.additional_kyokoro_orientations.is_empty()
+	):
 		await battle_dice_roll_presenter.play_kyokoro_sequence(
 			dice_result.additional_kyokoro_orientations
 		)
 
-	_show_charakoro_feedback(
-		feedback_move_card,
-		dice_result,
-		&"enemy"
-	)
+	if ai_energy_sufficient:
+		_show_charakoro_feedback(
+			feedback_move_card,
+			dice_result,
+			&"enemy"
+		)
+		await _wait_desktop_resolution_step()
+	else:
+		_clear_charakoro_feedback()
 
 	var move_card: Variant = (
 		RESOURCE_RECOVERY.safe_get_move(
@@ -2361,12 +2391,6 @@ func _execute_ai_turn() -> void:
 				&"ai_resolving",
 				1.0
 			)
-		var ai_energy_sufficient: bool = (
-			ENERGY_RESOLVER.can_pay_cost(
-				move_card,
-				dice_result
-			)
-		)
 		await _present_phone_roll_confirmation(
 			GameContentLocalizationService.localize_pokemon(
 				battle.state.enemy.pokemon_data
@@ -2469,11 +2493,19 @@ func _execute_ai_turn() -> void:
 func _clear_charakoro_feedback() -> void:
 	charakoro_feedback_title.text = ""
 	charakoro_feedback_label.text = ""
+	_clear_control_children(charakoro_feedback_icon_row)
+	charakoro_feedback_icon_row.visible = false
 	charakoro_feedback_panel.visible = (
 		not GameFlow.phone_mode
 		and layout_prototype != null
 		and layout_prototype.visible
 	)
+
+
+func _wait_desktop_resolution_step(seconds: float = 1.0) -> void:
+	if GameFlow.phone_mode:
+		return
+	await get_tree().create_timer(seconds).timeout
 
 
 func _present_phone_roll_confirmation(
@@ -2582,19 +2614,40 @@ func _show_charakoro_feedback(
 		{"actor": actor_text},
 		"[OK] {actor} Charakoro effect triggered"
 	)
-	charakoro_feedback_label.text = LocalizationService.tr_format(
-		"battle.charakoro_effect",
-		{
-			"effect": String(
-				feedback.get(
-					"summary",
-					""
-				)
-			)
-		},
-		"Effect: {effect}"
+	_clear_control_children(charakoro_feedback_icon_row)
+	for raw_orientation: Variant in feedback.get("orientations", []):
+		var orientation: StringName = StringName(raw_orientation)
+		var icon: TextureRect = TextureRect.new()
+		icon.texture = ICONS.load_kyokoro_icon(orientation)
+		icon.custom_minimum_size = Vector2(30, 30)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.tooltip_text = LocalizationService.tr_key(
+			"orientation." + String(orientation),
+			String(orientation).replace("_", " ").capitalize()
+		)
+		charakoro_feedback_icon_row.add_child(icon)
+	charakoro_feedback_icon_row.visible = (
+		charakoro_feedback_icon_row.get_child_count() > 0
 	)
+
+	var effect_lines: Array[String] = []
+	for raw_group: Variant in feedback.get("groups", []):
+		if not raw_group is Dictionary:
+			continue
+		var effect_text: String = String(
+			(raw_group as Dictionary).get("effect_text", "")
+		).strip_edges()
+		if not effect_text.is_empty() and not effect_lines.has(effect_text):
+			effect_lines.append(effect_text)
+	charakoro_feedback_label.text = "\n".join(effect_lines)
 	charakoro_feedback_panel.visible = not GameFlow.phone_mode
+
+
+func _clear_control_children(container: Control) -> void:
+	for child: Node in container.get_children():
+		container.remove_child(child)
+		child.queue_free()
 
 
 func _request_special_move_lock_target(

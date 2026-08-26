@@ -507,6 +507,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Charakoro Effect Triggered"
 
+[node name="CharakoroFeedbackIconRow" type="HBoxContainer" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox/CharakoroFeedbackPanel/FeedbackBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
 [node name="CharakoroFeedbackLabel" type="Label" parent="Margin/Main/Body/BattleScroll/BattleColumn/ActionRow/RollResultPanel/RollResultBox/CharakoroFeedbackPanel/FeedbackBox"]
 unique_name_in_owner = true
 layout_mode = 2

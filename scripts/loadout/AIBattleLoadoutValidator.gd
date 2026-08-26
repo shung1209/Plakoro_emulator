@@ -23,6 +23,7 @@ static func validate(
             loadout_data,
             database,
             allow_repeated_fixed_energy
+            or bool(loadout_data.uses_difficulty_dice)
         )
     )
 
