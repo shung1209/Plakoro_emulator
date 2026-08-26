@@ -1,6 +1,9 @@
 extends Control
 
 
+signal local_dice_player_selected(player_number: int)
+
+
 const PLAKORO_THEME: Script = preload(
     "res://scripts/ui/theme/PlakoroThemeFactory.gd"
 )
@@ -128,6 +131,7 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var analysis_divider: VSeparator = %AnalysisDivider
 @onready var setup_hint: Label = $BattleSetupDialog/SetupRoot/SetupHint
 @onready var player_setup_title: Label = $BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerSetupTitle
+@onready var player_setup_panel: PanelContainer = $BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel
 @onready var player_move_hint: Label = $BattleSetupDialog/SetupRoot/SetupColumns/PlayerSetupPanel/PlayerSetupBox/PlayerMoveHeader/PlayerMoveHint
 @onready var ai_setup_panel: PanelContainer = $BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel
 @onready var ai_setup_title: Label = $BattleSetupDialog/SetupRoot/SetupColumns/AISetupPanel/AISetupBox/AISetupTitle
@@ -193,6 +197,7 @@ var setup_move_hover_candidate: Control = null
 var setup_move_hover_request_serial: int = 0
 var setup_move_hover_anchor_mouse_position: Vector2i = Vector2i.ZERO
 var move_config_toast_tween: Tween = null
+var local_setup_stage: int = 0
 
 const SETUP_MOVE_HOVER_DELAY_SECONDS: float = 1.0
 const SETUP_MOVE_HOVER_DISMISS_DISTANCE: float = 72.0
@@ -250,9 +255,7 @@ func _ready() -> void:
 		_on_resolution_mode_selected
 	)
 	_populate_resolution_modes()
-	battle_setup_dialog.confirmed.connect(
-		_apply_battle_setup
-	)
+	battle_setup_dialog.confirmed.connect(_on_battle_setup_confirmed)
 	setup_player_pokemon_option.item_selected.connect(
 		func(_index: int) -> void:
 			_rebuild_setup_moves(false)
@@ -279,6 +282,8 @@ func _ready() -> void:
 		return
 
 	_reload_loadout()
+	if GameFlow.local_battle_mode:
+		call_deferred("_resume_local_battle_setup")
 
 
 
@@ -405,8 +410,8 @@ func _apply_localized_text() -> void:
         "Select 4 Moves"
 	)
 	ai_setup_title.text = LocalizationService.tr_key(
-		"preparation.ai",
-        "AI"
+		"preparation.player_two" if GameFlow.local_battle_mode else "preparation.ai",
+		"PLAYER 2" if GameFlow.local_battle_mode else "AI"
 	)
 	ai_move_hint.text = LocalizationService.tr_key(
 		"preparation.select_four_moves",
@@ -542,11 +547,22 @@ func _apply_responsive_layout() -> void:
 	loadout_signature_label.horizontal_alignment = status_alignment
 
 
-func _open_battle_setup() -> void:
+func _open_battle_setup(requested_stage: int = 0) -> void:
 	if GameFlow.phone_mode:
 		GameFlow.open_phone_battle_loadout()
 		return
+	local_setup_stage = (
+		(requested_stage if requested_stage in [1, 2] else 1)
+		if GameFlow.local_battle_mode
+		else 0
+	)
 	_prepare_battle_setup_controls()
+	if GameFlow.local_battle_mode:
+		await _present_local_setup_handoff(local_setup_stage)
+	_popup_battle_setup_dialog()
+
+
+func _popup_battle_setup_dialog() -> void:
 
 	var setup_dialog_size: Vector2i = Vector2i(1180, 720)
 	if OS.has_feature("web"):
@@ -557,6 +573,55 @@ func _open_battle_setup() -> void:
 		battle_setup_dialog.min_size = setup_dialog_size
 		battle_setup_dialog.max_size = setup_dialog_size
 	battle_setup_dialog.popup_centered(setup_dialog_size)
+
+
+func _on_battle_setup_confirmed() -> void:
+	if GameFlow.local_battle_mode:
+		if not _apply_battle_setup():
+			return
+		if local_setup_stage == 1:
+			GameFlow.local_battle_setup_phase = &"player2_loadout"
+			_open_energy_dice_builder(1)
+		else:
+			GameFlow.local_battle_setup_phase = &"ready"
+			_open_energy_dice_builder(2)
+		return
+	_apply_battle_setup()
+
+
+func _resume_local_battle_setup() -> void:
+	match GameFlow.local_battle_setup_phase:
+		&"player1_loadout":
+			_open_battle_setup(1)
+		&"player2_loadout":
+			_open_battle_setup(2)
+		&"ready":
+			_show_local_battle_ready_confirmation()
+
+
+func _show_local_battle_ready_confirmation() -> void:
+	var dialog: ConfirmationDialog = ConfirmationDialog.new()
+	dialog.title = LocalizationService.tr_key(
+		"preparation.local.ready_title",
+		"LOCAL VS READY"
+	)
+	dialog.dialog_text = LocalizationService.tr_key(
+		"preparation.local.ready_message",
+		"Both players are configured. Start the battle?"
+	)
+	dialog.ok_button_text = LocalizationService.tr_key(
+		"preparation.start_battle",
+		"Start Battle"
+	)
+	dialog.cancel_button_text = LocalizationService.tr_key("common.cancel", "Cancel")
+	add_child(dialog)
+	dialog.confirmed.connect(
+		func() -> void:
+			GameFlow.local_battle_setup_phase = &"complete"
+			GameFlow.open_battle()
+	)
+	dialog.canceled.connect(dialog.queue_free)
+	dialog.popup_centered(Vector2i(560, 220))
 
 
 func _prepare_battle_setup_controls() -> void:
@@ -605,6 +670,7 @@ func _prepare_battle_setup_controls() -> void:
 func _configure_setup_dialog_for_mode() -> void:
 	var configure_opponent: bool = GameFlow.free_mode
 	ai_setup_panel.visible = configure_opponent
+	setup_ai_difficulty_option.visible = not GameFlow.local_battle_mode
 	# Let the dialog columns determine width. Keep a bounded vertical viewport
 	# so the Move list scrolls instead of expanding the dialog content.
 	setup_player_move_scroll.custom_minimum_size.x = 0.0
@@ -620,13 +686,78 @@ func _configure_setup_dialog_for_mode() -> void:
 		"preparation.setup_hint_free"
 		if configure_opponent
 		else "preparation.setup_hint",
-		"Choose both Pokémon, their four Moves, and AI difficulty. "
-		+ "Each Pokémon automatically uses its own Default Enerkoro."
+		(
+			"Choose Player 1 and Player 2 Pokémon and four Moves. "
+			+ "Each Pokémon automatically uses its own Default Enerkoro."
+			if GameFlow.local_battle_mode
+			else "Choose both Pokémon, their four Moves, and AI difficulty. "
+			+ "Each Pokémon automatically uses its own Default Enerkoro."
+		)
 		if configure_opponent
 		else "Choose your Pokémon and four Moves. Your current "
 		+ "Enerkoro setup is used automatically. Opponent Loadout "
 		+ "stays hidden until battle."
 	)
+	_apply_local_setup_stage()
+
+
+func _apply_local_setup_stage() -> void:
+	if not GameFlow.local_battle_mode:
+		player_setup_panel.visible = true
+		return
+	player_setup_panel.visible = local_setup_stage == 1
+	ai_setup_panel.visible = local_setup_stage == 2
+	battle_setup_dialog.ok_button_text = LocalizationService.tr_key(
+		"preparation.local.next_player"
+		if local_setup_stage == 1
+		else "preparation.local.apply",
+		"NEXT: PLAYER 2" if local_setup_stage == 1 else "APPLY LOCAL VS SETUP"
+	)
+	setup_hint.text = LocalizationService.tr_format(
+		"preparation.local.configure_player",
+		{"player": local_setup_stage},
+		"Player {player}: choose a Pokémon and four Moves."
+	)
+
+
+func _present_local_setup_handoff(player_number: int) -> void:
+	var overlay: ColorRect = ColorRect.new()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.color = Color(0.025, 0.045, 0.08, 0.985)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 100
+	add_child(overlay)
+	var center: CenterContainer = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var content: VBoxContainer = VBoxContainer.new()
+	content.custom_minimum_size = Vector2(520, 250)
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.add_theme_constant_override("separation", 24)
+	center.add_child(content)
+	var title: Label = Label.new()
+	title.text = LocalizationService.tr_format(
+		"battle.local.handoff_title",
+		{"player": player_number},
+		"PASS TO PLAYER {player}"
+	)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 30)
+	content.add_child(title)
+	var ready: Button = Button.new()
+	ready.text = LocalizationService.tr_format(
+		"battle.local.ready",
+		{"player": player_number},
+		"PLAYER {player} READY"
+	)
+	ready.custom_minimum_size.y = 64
+	ready.add_theme_font_size_override("font_size", 22)
+	content.add_child(ready)
+	await get_tree().process_frame
+	ready.grab_focus()
+	await ready.pressed
+	overlay.queue_free()
+	await get_tree().process_frame
 
 
 func _apply_encounter_setup_lock() -> void:
@@ -3188,16 +3319,29 @@ func _open_move_builder() -> void:
 	)
 
 
-func _open_energy_dice_builder() -> void:
+func _open_energy_dice_builder(forced_player: int = 0) -> void:
 	if player_loadout_data == null:
 		validation_label.text = (
             "Player loadout is unavailable."
 		)
 		return
+	var editing_loadout: Variant = player_loadout_data
+	if GameFlow.local_battle_mode:
+		var selected_player: int = forced_player
+		if selected_player == 0:
+			selected_player = await _choose_local_dice_player()
+		if selected_player == 0:
+			return
+		await _present_local_setup_handoff(selected_player)
+		if selected_player == 2:
+			editing_loadout = ai_loadout_data
+	if editing_loadout == null:
+		validation_label.text = "Selected player loadout is unavailable."
+		return
 
 	var mode: String = "player_custom"
 	var pokemon_id: String = String(
-		player_loadout_data.pokemon_id
+		editing_loadout.pokemon_id
 	)
 	var species_id: String = ""
 
@@ -3260,6 +3404,60 @@ func _open_energy_dice_builder() -> void:
 			else ENERGY_DICE_BUILDER_SCENE_PATH
 		)
 	)
+
+
+func _choose_local_dice_player() -> int:
+	var overlay: ColorRect = ColorRect.new()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.color = Color(0.025, 0.045, 0.08, 0.96)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 100
+	add_child(overlay)
+	var center: CenterContainer = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var content: VBoxContainer = VBoxContainer.new()
+	content.custom_minimum_size = Vector2(520, 280)
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.add_theme_constant_override("separation", 16)
+	center.add_child(content)
+	var title: Label = Label.new()
+	title.text = LocalizationService.tr_key(
+		"preparation.local.choose_dice_player",
+		"WHO WILL EDIT ENERKORO?"
+	)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 28)
+	content.add_child(title)
+	for player_number: int in [1, 2]:
+		var button: Button = Button.new()
+		button.text = LocalizationService.tr_format(
+			"preparation.local.edit_player_dice",
+			{"player": player_number},
+			"PLAYER {player} ENERKORO"
+		)
+		button.custom_minimum_size.y = 60
+		button.add_theme_font_size_override("font_size", 20)
+		button.set_meta("player_number", player_number)
+		button.pressed.connect(
+			_emit_local_dice_player_selected.bind(player_number)
+		)
+		content.add_child(button)
+	var cancel: Button = Button.new()
+	cancel.text = LocalizationService.tr_key("common.cancel", "Cancel")
+	cancel.custom_minimum_size.y = 52
+	cancel.set_meta("player_number", 0)
+	cancel.pressed.connect(_emit_local_dice_player_selected.bind(0))
+	content.add_child(cancel)
+	await get_tree().process_frame
+	var result: int = await local_dice_player_selected
+	overlay.queue_free()
+	await get_tree().process_frame
+	return result
+
+
+func _emit_local_dice_player_selected(player_number: int) -> void:
+	local_dice_player_selected.emit(player_number)
 
 
 func _ensure_free_mode_custom_dice() -> bool:

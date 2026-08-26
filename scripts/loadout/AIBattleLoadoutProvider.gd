@@ -66,7 +66,11 @@ static func load_ai_loadout() -> Variant:
         )
 
         if saved_loadout != null:
-            _apply_difficulty_strategy(saved_loadout, true)
+            if GameFlow.local_battle_mode:
+                _apply_free_mode_pokemon_default_dice(saved_loadout)
+                saved_loadout.uses_difficulty_dice = false
+            else:
+                _apply_difficulty_strategy(saved_loadout, true)
             return saved_loadout
 
     return create_default_ai_loadout()

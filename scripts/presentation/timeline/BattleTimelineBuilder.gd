@@ -53,7 +53,12 @@ static func build_turn(
 		)
 	)
 
-	if ai_decision != null and ai_decision.is_valid():
+	if (
+		ai_decision != null
+		and ai_decision.has_method("is_valid")
+		and ai_decision.is_valid()
+		and not (ai_decision.selected_evaluation is Dictionary)
+	):
 		turn.add_entry(
 			_build_ai_entry(
 				actor_id,

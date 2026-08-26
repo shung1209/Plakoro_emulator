@@ -177,6 +177,7 @@ func _ready() -> void:
     advanced_toggle.toggled.connect(
         _on_advanced_toggled
     )
+    advanced_toggle.visible = not GameFlow.local_battle_mode
     repeat_fixed_energy_toggle.visible = GameFlow.free_mode
     repeat_fixed_energy_toggle.button_pressed = (
         GameFlow.free_mode
@@ -358,7 +359,7 @@ func _format_inventory_summary() -> String:
 func _on_advanced_toggled(
     enabled: bool
 ) -> void:
-    if GameFlow.phone_mode:
+    if GameFlow.phone_mode or GameFlow.local_battle_mode:
         enabled = false
     preview_coverage_row.visible = enabled
     advanced_toggle.text = (

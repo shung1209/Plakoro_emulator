@@ -1,0 +1,178 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/LocalBattleSetupUI.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/database/DatabaseService.gd" id="2_database"]
+
+[node name="LocalBattleSetupUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Database" type="Node" parent="."]
+script = ExtResource("2_database")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(880, 820)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 42
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 42
+
+[node name="Content" type="VBoxContainer" parent="Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "LOCAL VS"
+horizontal_alignment = 1
+
+[node name="PlayerLabel" type="Label" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "PLAYER 1: CHOOSE POKÉMON"
+horizontal_alignment = 1
+
+[node name="ReadyPanel" type="PanelContainer" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 440)
+layout_mode = 2
+
+[node name="ReadyBox" type="VBoxContainer" parent="Center/Panel/Margin/Content/ReadyPanel"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 22
+
+[node name="ReadyTitle" type="Label" parent="Center/Panel/Margin/Content/ReadyPanel/ReadyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "LOCAL VS READY"
+horizontal_alignment = 1
+
+[node name="ReadyMessage" type="Label" parent="Center/Panel/Margin/Content/ReadyPanel/ReadyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Both players are configured."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="PokemonOption" type="OptionButton" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+
+[node name="PokemonSummary" type="HBoxContainer" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+theme_override_constants/separation = 28
+
+[node name="PortraitSlot" type="CenterContainer" parent="Center/Panel/Margin/Content/PokemonSummary"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 250)
+layout_mode = 2
+
+[node name="PokemonInfo" type="VBoxContainer" parent="Center/Panel/Margin/Content/PokemonSummary"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="PokemonName" type="Label" parent="Center/Panel/Margin/Content/PokemonSummary/PokemonInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Pokémon"
+
+[node name="TypeLine" type="HBoxContainer" parent="Center/Panel/Margin/Content/PokemonSummary/PokemonInfo"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TypeCaption" type="Label" parent="Center/Panel/Margin/Content/PokemonSummary/PokemonInfo/TypeLine"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Type"
+
+[node name="TypeRow" type="HBoxContainer" parent="Center/Panel/Margin/Content/PokemonSummary/PokemonInfo/TypeLine"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="WeaknessLine" type="HBoxContainer" parent="Center/Panel/Margin/Content/PokemonSummary/PokemonInfo"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="WeaknessCaption" type="Label" parent="Center/Panel/Margin/Content/PokemonSummary/PokemonInfo/WeaknessLine"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Weakness"
+
+[node name="WeaknessRow" type="HBoxContainer" parent="Center/Panel/Margin/Content/PokemonSummary/PokemonInfo/WeaknessLine"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PokemonHp" type="Label" parent="Center/Panel/Margin/Content/PokemonSummary/PokemonInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "HP 120"
+
+[node name="MoveScroll" type="ScrollContainer" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="MoveRows" type="GridContainer" parent="Center/Panel/Margin/Content/MoveScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="StatusLabel" type="Label" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ContinueButton" type="Button" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "CONTINUE TO ENERKORO"
+
+[node name="BackButton" type="Button" parent="Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "MAIN MENU"

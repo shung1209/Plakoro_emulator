@@ -381,7 +381,7 @@ func _on_locale_changed(
 
 
 func _rebuild_localized_move_buttons() -> void:
-	if player_loadout == null:
+	if player_loadout == null or enemy_loadout == null:
 		return
 	_clear_move_buttons()
 	_create_move_buttons()
@@ -421,12 +421,12 @@ func _apply_localized_text() -> void:
 		"Battle Timeline"
 	)
 	player_header_label.text = LocalizationService.tr_key(
-		"battle.you",
-		"YOU"
+		"battle.player_one" if GameFlow.local_battle_mode else "battle.you",
+		"PLAYER 1" if GameFlow.local_battle_mode else "YOU"
 	)
 	enemy_header_label.text = LocalizationService.tr_key(
-		"battle.ai",
-		"AI"
+		"battle.player_two" if GameFlow.local_battle_mode else "battle.ai",
+		"PLAYER 2" if GameFlow.local_battle_mode else "AI"
 	)
 	enemy_charakoro_button.tooltip_text = LocalizationService.tr_key(
 		"battle.opponent_moves_open",
@@ -1529,15 +1529,29 @@ func _start_new_battle() -> void:
 			int(battle.state.turn_number),
 			&"enemy"
 		)
-		MESSAGE_PRESENTER.show_ai(
-			message_label,
-			LocalizationService.tr_key(
-				"battle.ai_goes_first",
-				"AI won the coin toss and goes first."
+		if GameFlow.local_battle_mode:
+			_clear_move_buttons()
+			_create_move_buttons()
+			_set_battle_action_state(&"choose_move")
+			MESSAGE_PRESENTER.show_ai(
+				message_label,
+				LocalizationService.tr_key(
+					"battle.local.player_two_choose",
+					"Player 2: choose a move."
+				)
 			)
-		)
-		await _hold_action_state(&"ai_thinking", 0.8)
-		await _execute_ai_turn()
+			_set_player_input_enabled(true)
+			_set_battle_navigation_locked(false)
+		else:
+			MESSAGE_PRESENTER.show_ai(
+				message_label,
+				LocalizationService.tr_key(
+					"battle.ai_goes_first",
+					"AI won the coin toss and goes first."
+				)
+			)
+			await _hold_action_state(&"ai_thinking", 0.8)
+			await _execute_ai_turn()
 		return
 
 	TURN_BANNER.show_turn(
@@ -1625,6 +1639,10 @@ func _refresh_single_portrait(
 
 
 func _refresh_enemy_move_reveal() -> void:
+	# The portrait lives inside this button. Local VS hides the opponent Move
+	# reveal interaction, but must keep Player 2's Charakoro visible.
+	enemy_charakoro_button.visible = true
+	enemy_charakoro_button.disabled = GameFlow.local_battle_mode
 	for child: Node in enemy_move_detail_grid.get_children():
 		child.queue_free()
 	if enemy_loadout == null:
@@ -1638,7 +1656,7 @@ func _refresh_enemy_move_reveal() -> void:
 
 
 func _open_enemy_move_window() -> void:
-	if GameFlow.phone_mode:
+	if GameFlow.phone_mode or GameFlow.local_battle_mode:
 		return
 	if enemy_loadout == null:
 		return
@@ -1681,8 +1699,18 @@ func _build_enemy_move_reveal_card(move_card: Variant) -> Button:
 
 
 func _create_move_buttons() -> void:
+	var displayed_loadout: Variant = player_loadout
+	var displayed_setup: Variant = player_energy_setup
+	if (
+		GameFlow.local_battle_mode
+		and battle != null
+		and battle.state != null
+		and battle.state.current_participant_id == &"enemy"
+	):
+		displayed_loadout = enemy_loadout
+		displayed_setup = ai_loadout_data.energy_dice_setup
 	for move_card: Variant in (
-		player_loadout.selected_move_cards
+		displayed_loadout.selected_move_cards
 	):
 		if move_card == null:
 			push_warning(
@@ -1713,7 +1741,7 @@ func _create_move_buttons() -> void:
 
 		var coverage: Variant = (
 			MOVE_COVERAGE_ANALYZER.analyze_move(
-				player_energy_setup,
+				displayed_setup,
 				move_card
 			)
 		)
@@ -1864,9 +1892,15 @@ func _on_move_pressed(
 		return
 
 	if (
-		battle.state.current_participant_id
-		!= &"player"
+		GameFlow.local_battle_mode
+		and battle.state.current_participant_id == &"enemy"
 	):
+		_set_player_input_enabled(false)
+		_set_battle_navigation_locked(true)
+		await _execute_ai_turn(move_card_id)
+		return
+
+	if battle.state.current_participant_id != &"player":
 		return
 
 	_set_player_input_enabled(false)
@@ -2201,21 +2235,29 @@ func _on_move_pressed(
 		_show_battle_result()
 		return
 
-	MESSAGE_PRESENTER.show_ai(
-		message_label,
-		LocalizationService.tr_key(
-			"battle.ai_thinking",
-			"AI is thinking..."
+	if GameFlow.local_battle_mode:
+		_clear_move_buttons()
+		_create_move_buttons()
+		_set_battle_action_state(&"choose_move")
+		MESSAGE_PRESENTER.show_ai(
+			message_label,
+			LocalizationService.tr_key(
+				"battle.local.player_two_choose",
+				"Player 2: choose a move."
+			)
 		)
-	)
-	await _hold_action_state(
-		&"ai_thinking",
-		1.0
-	)
-	await _execute_ai_turn()
+		_set_player_input_enabled(true)
+		_set_battle_navigation_locked(false)
+	else:
+		MESSAGE_PRESENTER.show_ai(
+			message_label,
+			LocalizationService.tr_key("battle.ai_thinking", "AI is thinking...")
+		)
+		await _hold_action_state(&"ai_thinking", 1.0)
+		await _execute_ai_turn()
 
 
-func _execute_ai_turn() -> void:
+func _execute_ai_turn(selected_move_card_id: StringName = &"") -> void:
 	if battle.state.is_finished:
 		# _present_turn_damage() has completed all target/self HP beats before
 		# the KO/result UI is revealed.
@@ -2240,7 +2282,8 @@ func _execute_ai_turn() -> void:
 
 	var execution: Dictionary = (
 		ai_turn_service.execute_ai_turn(
-			StringName(ai_loadout_data.difficulty)
+			StringName(ai_loadout_data.difficulty),
+			selected_move_card_id
 		)
 	)
 
@@ -2425,7 +2468,7 @@ func _execute_ai_turn() -> void:
 				move_card,
 				dice_result,
 				turn_result,
-				decision
+				null if GameFlow.local_battle_mode else decision
 			)
 		)
 	else:
@@ -2479,6 +2522,9 @@ func _execute_ai_turn() -> void:
 		&"player"
 	)
 	_set_battle_action_state(&"choose_move")
+	if GameFlow.local_battle_mode:
+		_clear_move_buttons()
+		_create_move_buttons()
 	MESSAGE_PRESENTER.show_player(
 		message_label,
 		LocalizationService.tr_key(
@@ -3406,19 +3452,24 @@ func _refresh_move_button_states() -> void:
 	if battle == null:
 		return
 
+	var active_loadout: Variant = player_loadout
+	var active_participant: Variant = battle.state.player
+	if GameFlow.local_battle_mode and battle.state.current_participant_id == &"enemy":
+		active_loadout = enemy_loadout
+		active_participant = battle.state.enemy
 	for index: int in range(
 		move_buttons.size()
 	):
 		var button: Button = move_buttons[index]
 		var move_card: Variant = (
-			player_loadout.selected_move_cards[index]
+			active_loadout.selected_move_cards[index]
 		)
 
 		var move_name_id: StringName = StringName(
 			move_card.move_name_id
 		)
 		var usable: bool = (
-			battle.state.player.can_use_move(
+			active_participant.can_use_move(
 				move_name_id
 			)
 		)
@@ -3426,14 +3477,14 @@ func _refresh_move_button_states() -> void:
 
 		if not usable:
 			if STATUS_RESOLVER.is_move_locked(
-				battle.state.player,
+				active_participant,
 				move_name_id
 			):
 				unavailable_reason = LocalizationService.tr_key(
 					"battle.move_unavailable.disabled",
 					"Disabled by an active effect"
 				)
-			elif battle.state.player.last_move_name_id == move_name_id:
+			elif active_participant.last_move_name_id == move_name_id:
 				unavailable_reason = LocalizationService.tr_key(
 					"battle.move_unavailable.repeat",
 					"Cannot repeat this move"

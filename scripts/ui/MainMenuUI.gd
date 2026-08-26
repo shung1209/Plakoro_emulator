@@ -25,6 +25,7 @@ const TITLE_DARK: Texture2D = preload(
 @onready var play_button: Button = %PlayButton
 @onready var content_studio_button: Button = %ContentStudioButton
 @onready var free_mode_button: Button = %FreeModeButton
+@onready var local_battle_button: Button = %LocalBattleButton
 @onready var phone_mode_button: Button = %PhoneModeButton
 @onready var unsealed_label: Label = %UnsealedLabel
 @onready var quit_button: Button = %QuitButton
@@ -56,6 +57,7 @@ func _ready() -> void:
 	play_button.pressed.connect(_start_story_mode)
 	content_studio_button.pressed.connect(_open_content_studio)
 	free_mode_button.pressed.connect(_start_free_mode)
+	local_battle_button.pressed.connect(_start_local_battle)
 	phone_mode_button.pressed.connect(_start_phone_mode)
 	quit_button.pressed.connect(_request_quit)
 	delete_save_button.pressed.connect(_request_delete_save)
@@ -217,6 +219,7 @@ func _apply_main_menu_layout(
 		for button: Button in [
 			content_studio_button,
 			free_mode_button,
+			local_battle_button,
 			phone_mode_button,
 			quit_button
 		]:
@@ -230,6 +233,8 @@ func _apply_main_menu_layout(
 		content_studio_button.add_theme_font_size_override("font_size", 18)
 		free_mode_button.custom_minimum_size.y = 58.0
 		free_mode_button.add_theme_font_size_override("font_size", 20)
+		local_battle_button.custom_minimum_size.y = 58.0
+		local_battle_button.add_theme_font_size_override("font_size", 20)
 		phone_mode_button.custom_minimum_size.y = 58.0
 		phone_mode_button.add_theme_font_size_override("font_size", 20)
 		quit_button.custom_minimum_size.y = 54.0
@@ -290,6 +295,10 @@ func _apply_localized_text() -> void:
 	free_mode_button.text = LocalizationService.tr_key(
 		"main_menu.free_mode",
 		"FREE MODE"
+	)
+	local_battle_button.text = LocalizationService.tr_key(
+		"main_menu.local_battle",
+		"LOCAL VS"
 	)
 	phone_mode_button.text = LocalizationService.tr_key(
 		"main_menu.phone_mode",
@@ -375,6 +384,11 @@ func _start_story_mode() -> void:
 func _start_free_mode() -> void:
 	_begin_navigation()
 	GameFlow.open_free_mode()
+
+
+func _start_local_battle() -> void:
+	_begin_navigation()
+	GameFlow.open_local_battle()
 
 
 func _start_phone_mode() -> void:

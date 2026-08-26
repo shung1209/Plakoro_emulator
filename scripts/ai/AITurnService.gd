@@ -49,7 +49,8 @@ func _init(
 
 
 func execute_ai_turn(
-    difficulty: StringName = &"normal"
+    difficulty: StringName = &"normal",
+    selected_move_card_id: StringName = &""
 ) -> Dictionary:
     var result: Dictionary = {
         "success": false,
@@ -83,6 +84,20 @@ func execute_ai_turn(
             difficulty
         )
     )
+    if selected_move_card_id != &"":
+        if not actor.loadout.has_move_card(selected_move_card_id):
+            return result
+        var selected_move: Variant = battle_controller.database.get_move_card(
+            selected_move_card_id
+        )
+        if selected_move == null or not actor.can_use_move(
+            StringName(selected_move.move_name_id)
+        ):
+            return result
+        decision.selected_move_card_id = selected_move_card_id
+        # Local VS supplies the selection, so an AI evaluation is unnecessary;
+        # keep the existing result contract valid for the presentation layer.
+        decision.selected_evaluation = {}
 
     result["decision"] = decision
 

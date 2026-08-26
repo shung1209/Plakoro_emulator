@@ -157,6 +157,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "FREE MODE"
 
+[node name="LocalBattleButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "LOCAL VS"
+
 [node name="PhoneModeButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
 unique_name_in_owner = true
 visible = false
