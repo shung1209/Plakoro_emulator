@@ -109,7 +109,7 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="PokemonPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow"]
-custom_minimum_size = Vector2(0, 220)
+custom_minimum_size = Vector2(0, 190)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -127,7 +127,7 @@ theme_override_constants/separation = 14
 
 [node name="HeroPlakoroContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonHeroRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(190, 190)
+custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 alignment = 1
 
@@ -168,7 +168,7 @@ layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="BattleReadyPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow"]
-custom_minimum_size = Vector2(0, 220)
+custom_minimum_size = Vector2(0, 190)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -187,7 +187,7 @@ theme_override_constants/separation = 8
 
 [node name="OpponentPortraitContainer" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(105, 105)
+custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 alignment = 1
 
@@ -300,83 +300,103 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="CoverageTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+[node name="AnalysisHeader" type="BoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="AnalysisSummary" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="CoverageTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisHeader/AnalysisSummary"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Loadout Analysis"
 
-[node name="OverallRatingLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+[node name="OverallRatingLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisHeader/AnalysisSummary"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "-----  No Analysis"
 
-[node name="OverallProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+[node name="OverallProbabilityLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisHeader/AnalysisSummary"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "Overall coverage: -"
 
+[node name="StatusSummary" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="LoadoutStatusLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisHeader/StatusSummary"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 2
+text = "Loadout Status: Saved"
+
+[node name="LoadoutSignatureLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisHeader/StatusSummary"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 2
+text = "Loadout Signature: -"
+
 [node name="SeparatorA" type="HSeparator" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
 layout_mode = 2
 
-[node name="MoveCoverageTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+[node name="AnalysisColumns" type="BoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="MoveCoverageColumn" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisColumns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="MoveCoverageTitle" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisColumns/MoveCoverageColumn"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Move Coverage"
 
-[node name="CoverageSummaryLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+[node name="CoverageSummaryLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisColumns/MoveCoverageColumn"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 autowrap_mode = 2
 text = "Coverage"
 
-[node name="SeparatorB" type="HSeparator" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
-layout_mode = 2
-
-[node name="EnergyUsageLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+[node name="AnalysisDivider" type="VSeparator" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisColumns"]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="EnergyUsageColumn" type="VBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisColumns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="EnergyUsageLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisColumns/EnergyUsageColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
 autowrap_mode = 2
 text = "Energy Usage"
 
-[node name="EnergyIconContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
+[node name="EnergyIconContainer" type="HBoxContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox/AnalysisColumns/EnergyUsageColumn"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
-
-[node name="LoadoutStatusLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Loadout Status: Saved"
-
-[node name="LoadoutSignatureLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/CoveragePanel/CoverageBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Loadout Signature: -"
-
-
-[node name="MoveDraftStatusPanel" type="PanelContainer" parent="Margin/Main/ContentScroll/Content/Body/RightColumn"]
-custom_minimum_size = Vector2(0, 44)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MoveDraftStatusLabel" type="Label" parent="Margin/Main/ContentScroll/Content/Body/RightColumn/MoveDraftStatusPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-autowrap_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Move Configuration: [OK] Saved Loadout"
 
 [node name="Actions" type="HBoxContainer" parent="Margin/Main"]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 theme_override_constants/separation = 10
-
-[node name="RefreshButton" type="Button" parent="Margin/Main/Actions"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(132, 46)
-layout_mode = 2
-text = "Refresh"
 
 [node name="EditDiceButton" type="Button" parent="Margin/Main/Actions"]
 unique_name_in_owner = true
@@ -400,6 +420,40 @@ custom_minimum_size = Vector2(210, 50)
 layout_mode = 2
 theme_override_font_sizes/font_size = 19
 text = "Start Battle"
+
+[node name="MoveConfigToast" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 20
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -410.0
+offset_top = -92.0
+offset_right = -24.0
+offset_bottom = -28.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="MoveConfigToastMargin" type="MarginContainer" parent="MoveConfigToast"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 12
+
+[node name="MoveConfigToastLabel" type="Label" parent="MoveConfigToast/MoveConfigToastMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Move configuration saved"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="BattleSetupDialog" type="ConfirmationDialog" parent="."]
 unique_name_in_owner = true

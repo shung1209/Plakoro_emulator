@@ -53,9 +53,6 @@ const AI_LOADOUT_PROVIDER: Script = preload(
 const AI_LOADOUT_SAVE_SERVICE: Script = preload(
     "res://scripts/loadout/AIBattleLoadoutSaveService.gd"
 )
-const DICE_ICON_SUMMARY: Script = preload(
-    "res://scripts/ui/components/EnergyDiceIconSummary.gd"
-)
 const BUILDER_CONTEXT: Script = preload(
     "res://scripts/dice/setup/EnergyDiceBuilderContextService.gd"
 )
@@ -78,6 +75,15 @@ const VALID_ENERGY_TYPES: Array[StringName] = [
     &"steel",
     &"flying"
 ]
+
+const FACE_ENERGY_FIELDS: Dictionary = {
+    &"fixed_a": [&"fixed_a"],
+    &"fixed_b": [&"fixed_b"],
+    &"double_a": [&"double_a_first", &"double_a_second"],
+    &"double_b": [&"double_b_first", &"double_b_second"],
+    &"single_a": [&"single_a"],
+    &"single_b": [&"single_b"]
+}
 
 
 const DEFAULT_SETUP_PATH: String = (
@@ -106,7 +112,6 @@ const PREPARATION_SCENE_PATH: String = (
 @onready var repeat_fixed_energy_toggle: CheckButton = %RepeatFixedEnergyToggle
 @onready var dice_section_title: Label = $Margin/Main/ContentScroll/Content/DiceSectionHeader/DiceSectionTitle
 @onready var dice_section_hint: Label = $Margin/Main/ContentScroll/Content/DiceSectionHeader/DiceSectionHint
-@onready var energy_preview_title: Label = $Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel/PreviewBox/DiceIconPreviewTitle
 @onready var move_readiness_title: Label = $Margin/Main/ContentScroll/Content/PreviewCoverageRow/CoveragePanel/CoverageBox/AnalysisTitle
 @onready var move_readiness_hint: Label = $Margin/Main/ContentScroll/Content/PreviewCoverageRow/CoveragePanel/CoverageBox/CoverageDescription
 @onready var margin: MarginContainer = $Margin
@@ -116,19 +121,15 @@ const PREPARATION_SCENE_PATH: String = (
 @onready var dice_scroll: ScrollContainer = (
     $Margin/Main/ContentScroll/Content/DiceScroll
 )
-@onready var summary_split: HSplitContainer = (
-    $Margin/Main/ContentScroll/Content/SummarySplit
-)
 @onready var actions: HBoxContainer = $Margin/Main/Actions
 @onready var dice_container: HBoxContainer = %DiceContainer
-@onready var preview_coverage_row: HBoxContainer = %PreviewCoverageRow
-@onready var preview_panel: PanelContainer = (
-    $Margin/Main/ContentScroll/Content/PreviewCoverageRow/PreviewPanel
-)
+@onready var preview_coverage_row: BoxContainer = %PreviewCoverageRow
 @onready var coverage_panel: PanelContainer = (
     $Margin/Main/ContentScroll/Content/PreviewCoverageRow/CoveragePanel
 )
-@onready var dice_icon_preview_container: HBoxContainer = %DiceIconPreviewContainer
+@onready var probability_panel: PanelContainer = (
+    $Margin/Main/ContentScroll/Content/PreviewCoverageRow/ProbabilityPanel
+)
 @onready var validation_label: Label = %ValidationLabel
 @onready var probability_label: Label = %ProbabilityLabel
 @onready var top_validation_label: Label = %TopValidationLabel
@@ -143,6 +144,7 @@ const PREPARATION_SCENE_PATH: String = (
 var setup: Variant = null
 var die_editors: Array = []
 var enerkoro_color_options: Array[OptionButton] = []
+var enerkoro_color_labels: Array[Label] = []
 var move_cards: Array = []
 
 var current_player_loadout: Variant = null
@@ -250,10 +252,6 @@ func _apply_localized_text() -> void:
     dice_section_hint.text = LocalizationService.tr_key(
         "enerkoro_builder.faces_hint",
         "3 Enerkoro  |  6 faces each"
-    )
-    energy_preview_title.text = LocalizationService.tr_key(
-        "enerkoro_builder.energy_preview",
-        "Energy Preview"
     )
     move_readiness_title.text = LocalizationService.tr_key(
         "enerkoro_builder.move_readiness",
@@ -363,11 +361,10 @@ func _on_advanced_toggled(
     if GameFlow.phone_mode:
         enabled = false
     preview_coverage_row.visible = enabled
-    summary_split.visible = enabled
     advanced_toggle.text = (
-        LocalizationService.tr_key("enerkoro_builder.advanced_open", "Advanced v")
+        LocalizationService.tr_key("enerkoro_builder.advanced_open", "Advanced -")
         if enabled
-        else LocalizationService.tr_key("enerkoro_builder.advanced_closed", "Advanced >")
+        else LocalizationService.tr_key("enerkoro_builder.advanced_closed", "Advanced +")
     )
 
     # Normal Builder mode is intentionally a single-screen workspace.
@@ -422,13 +419,6 @@ func _apply_responsive_layout() -> void:
         180
     )
 
-    RESPONSIVE_UI.apply_split(
-        summary_split,
-        profile,
-        get_viewport_rect().size.x,
-        0.50
-    )
-
     RESPONSIVE_UI.apply_grid_columns(
         coverage_container,
         profile,
@@ -449,28 +439,25 @@ func _apply_responsive_layout() -> void:
 func _apply_preview_coverage_layout(
     profile: StringName
 ) -> void:
-    # On desktop, Preview and Coverage share one horizontal band to make use
-    # of the large empty space visible to the right of the preview.
+    preview_coverage_row.vertical = (
+        profile == RESPONSIVE_PROFILE.PROFILE_HANDHELD
+    )
+    coverage_panel.custom_minimum_size.x = 0.0
+    probability_panel.custom_minimum_size.x = 0.0
     match profile:
         RESPONSIVE_PROFILE.PROFILE_FULL:
-            preview_panel.custom_minimum_size.x = 620.0
-            coverage_panel.custom_minimum_size.x = 560.0
             preview_coverage_row.add_theme_constant_override(
                 "separation",
                 14
             )
 
         RESPONSIVE_PROFILE.PROFILE_COMPACT:
-            preview_panel.custom_minimum_size.x = 520.0
-            coverage_panel.custom_minimum_size.x = 470.0
             preview_coverage_row.add_theme_constant_override(
                 "separation",
                 12
             )
 
         _:
-            preview_panel.custom_minimum_size.x = 430.0
-            coverage_panel.custom_minimum_size.x = 410.0
             preview_coverage_row.add_theme_constant_override(
                 "separation",
                 10
@@ -677,6 +664,7 @@ func _load_factory_default() -> void:
 func _build_die_editors() -> void:
     die_editors.clear()
     enerkoro_color_options.clear()
+    enerkoro_color_labels.clear()
 
     for child: Node in (
         dice_container.get_children()
@@ -711,6 +699,7 @@ func _build_die_editors() -> void:
             "Color"
         )
         color_row.add_child(color_label)
+        enerkoro_color_labels.append(color_label)
 
         var color_option: OptionButton = OptionButton.new()
         color_option.custom_minimum_size = Vector2(150.0, 42.0)
@@ -753,6 +742,7 @@ func _build_die_editors() -> void:
         )
 
         die_editors.append(editor)
+        _apply_enerkoro_editor_color(index)
 
 
 
@@ -780,6 +770,11 @@ func _populate_enerkoro_color_option(
 
 
 func _refresh_enerkoro_color_option_texts() -> void:
+    for color_label: Label in enerkoro_color_labels:
+        color_label.text = LocalizationService.tr_key(
+            "enerkoro_builder.dice_color",
+            "Color"
+        )
     for slot_index: int in range(enerkoro_color_options.size()):
         _populate_enerkoro_color_option(
             enerkoro_color_options[slot_index],
@@ -798,6 +793,31 @@ func _on_enerkoro_color_selected(
         return
     var color_type: String = str(option.get_item_metadata(item_index))
     PLAKORO_THEME.set_enerkoro_color_type(slot_index, color_type)
+    _apply_enerkoro_editor_color(slot_index)
+
+
+func _apply_enerkoro_editor_color(slot_index: int) -> void:
+    if slot_index < 0 or slot_index >= die_editors.size():
+        return
+    var editor: PanelContainer = die_editors[slot_index] as PanelContainer
+    if editor == null:
+        return
+    var color_type: StringName = StringName(
+        PLAKORO_THEME.get_enerkoro_color_type(slot_index)
+    )
+    var base_color: Color = (
+        PLAKORO_THEME.get_enerkoro_background_color(color_type)
+    )
+    var panel_style: StyleBoxFlat = StyleBoxFlat.new()
+    panel_style.bg_color = Color(base_color, 0.92)
+    panel_style.border_color = base_color.lightened(0.38)
+    panel_style.set_border_width_all(2)
+    panel_style.set_corner_radius_all(12)
+    panel_style.content_margin_left = 12.0
+    panel_style.content_margin_top = 12.0
+    panel_style.content_margin_right = 12.0
+    panel_style.content_margin_bottom = 12.0
+    editor.add_theme_stylebox_override("panel", panel_style)
 
 
 
@@ -907,33 +927,6 @@ func _refresh_all_analysis() -> void:
     _refresh_validation()
     _refresh_energy_probability()
     _refresh_move_coverage()
-    _refresh_dice_icon_preview()
-
-
-
-func _refresh_dice_icon_preview() -> void:
-    for child: Node in (
-        dice_icon_preview_container.get_children()
-    ):
-        dice_icon_preview_container.remove_child(
-            child
-        )
-        child.queue_free()
-
-    if setup == null:
-        return
-
-    var summary: HBoxContainer = HBoxContainer.new()
-    summary.set_script(
-        DICE_ICON_SUMMARY
-    )
-    summary.setup(
-        setup,
-        false
-    )
-    dice_icon_preview_container.add_child(
-        summary
-    )
 
 
 func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
@@ -968,6 +961,7 @@ func _refresh_validation() -> void:
         )
     )
     _merge_inventory_validation(validation)
+    _refresh_invalid_face_highlights()
 
     if bool(validation["success"]):
         top_validation_label.text = LocalizationService.tr_key("enerkoro_builder.valid", "[OK] Valid")
@@ -999,6 +993,105 @@ func _refresh_validation() -> void:
         )
         confirm_button.disabled = true
         back_button.disabled = false
+
+
+func _refresh_invalid_face_highlights() -> void:
+    var invalid_faces: Dictionary = _collect_invalid_faces()
+    for die_index: int in range(die_editors.size()):
+        var editor: Variant = die_editors[die_index]
+        if editor == null or not editor.has_method("set_invalid_fields"):
+            continue
+        var fields: Array[StringName] = []
+        for raw_field: Variant in invalid_faces.get(die_index, []):
+            fields.append(StringName(raw_field))
+        editor.set_invalid_fields(fields)
+
+
+func _collect_invalid_faces() -> Dictionary:
+    var result: Dictionary = {}
+    var fixed_occurrences: Dictionary = {}
+    var energy_occurrences: Dictionary = {}
+    if setup == null:
+        return result
+
+    for die_index: int in range(setup.dice.size()):
+        for raw_face_id: Variant in FACE_ENERGY_FIELDS.keys():
+            var face_id: StringName = StringName(raw_face_id)
+            var component_fields: Array = FACE_ENERGY_FIELDS[raw_face_id]
+            for raw_component: Variant in component_fields:
+                var component: StringName = StringName(raw_component)
+                var energy: StringName = EDITOR_SERVICE.get_energy(
+                    setup,
+                    die_index,
+                    component
+                )
+                if energy == &"" or not VALID_ENERGY_TYPES.has(energy):
+                    _mark_invalid_face(result, die_index, face_id)
+                if energy != &"":
+                    var occurrences: Array = energy_occurrences.get(energy, [])
+                    occurrences.append({
+                        "die_index": die_index,
+                        "face_id": face_id
+                    })
+                    energy_occurrences[energy] = occurrences
+
+                if component in [&"fixed_a", &"fixed_b"] and energy != &"":
+                    var fixed_entries: Array = fixed_occurrences.get(energy, [])
+                    fixed_entries.append({
+                        "die_index": die_index,
+                        "face_id": face_id
+                    })
+                    fixed_occurrences[energy] = fixed_entries
+
+        var die_data: Variant = setup.dice[die_index]
+        if StringName(die_data.fixed_a) == StringName(die_data.fixed_b):
+            _mark_invalid_face(result, die_index, &"fixed_a")
+            _mark_invalid_face(result, die_index, &"fixed_b")
+
+    var allow_repeated_fixed: bool = (
+        GameFlow.free_mode
+        and GameFlow.free_mode_allow_repeated_fixed_energy
+    )
+    if not allow_repeated_fixed:
+        for raw_energy: Variant in fixed_occurrences.keys():
+            var fixed_entries: Array = fixed_occurrences[raw_energy]
+            if fixed_entries.size() <= 1:
+                continue
+            for entry: Dictionary in fixed_entries:
+                _mark_invalid_face(
+                    result,
+                    int(entry.get("die_index", -1)),
+                    StringName(entry.get("face_id", &""))
+                )
+
+    var inventory: Dictionary = _get_player_energy_inventory()
+    if not inventory.is_empty():
+        for raw_energy: Variant in energy_occurrences.keys():
+            var entries: Array = energy_occurrences[raw_energy]
+            var owned: int = max(0, int(inventory.get(String(raw_energy), 0)))
+            if entries.size() <= owned:
+                continue
+            for entry: Dictionary in entries:
+                _mark_invalid_face(
+                    result,
+                    int(entry.get("die_index", -1)),
+                    StringName(entry.get("face_id", &""))
+                )
+
+    return result
+
+
+func _mark_invalid_face(
+    result: Dictionary,
+    die_index: int,
+    face_id: StringName
+) -> void:
+    if die_index < 0 or face_id == &"":
+        return
+    var fields: Array = result.get(die_index, [])
+    if not fields.has(face_id):
+        fields.append(face_id)
+    result[die_index] = fields
 
 
 func _refresh_energy_probability() -> void:

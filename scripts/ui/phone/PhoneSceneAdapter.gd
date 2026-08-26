@@ -163,22 +163,15 @@ func _adapt_enerkoro_builder() -> void:
 	_hide("Margin/Main/ContentScroll/Content/RepeatFixedEnergyToggle")
 	_hide("Margin/Main/ContentScroll/Content/AdvancedToggle")
 	_hide("Margin/Main/ContentScroll/Content/PreviewCoverageRow")
-	_hide("Margin/Main/ContentScroll/Content/SummarySplit/ProbabilityPanel")
 	var content_scroll: ScrollContainer = source.get_node_or_null(
 		"Margin/Main/ContentScroll"
 	) as ScrollContainer
-	var content: VBoxContainer = source.get_node_or_null(
-		"Margin/Main/ContentScroll/Content"
-	) as VBoxContainer
 	var dice_scroll: ScrollContainer = source.get_node_or_null(
 		"Margin/Main/ContentScroll/Content/DiceScroll"
 	) as ScrollContainer
 	var dice_row: HBoxContainer = source.get_node_or_null(
 		"%DiceContainer"
 	) as HBoxContainer
-	var validation_panel: PanelContainer = source.get_node_or_null(
-		"Margin/Main/ContentScroll/Content/SummarySplit/ValidationPanel"
-	) as PanelContainer
 	if content_scroll != null:
 		content_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	if dice_scroll != null:
@@ -196,16 +189,7 @@ func _adapt_enerkoro_builder() -> void:
 				editor.reparent(dice_stack)
 				(editor as Control).custom_minimum_size.x = 0
 				(editor as Control).size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				if editor.get_child_count() > 0:
-					var column: Node = editor.get_child(0)
-					if column is VBoxContainer and column.get_child_count() > 0:
-						var color_row: Node = column.get_child(0)
-						if color_row is HBoxContainer:
-							(color_row as HBoxContainer).visible = false
 		dice_row.queue_free()
-	if validation_panel != null and content != null:
-		validation_panel.reparent(content)
-		validation_panel.custom_minimum_size = Vector2(0, 90)
 	var save_path: LineEdit = source.get_node_or_null("%SavePathEdit") as LineEdit
 	if save_path != null:
 		save_path.visible = false

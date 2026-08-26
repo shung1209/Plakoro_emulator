@@ -58,6 +58,14 @@ func set_allow_repeated_fixed_energy(value: bool) -> void:
     close_palette()
 
 
+func set_invalid_fields(field_ids: Array[StringName]) -> void:
+    for raw_field_id: Variant in _face_buttons.keys():
+        var current_field_id: StringName = StringName(raw_field_id)
+        var button: Variant = _face_buttons[current_field_id]
+        if button != null and button.has_method("set_invalid"):
+            button.set_invalid(field_ids.has(current_field_id))
+
+
 func refresh_from_setup() -> void:
     if setup == null:
         return

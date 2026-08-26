@@ -1070,28 +1070,7 @@ func _blend_element_colors(energies: Array[StringName]) -> Color:
 
 
 func _element_background_color(energy_type: StringName) -> Color:
-    # Dark, saturated variants of the Energy colors keep white labels readable
-    # while still making each landed die immediately identifiable.
-    match energy_type:
-        &"fire":
-            return Color("7a2434")
-        &"water":
-            return Color("17517f")
-        &"grass":
-            return Color("265f3b")
-        &"electric":
-            return Color("6b5714")
-        &"psychic":
-            return Color("70275f")
-        &"fighting":
-            return Color("7b431f")
-        &"dark":
-            return Color("342a4f")
-        &"steel":
-            return Color("4f596b")
-        &"flying":
-            return Color("275b6b")
-    return Color(0.0, 0.0, 0.0, 0.0)
+    return THEME_FACTORY.get_enerkoro_background_color(energy_type)
 
 
 func _random_energy_face() -> Array:
