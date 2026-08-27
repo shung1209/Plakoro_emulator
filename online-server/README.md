@@ -40,6 +40,10 @@ Blueprint. After the first deployment:
 ## Current scope
 
 Room and match state are currently in memory. A Render restart clears active
-rooms, and reconnecting players do not yet reclaim an interrupted seat. Those
-are the next persistence/reconnect milestones; do not use this foundation for
-ranked or long-running matches yet.
+rooms. A dropped connection keeps its seat for 30 seconds and the client
+automatically resumes the same player id, Loadout, HP, and turn when possible.
+After the grace period, an active match is resolved as a disconnect loss.
+Waiting rooms expire after 15 minutes of inactivity and finished rooms after
+3 minutes, keeping the free Render instance from accumulating stale state.
+This in-memory foundation is still not intended for ranked or long-running
+matches because a Render restart cannot restore a room.

@@ -6,7 +6,14 @@ import { WebSocket } from "ws";
 const port = 18127;
 const server = spawn(process.execPath, ["src/server.js"], {
   cwd: new URL("..", import.meta.url),
-  env: { ...process.env, PORT: String(port) },
+  env: {
+    ...process.env,
+    PORT: String(port),
+    RECONNECT_GRACE_MS: "180",
+    WAITING_ROOM_TTL_MS: "300",
+    FINISHED_ROOM_TTL_MS: "300",
+    HEARTBEAT_MS: "1000"
+  },
   stdio: ["ignore", "pipe", "inherit"]
 });
 
@@ -76,6 +83,8 @@ async function createStartedMatch() {
   const connectedTwo = await playerTwo.next("connected");
   playerOne.id = connectedOne.player_id;
   playerTwo.id = connectedTwo.player_id;
+  playerOne.reconnectToken = connectedOne.reconnect_token;
+  playerTwo.reconnectToken = connectedTwo.reconnect_token;
   playerOne.send({ type: "create_room", player_name: "Player" });
   const joined = await playerOne.next("room_joined");
   playerTwo.send({ type: "join_room", room_code: joined.room.code, player_name: "Player" });
@@ -117,6 +126,32 @@ async function run() {
   await forfeited.playerTwo.next("room_left");
   forfeited.playerOne.socket.close();
   forfeited.playerTwo.socket.close();
+
+  const resumed = await createStartedMatch();
+  resumed.playerOne.socket.close();
+  await delay(30);
+  resumed.playerTwo.send({
+    type: "choose_move",
+    move_id: loadout.move_card_ids[0]
+  });
+  await assert.rejects(
+    () => resumed.playerTwo.next("turn_resolved"),
+    /match_paused/,
+    "The match must pause while a player is inside the reconnect grace period"
+  );
+  const replacement = connectClient();
+  await replacement.next("connected");
+  replacement.send({
+    type: "resume_session",
+    reconnect_token: resumed.playerOne.reconnectToken
+  });
+  const resumedIdentity = await replacement.next("session_resumed");
+  const resumedMatch = await replacement.next("match_started");
+  assert.equal(resumedIdentity.player_id, resumed.playerOne.id);
+  assert.equal(resumedMatch.match.id, resumed.match.id);
+  assert.equal(resumedMatch.match.current_player_id, resumed.match.current_player_id);
+  replacement.socket.close();
+  resumed.playerTwo.socket.close();
 
   const disconnected = await createStartedMatch();
   disconnected.playerOne.socket.close();
@@ -164,8 +199,15 @@ async function run() {
   natural.playerOne.socket.close();
   natural.playerTwo.socket.close();
 
+  const idle = connectClient();
+  await idle.next("connected");
+  idle.send({ type: "create_room", player_name: "Idle Player" });
+  await idle.next("room_joined");
+  await idle.next("room_expired", 1500);
+  idle.socket.close();
+
   await delay(50);
-  console.log("Online end-state tests passed: HP-zero, forfeit, and disconnect winner sync.");
+  console.log("Online lifecycle tests passed: reconnect, disconnect, cleanup, forfeit, and HP-zero sync.");
 }
 
 try {

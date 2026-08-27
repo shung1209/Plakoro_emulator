@@ -11,6 +11,7 @@ signal server_error(code: String, message: String)
 const DEFAULT_LOCAL_URL: String = "ws://127.0.0.1:10000/ws"
 const SERVER_SETTING: String = "online/server_url"
 const HEARTBEAT_INTERVAL_MSEC: int = 20000
+const RECONNECT_DELAYS_MSEC: Array[int] = [500, 1500, 3000, 5000]
 
 var socket: WebSocketPeer = WebSocketPeer.new()
 var connection_state: StringName = &"disconnected"
@@ -20,6 +21,11 @@ var revealed_players: Array = []
 var battle_session: Dictionary = {}
 var server_url: String = ""
 var last_heartbeat_msec: int = 0
+var reconnect_token: String = ""
+var resume_token: String = ""
+var reconnect_attempt: int = 0
+var reconnect_at_msec: int = 0
+var intentional_disconnect: bool = false
 
 
 func _ready() -> void:
@@ -34,9 +40,25 @@ func connect_to_server(url: String = "") -> Error:
 	if connection_state != &"disconnected":
 		disconnect_from_server()
 	server_url = url.strip_edges() if not url.strip_edges().is_empty() else get_default_server_url()
+	intentional_disconnect = false
+	resume_token = ""
+	reconnect_attempt = 0
+	return _open_socket()
+
+
+func _open_socket() -> Error:
 	socket = WebSocketPeer.new()
 	var error: Error = socket.connect_to_url(server_url)
 	if error != OK:
+		if not resume_token.is_empty() and reconnect_attempt < RECONNECT_DELAYS_MSEC.size():
+			reconnect_at_msec = (
+				Time.get_ticks_msec()
+				+ RECONNECT_DELAYS_MSEC[reconnect_attempt]
+			)
+			reconnect_attempt += 1
+			_set_state(&"reconnecting")
+			set_process(true)
+			return error
 		_set_state(&"disconnected")
 		server_error.emit("connect_failed", error_string(error))
 		return error
@@ -46,12 +68,16 @@ func connect_to_server(url: String = "") -> Error:
 
 
 func disconnect_from_server() -> void:
+	intentional_disconnect = true
 	if socket.get_ready_state() != WebSocketPeer.STATE_CLOSED:
 		socket.close(1000, "Client closed")
 	current_room.clear()
 	revealed_players.clear()
 	battle_session.clear()
 	player_id = ""
+	reconnect_token = ""
+	resume_token = ""
+	reconnect_attempt = 0
 	set_process(false)
 	_set_state(&"disconnected")
 
@@ -98,10 +124,14 @@ func forfeit_match() -> void:
 
 
 func _process(_delta: float) -> void:
+	if connection_state == &"reconnecting":
+		if Time.get_ticks_msec() >= reconnect_at_msec:
+			_open_socket()
+		return
 	socket.poll()
 	var ready_state: WebSocketPeer.State = socket.get_ready_state()
 	if ready_state == WebSocketPeer.STATE_OPEN:
-		if connection_state != &"connected":
+		if connection_state != &"connected" and resume_token.is_empty():
 			_set_state(&"connected")
 		while socket.get_available_packet_count() > 0:
 			_receive_packet(socket.get_packet())
@@ -112,11 +142,22 @@ func _process(_delta: float) -> void:
 	elif ready_state == WebSocketPeer.STATE_CLOSED:
 		var close_code: int = socket.get_close_code()
 		var close_reason: String = socket.get_close_reason()
+		if (
+			not intentional_disconnect
+			and not reconnect_token.is_empty()
+			and not current_room.is_empty()
+			and reconnect_attempt < RECONNECT_DELAYS_MSEC.size()
+		):
+			resume_token = reconnect_token
+			reconnect_at_msec = (
+				Time.get_ticks_msec()
+				+ RECONNECT_DELAYS_MSEC[reconnect_attempt]
+			)
+			reconnect_attempt += 1
+			_set_state(&"reconnecting")
+			return
+		_clear_online_session()
 		set_process(false)
-		current_room.clear()
-		revealed_players.clear()
-		battle_session.clear()
-		player_id = ""
 		_set_state(&"disconnected")
 		if close_code != 1000 and close_code != -1:
 			server_error.emit("connection_closed", close_reason)
@@ -131,14 +172,31 @@ func _receive_packet(packet: PackedByteArray) -> void:
 	match String(message.get("type", "")):
 		"connected":
 			player_id = String(message.get("player_id", ""))
+			reconnect_token = String(message.get("reconnect_token", ""))
+			if not resume_token.is_empty():
+				_send({
+					"type": "resume_session",
+					"reconnect_token": resume_token
+				})
+		"session_resumed":
+			player_id = String(message.get("player_id", ""))
+			reconnect_token = String(message.get("reconnect_token", resume_token))
+			resume_token = ""
+			reconnect_attempt = 0
+			_set_state(&"connected")
 		"room_joined", "room_updated":
 			current_room = Dictionary(message.get("room", {})).duplicate(true)
 			room_changed.emit(current_room)
 		"room_left":
-			current_room.clear()
-			revealed_players.clear()
-			battle_session.clear()
+			_clear_room_state()
 			room_changed.emit(current_room)
+		"room_expired":
+			_clear_room_state()
+			room_changed.emit(current_room)
+			server_error.emit(
+				"room_expired",
+				"The Online room expired after being inactive."
+			)
 		"match_ready":
 			revealed_players = Array(message.get("players", [])).duplicate(true)
 			match_ready.emit(revealed_players)
@@ -159,7 +217,14 @@ func _receive_packet(packet: PackedByteArray) -> void:
 			battle_session["room_code"] = String(message.get("room_code", ""))
 			battle_session["players"] = previous_players
 			match_ended.emit(Dictionary(message).duplicate(true))
+		"opponent_reconnecting", "opponent_reconnected":
+			server_error.emit(
+				String(message.get("type", "online_notice")),
+				String(message.get("message", ""))
+			)
 		"error":
+			if String(message.get("code", "")) == "resume_failed":
+				_clear_online_session()
 			server_error.emit(
 				String(message.get("code", "server_error")),
 				String(message.get("message", "Server error."))
@@ -178,3 +243,18 @@ func _set_state(next_state: StringName) -> void:
 		return
 	connection_state = next_state
 	connection_state_changed.emit(connection_state)
+
+
+func _clear_room_state() -> void:
+	current_room.clear()
+	revealed_players.clear()
+	battle_session.clear()
+
+
+func _clear_online_session() -> void:
+	_clear_room_state()
+	player_id = ""
+	reconnect_token = ""
+	resume_token = ""
+	reconnect_attempt = 0
+	room_changed.emit(current_room)

@@ -238,6 +238,9 @@ func _refresh_connection_text() -> void:
 		&"connecting":
 			status_label.text = LocalizationService.tr_key("online.connecting", "CONNECTING...")
 			connect_button.text = LocalizationService.tr_key("online.connect", "CONNECT")
+		&"reconnecting":
+			status_label.text = LocalizationService.tr_key("online.reconnecting", "RECONNECTING...")
+			connect_button.text = LocalizationService.tr_key("online.disconnect", "DISCONNECT")
 		_:
 			status_label.text = LocalizationService.tr_key("online.disconnected", "DISCONNECTED")
 			connect_button.text = LocalizationService.tr_key("online.connect", "CONNECT")

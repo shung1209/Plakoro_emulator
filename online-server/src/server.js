@@ -8,6 +8,10 @@ import { WebSocket, WebSocketServer } from "ws";
 const PORT = Number.parseInt(process.env.PORT ?? "10000", 10);
 const ROOM_CODE_LENGTH = 6;
 const MAX_PLAYERS = 2;
+const RECONNECT_GRACE_MS = Number.parseInt(process.env.RECONNECT_GRACE_MS ?? "30000", 10);
+const WAITING_ROOM_TTL_MS = Number.parseInt(process.env.WAITING_ROOM_TTL_MS ?? "900000", 10);
+const FINISHED_ROOM_TTL_MS = Number.parseInt(process.env.FINISHED_ROOM_TTL_MS ?? "180000", 10);
+const HEARTBEAT_MS = Number.parseInt(process.env.HEARTBEAT_MS ?? "25000", 10);
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const ORIENTATIONS = ["FACE_DOWN", "FACE_UP", "HEAD_UP", "HEAD_DOWN", "HEAD_LEFT", "HEAD_RIGHT"];
 const rooms = new Map();
@@ -22,7 +26,7 @@ const server = createServer((request, response) => {
   response.writeHead(200, { "content-type": "application/json" });
   response.end(JSON.stringify({
     service: "plakoro-online",
-    protocol: 1,
+    protocol: 2,
     websocket: "/ws"
   }));
 });
@@ -32,17 +36,37 @@ const websocketServer = new WebSocketServer({ server, path: "/ws" });
 websocketServer.on("connection", (socket) => {
   const client = {
     id: randomBytes(8).toString("hex"),
+    reconnectToken: randomBytes(24).toString("hex"),
     name: "Player",
     roomCode: null,
+    connected: true,
+    disconnectTimer: null,
     socket
   };
+  socket.isAlive = true;
   clients.set(socket, client);
-  send(socket, { type: "connected", player_id: client.id, protocol: 1 });
+  sendConnected(client, false);
 
   socket.on("message", (buffer) => handleMessage(client, buffer));
-  socket.on("close", () => removeClient(client));
-  socket.on("error", () => removeClient(client));
+  socket.on("pong", () => { socket.isAlive = true; });
+  socket.on("close", (code) => removeClient(client, code));
+  socket.on("error", () => {});
 });
+
+const heartbeatTimer = setInterval(() => {
+  for (const socket of websocketServer.clients) {
+    if (socket.isAlive === false) {
+      socket.terminate();
+      continue;
+    }
+    socket.isAlive = false;
+    socket.ping();
+  }
+}, HEARTBEAT_MS);
+heartbeatTimer.unref();
+
+const cleanupTimer = setInterval(cleanupRooms, Math.min(60000, WAITING_ROOM_TTL_MS));
+cleanupTimer.unref();
 
 function handleMessage(client, buffer) {
   let message;
@@ -52,8 +76,12 @@ function handleMessage(client, buffer) {
     sendError(client.socket, "invalid_json", "Message must be valid JSON.");
     return;
   }
+  if (message.type !== "ping") touchRoom(client.roomCode);
 
   switch (message.type) {
+    case "resume_session":
+      resumeSession(client, String(message.reconnect_token ?? ""));
+      break;
     case "create_room":
       createRoom(client, cleanName(message.player_name));
       break;
@@ -92,7 +120,8 @@ function createRoom(client, playerName) {
     hostId: client.id,
     players: new Map(),
     match: null,
-    rules: { allow_repeated_fixed_energy: false }
+    rules: { allow_repeated_fixed_energy: false },
+    updatedAt: Date.now()
   };
   rooms.set(code, room);
   addPlayer(room, client, playerName);
@@ -121,6 +150,73 @@ function addPlayer(room, client, playerName) {
   client.roomCode = room.code;
   room.players.set(client.id, client);
   client.loadout = null;
+  client.connected = true;
+  room.updatedAt = Date.now();
+}
+
+function sendConnected(client, resumed) {
+  send(client.socket, {
+    type: resumed ? "session_resumed" : "connected",
+    player_id: client.id,
+    reconnect_token: client.reconnectToken,
+    protocol: 2
+  });
+}
+
+function resumeSession(client, reconnectToken) {
+  let previous = null;
+  let room = null;
+  for (const candidateRoom of rooms.values()) {
+    previous = [...candidateRoom.players.values()].find((player) =>
+      player.reconnectToken === reconnectToken && !player.connected
+    );
+    if (previous) {
+      room = candidateRoom;
+      break;
+    }
+  }
+  if (!previous || !room) {
+    sendError(client.socket, "resume_failed", "The previous Online session is no longer available.");
+    return;
+  }
+  if (previous.disconnectTimer) clearTimeout(previous.disconnectTimer);
+  client.id = previous.id;
+  client.reconnectToken = previous.reconnectToken;
+  client.name = previous.name;
+  client.roomCode = room.code;
+  client.loadout = previous.loadout;
+  client.connected = true;
+  client.disconnectTimer = null;
+  room.players.delete(previous.id);
+  room.players.set(client.id, client);
+  room.updatedAt = Date.now();
+  sendConnected(client, true);
+  send(client.socket, { type: "room_joined", player_id: client.id, room: serializeRoom(room) });
+  broadcastRoom(room);
+  if (room.match) sendMatchState(room, client);
+  for (const player of room.players.values()) {
+    if (player.id !== client.id && player.connected) {
+      send(player.socket, {
+        type: "opponent_reconnected",
+        message: "Opponent reconnected. The match can continue."
+      });
+    }
+  }
+}
+
+function sendMatchState(room, client) {
+  const players = [...room.players.values()].map((player) => ({
+    id: player.id,
+    name: player.name,
+    loadout: player.loadout
+  }));
+  send(client.socket, { type: "match_ready", room_code: room.code, players });
+  send(client.socket, {
+    type: "match_started",
+    room_code: room.code,
+    match: serializeMatch(room.match),
+    players: players.map((player) => ({ id: player.id, name: player.name }))
+  });
 }
 
 function setRoomRules(client, rawRules) {
@@ -210,11 +306,14 @@ function leaveRoom(client, notify = true) {
   if (!client.roomCode) return;
   const room = rooms.get(client.roomCode);
   client.roomCode = null;
+  if (client.disconnectTimer) clearTimeout(client.disconnectTimer);
+  client.disconnectTimer = null;
   if (!room) return;
   if (room.match?.phase !== "finished" && room.players.has(client.id)) {
     forfeitMatch(client, "disconnected", room);
   }
   room.players.delete(client.id);
+  room.updatedAt = Date.now();
   if (room.players.size === 0) {
     rooms.delete(room.code);
   } else {
@@ -248,10 +347,57 @@ function forfeitMatch(client, reason = "forfeit", knownRoom = null) {
   for (const player of room.players.values()) send(player.socket, payload);
 }
 
-function removeClient(client) {
+function removeClient(client, closeCode = 1006) {
   if (!clients.has(client.socket)) return;
-  leaveRoom(client, false);
   clients.delete(client.socket);
+  if (closeCode === 1000) {
+    leaveRoom(client, false);
+    return;
+  }
+  client.connected = false;
+  if (!client.roomCode) return;
+  const room = rooms.get(client.roomCode);
+  if (!room || !room.players.has(client.id)) return;
+  room.updatedAt = Date.now();
+  broadcastRoom(room);
+  for (const player of room.players.values()) {
+    if (player.id !== client.id && player.connected) {
+      send(player.socket, {
+        type: "opponent_reconnecting",
+        grace_ms: RECONNECT_GRACE_MS,
+        message: "Opponent disconnected. Waiting briefly for reconnection."
+      });
+    }
+  }
+  client.disconnectTimer = setTimeout(() => expireDisconnectedClient(client), RECONNECT_GRACE_MS);
+  client.disconnectTimer.unref?.();
+}
+
+function expireDisconnectedClient(client) {
+  if (client.connected || !client.roomCode) return;
+  const room = rooms.get(client.roomCode);
+  if (!room || room.players.get(client.id) !== client) return;
+  if (room.match?.phase !== "finished") forfeitMatch(client, "disconnected", room);
+  leaveRoom(client, false);
+}
+
+function touchRoom(code) {
+  const room = code ? rooms.get(code) : null;
+  if (room) room.updatedAt = Date.now();
+}
+
+function cleanupRooms() {
+  const now = Date.now();
+  for (const room of rooms.values()) {
+    const ttl = room.match?.phase === "finished" ? FINISHED_ROOM_TTL_MS : WAITING_ROOM_TTL_MS;
+    if (now - room.updatedAt < ttl) continue;
+    for (const player of room.players.values()) {
+      if (player.disconnectTimer) clearTimeout(player.disconnectTimer);
+      player.roomCode = null;
+      send(player.socket, { type: "room_expired" });
+    }
+    rooms.delete(room.code);
+  }
 }
 
 function broadcastRoom(room) {
@@ -270,7 +416,8 @@ function serializeRoom(room) {
       id: player.id,
       name: player.name,
       is_host: player.id === room.hostId,
-      ready: player.loadout !== null
+      ready: player.loadout !== null,
+      connected: player.connected
     }))
   };
 }
@@ -292,6 +439,10 @@ function resolveTurn(client, moveId) {
   const room = rooms.get(client.roomCode);
   if (!room?.match || !room.players.has(client.id)) {
     sendError(client.socket, "match_not_ready", "The Online battle is not ready.");
+    return;
+  }
+  if ([...room.players.values()].some((player) => !player.connected)) {
+    sendError(client.socket, "match_paused", "Wait for the opponent to reconnect.");
     return;
   }
   const match = room.match;

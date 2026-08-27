@@ -2128,9 +2128,22 @@ func _on_online_battle_error(_code: String, error_message: String) -> void:
 
 
 func _on_online_connection_state_changed(state: StringName) -> void:
-	if not GameFlow.online_battle_mode or state != &"disconnected":
+	if not GameFlow.online_battle_mode:
 		return
-	_show_online_connection_lost()
+	match state:
+		&"connecting", &"reconnecting":
+			_set_player_input_enabled(false)
+			var reconnecting_text: String = LocalizationService.tr_key(
+				"online.reconnecting", "RECONNECTING..."
+			)
+			message_label.text = reconnecting_text
+			prototype_battle_message_label.text = reconnecting_text
+		&"connected":
+			if not online_connection_lost:
+				_sync_online_battle_state(OnlineBattleService.battle_session)
+				_refresh_online_turn_prompt()
+		&"disconnected":
+			_show_online_connection_lost()
 
 
 func _show_online_connection_lost() -> void:
