@@ -33,7 +33,7 @@ OnlineBattleService="*res://scripts/online/OnlineBattleService.gd"
 
 [online]
 
-server_url="ws://127.0.0.1:10000/ws"
+server_url="wss://plakoro-online.onrender.com/ws"
 
 [display]
 
