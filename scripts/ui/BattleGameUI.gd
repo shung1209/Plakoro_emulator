@@ -11,6 +11,7 @@ signal phone_roll_confirmation_changed(
 	detail: String,
 	amount: int
 )
+signal phone_attack_animation_requested
 
 
 const CHARAKORO_FEEDBACK: Script = preload(
@@ -1125,11 +1126,8 @@ func _on_back_to_preparation_pressed() -> void:
 				"online.forfeiting", "FORFEITING MATCH..."
 			)
 			OnlineBattleService.forfeit_match()
-			OnlineBattleService.leave_room()
+		OnlineBattleService.leave_room()
 		GameFlow.return_to_online_lobby()
-		else:
-			OnlineBattleService.leave_room()
-			GameFlow.return_to_online_lobby()
 	else:
 		GameFlow.open_preparation()
 
@@ -1881,9 +1879,9 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 			lines.append(LocalizationService.tr_format(
 				"online.recoil_result", {"amount": int(result.get("recoil", 0))}, "RECOIL • {amount} DAMAGE"
 			))
+	await _present_online_phone_turn(actor_name, move_name, result)
 	message_label.text = "\n".join(lines)
 	prototype_battle_message_label.text = "\n".join(lines)
-	await _present_online_phone_turn(actor_name, move_name, result)
 	await _add_timeline_turn(TIMELINE_BUILDER.build_online_turn(
 		result,
 		&"player" if actor_is_local else &"enemy",
@@ -1896,6 +1894,10 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 	var player_hp_before: int = int(battle.state.player.current_hp)
 	var enemy_hp_before: int = int(battle.state.enemy.current_hp)
 	if bool(result.get("energy_met", false)) and move_card != null:
+		if GameFlow.phone_mode:
+			phone_attack_animation_requested.emit()
+			await get_tree().process_frame
+			await get_tree().create_timer(0.25).timeout
 		await _play_attack_vfx(
 			move_card,
 			&"player" if actor_is_local else &"enemy"
@@ -1914,38 +1916,90 @@ func _present_online_phone_turn(
 	move_name: String,
 	result: Dictionary
 ) -> void:
-	if not GameFlow.phone_mode:
-		await get_tree().create_timer(0.7).timeout
-		return
-	phone_roll_confirmation_changed.emit(
-		&"move", true, actor_name + "\n" + move_name, 0
-	)
+	var staged_lines: PackedStringArray = [
+		LocalizationService.tr_format(
+			"phone_mode.roll_move",
+			{"actor": actor_name, "move": move_name},
+			"{actor} used {move}"
+		)
+	]
+	_set_online_staged_feedback(staged_lines)
+	if GameFlow.phone_mode:
+		phone_roll_confirmation_changed.emit(
+			&"move", true, actor_name + "\n" + move_name, 0
+		)
 	var energy_met: bool = bool(result.get("energy_met", false))
-	phone_roll_confirmation_changed.emit(
-		&"enerkoro",
-		energy_met,
-		"",
-		int(result.get("printed_damage", 0))
+	var printed_damage: int = int(result.get("printed_damage", 0))
+	staged_lines.append(
+		LocalizationService.tr_format(
+			"phone_mode.roll_enerkoro_damage",
+			{"damage": printed_damage},
+			"ENERKORO energy confirmed  +{damage}"
+		)
+		if energy_met
+		else LocalizationService.tr_key(
+			"phone_mode.roll_enerkoro_failed",
+			"ENERKORO ENERGY FAILED"
+		)
 	)
+	_set_online_staged_feedback(staged_lines)
+	if GameFlow.phone_mode:
+		phone_roll_confirmation_changed.emit(
+			&"enerkoro", energy_met, "", printed_damage
+		)
 	await get_tree().create_timer(1.0).timeout
 	if not energy_met:
-		phone_roll_confirmation_changed.emit(&"attack", false, "", 0)
+		staged_lines.append(LocalizationService.tr_key(
+			"phone_mode.roll_attack_failed", "ATTACK FAILED!"
+		))
+		_set_online_staged_feedback(staged_lines)
+		if GameFlow.phone_mode:
+			phone_roll_confirmation_changed.emit(&"attack", false, "", 0)
 		await get_tree().create_timer(1.4).timeout
 		return
-	phone_roll_confirmation_changed.emit(
-		&"charakoro", true, "", int(result.get("charakoro_bonus", 0))
-	)
+	var charakoro_bonus: int = int(result.get("charakoro_bonus", 0))
+	staged_lines.append(LocalizationService.tr_format(
+		"phone_mode.roll_charakoro_damage",
+		{"damage": charakoro_bonus},
+		"CHARAKORO result confirmed  +{damage}"
+	))
+	_set_online_staged_feedback(staged_lines)
+	if GameFlow.phone_mode:
+		phone_roll_confirmation_changed.emit(
+			&"charakoro", true, "", charakoro_bonus
+		)
 	await get_tree().create_timer(1.0).timeout
 	var weakness_bonus: int = int(result.get("weakness_bonus", 0))
 	if weakness_bonus > 0:
-		phone_roll_confirmation_changed.emit(
-			&"weakness", true, "", weakness_bonus
-		)
+		staged_lines.append(LocalizationService.tr_format(
+			"phone_mode.roll_weakness_damage",
+			{"damage": weakness_bonus},
+			"Weakness  +{damage}"
+		))
+		_set_online_staged_feedback(staged_lines)
+		if GameFlow.phone_mode:
+			phone_roll_confirmation_changed.emit(
+				&"weakness", true, "", weakness_bonus
+			)
 		await get_tree().create_timer(1.0).timeout
-	phone_roll_confirmation_changed.emit(
-		&"attack", true, "", int(result.get("damage", 0))
-	)
+	var damage: int = int(result.get("damage", 0))
+	staged_lines.append(LocalizationService.tr_format(
+		"phone_mode.roll_attack_damage",
+		{"damage": damage},
+		"Attack succeeded  •  {damage} damage"
+	))
+	_set_online_staged_feedback(staged_lines)
+	if GameFlow.phone_mode:
+		phone_roll_confirmation_changed.emit(
+			&"attack", true, "", damage
+		)
 	await get_tree().create_timer(1.4).timeout
+
+
+func _set_online_staged_feedback(lines: PackedStringArray) -> void:
+	var text_value: String = "\n".join(lines)
+	message_label.text = text_value
+	prototype_battle_message_label.text = text_value
 
 
 func _on_online_battle_error(_code: String, error_message: String) -> void:

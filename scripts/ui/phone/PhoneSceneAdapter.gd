@@ -545,6 +545,11 @@ func _adapt_battle() -> void:
 			"phone_roll_confirmation_changed",
 			_on_phone_roll_confirmation_changed
 		)
+	if source.has_signal("phone_attack_animation_requested"):
+		source.connect(
+			"phone_attack_animation_requested",
+			_on_phone_attack_animation_requested
+		)
 	_fit_phone_popup("%CoinTossWindow", Vector2i(430, 410))
 	_fit_phone_popup("%EnemyMoveWindow", Vector2i(440, 790))
 	var viewport: Viewport = source.get_viewport()
@@ -667,6 +672,10 @@ func _on_phone_move_pressed() -> void:
 	_show_battle_view(&"roll")
 
 
+func _on_phone_attack_animation_requested() -> void:
+	_show_battle_view(&"arena")
+
+
 func _on_battle_phase_changed(phase: StringName) -> void:
 	match phase:
 		&"choose_move":
@@ -677,8 +686,13 @@ func _on_battle_phase_changed(phase: StringName) -> void:
 			if phase != &"select_target":
 				_clear_phone_roll_confirmations()
 			_show_battle_view(&"roll")
-		&"resolving", &"ai_resolving", &"ai_thinking":
+		&"resolving", &"ai_resolving":
 			_show_battle_view(&"roll")
+		&"ai_thinking":
+			# Waiting for the opponent to choose is still an arena state.
+			# Switch to ROLL only when their resolved dice event arrives and
+			# BattleGameUI emits ai_rolling.
+			_show_battle_view(&"arena")
 		&"battle_finished":
 			_show_battle_view(&"arena")
 
