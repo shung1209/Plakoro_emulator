@@ -21,6 +21,7 @@ WebSocket endpoint: `ws://localhost:10000/ws`
 Create a Render Web Service with:
 
 - Root Directory: `online-server`
+- Instance Type: `Free`
 - Build Command: `pnpm install --frozen-lockfile`
 - Start Command: `pnpm start`
 - Health Check Path: `/health`
