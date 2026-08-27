@@ -4,11 +4,13 @@ const PLAKORO_THEME: Script = preload(
 	"res://scripts/ui/theme/PlakoroThemeFactory.gd"
 )
 const MOVE_AUTHORING: Script = preload("res://scripts/content/MoveCardAuthoringService.gd")
+const ICONS: Script = preload("res://scripts/presentation/PlakoroIconService.gd")
 const DEFAULT_ONLINE_PLAYER_NAME: String = "Player"
-const IOS_WEB_PROMPT_COOLDOWN_MS: int = 750
-
-var _ios_web_input: bool = false
-var _last_ios_prompt_ms: int = -IOS_WEB_PROMPT_COOLDOWN_MS
+const ENERGY_CODES: Dictionary = {
+	"A": &"grass", "B": &"fire", "C": &"water",
+	"D": &"electric", "E": &"psychic", "F": &"fighting",
+	"G": &"dark", "H": &"steel", "I": &"flying",
+}
 
 @onready var panel: PanelContainer = %Panel
 @onready var title_label: Label = %TitleLabel
@@ -20,9 +22,14 @@ var _last_ios_prompt_ms: int = -IOS_WEB_PROMPT_COOLDOWN_MS
 @onready var create_room_button: Button = %CreateRoomButton
 @onready var join_label: Label = %JoinLabel
 @onready var room_code_edit: LineEdit = %RoomCodeEdit
+@onready var code_display: HBoxContainer = %CodeDisplay
+@onready var energy_palette: GridContainer = %EnergyPalette
+@onready var code_back_button: Button = %CodeBackButton
+@onready var code_clear_button: Button = %CodeClearButton
 @onready var join_room_button: Button = %JoinRoomButton
 @onready var room_panel: PanelContainer = %RoomPanel
 @onready var room_code_label: Label = %RoomCodeLabel
+@onready var room_energy_code: HBoxContainer = %RoomEnergyCode
 @onready var players_label: Label = %PlayersLabel
 @onready var first_turn_label: Label = %FirstTurnLabel
 @onready var repeat_fixed_energy_toggle: CheckButton = %RepeatFixedEnergyToggle
@@ -39,21 +46,20 @@ var _last_ios_prompt_ms: int = -IOS_WEB_PROMPT_COOLDOWN_MS
 
 func _ready() -> void:
 	PLAKORO_THEME.apply_to(self)
-	_ios_web_input = _is_ios_web_browser()
 	server_url_edit.text = OnlineBattleService.get_default_server_url()
 	connect_button.pressed.connect(_toggle_connection)
 	create_room_button.pressed.connect(_create_room)
 	join_room_button.pressed.connect(_join_room)
+	code_back_button.pressed.connect(_remove_code_energy)
+	code_clear_button.pressed.connect(_clear_code)
 	leave_room_button.pressed.connect(OnlineBattleService.leave_room)
 	repeat_fixed_energy_toggle.toggled.connect(_on_repeat_fixed_energy_toggled)
 	configure_button.pressed.connect(GameFlow.open_online_loadout_setup)
 	submit_move_button.pressed.connect(_submit_selected_move)
 	back_button.pressed.connect(_go_back)
 	room_code_edit.text_changed.connect(_normalize_room_code)
-	room_code_edit.gui_input.connect(_on_room_code_gui_input)
-	room_code_edit.virtual_keyboard_enabled = true
-	room_code_edit.virtual_keyboard_show_on_focus = true
-	room_code_edit.focus_mode = Control.FOCUS_ALL
+	_build_energy_palette()
+	_refresh_energy_code_display()
 	OnlineBattleService.connection_state_changed.connect(_on_connection_state_changed)
 	OnlineBattleService.room_changed.connect(_on_room_changed)
 	OnlineBattleService.server_error.connect(_on_server_error)
@@ -94,6 +100,7 @@ func _apply_responsive_layout() -> void:
 		minf(700.0, viewport_size.x - 32.0),
 		minf(720.0, viewport_size.y - 32.0)
 	)
+	energy_palette.columns = 3 if portrait else 9
 	server_url_edit.custom_minimum_size.y = 58.0 if portrait else 52.0
 
 
@@ -108,6 +115,7 @@ func _apply_localized_text() -> void:
 	)
 	join_label.text = LocalizationService.tr_key("online.join_room", "Join Room")
 	join_room_button.text = LocalizationService.tr_key("online.join", "JOIN")
+	code_clear_button.text = LocalizationService.tr_key("common.clear", "CLEAR")
 	leave_room_button.text = LocalizationService.tr_key("online.leave", "LEAVE ROOM")
 	configure_button.text = LocalizationService.tr_key(
 		"online.configure", "CONFIGURE MY LOADOUT"
@@ -152,72 +160,56 @@ func _normalize_room_code(value: String) -> void:
 	if normalized != value:
 		room_code_edit.text = normalized
 		room_code_edit.caret_column = normalized.length()
+	_refresh_energy_code_display()
 
 
-func _on_room_code_gui_input(event: InputEvent) -> void:
-	# Web exports receive an iPhone tap through the canvas before LineEdit can
-	# reliably acquire focus. Grabbing it during that same user gesture lets
-	# Godot's hidden Web input open the iOS virtual keyboard.
-	var pressed: bool = (
-		(event is InputEventScreenTouch and event.pressed)
-		or (
-			event is InputEventMouseButton
-			and event.button_index == MOUSE_BUTTON_LEFT
-			and event.pressed
-		)
-	)
-	if pressed and _ios_web_input:
-		_open_ios_room_code_prompt()
-		accept_event()
+func _build_energy_palette() -> void:
+	for code: String in ENERGY_CODES:
+		var energy: StringName = ENERGY_CODES[code]
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(54, 54)
+		button.icon = ICONS.load_energy_icon(energy)
+		button.expand_icon = true
+		button.tooltip_text = String(energy).capitalize()
+		button.pressed.connect(_append_code_energy.bind(code))
+		energy_palette.add_child(button)
+
+
+func _append_code_energy(code: String) -> void:
+	if room_code_edit.text.length() >= 6:
 		return
-	if pressed and not room_code_edit.has_focus():
-		room_code_edit.grab_focus()
-	if pressed and DisplayServer.has_feature(DisplayServer.FEATURE_VIRTUAL_KEYBOARD):
-		DisplayServer.virtual_keyboard_show(
-			room_code_edit.text,
-			room_code_edit.get_global_rect(),
-			DisplayServer.KEYBOARD_TYPE_DEFAULT,
-			room_code_edit.max_length,
-			room_code_edit.caret_column,
-			room_code_edit.caret_column
-		)
+	room_code_edit.text += code
 
 
-func _is_ios_web_browser() -> bool:
-	if not OS.has_feature("web"):
-		return false
-	var detected: Variant = JavaScriptBridge.eval(
-		"/iPhone|iPad|iPod/.test(navigator.userAgent) || "
-		+ "(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)",
-		true
+func _remove_code_energy() -> void:
+	room_code_edit.text = room_code_edit.text.left(maxi(0, room_code_edit.text.length() - 1))
+
+
+func _clear_code() -> void:
+	room_code_edit.text = ""
+
+
+func _refresh_energy_code_display() -> void:
+	_render_energy_code(code_display, room_code_edit.text, true)
+	join_room_button.disabled = (
+		OnlineBattleService.connection_state != &"connected"
+		or room_code_edit.text.length() != 6
 	)
-	return bool(detected)
 
 
-func _open_ios_room_code_prompt() -> void:
-	# All iOS browsers use WebKit. Some versions do not expose Godot's hidden
-	# canvas input to the keyboard, so use a native prompt from the tap event.
-	var now_ms: int = Time.get_ticks_msec()
-	if now_ms - _last_ios_prompt_ms < IOS_WEB_PROMPT_COOLDOWN_MS:
-		return
-	_last_ios_prompt_ms = now_ms
-	var prompt_text: String = LocalizationService.tr_key(
-		"online.enter_room_code", "Enter the six-character room code."
-	)
-	var script: String = "window.prompt(%s, %s)" % [
-		JSON.stringify(prompt_text),
-		JSON.stringify(room_code_edit.text),
-	]
-	var entered_value: Variant = JavaScriptBridge.eval(script, true)
-	if entered_value == null:
-		return
-	var entered: String = String(entered_value).strip_edges().to_upper()
-	var cleaned: String = ""
-	for character: String in entered:
-		if character.is_valid_identifier() or character.is_valid_int():
-			cleaned += character
-	room_code_edit.text = cleaned.left(6)
-	room_code_edit.caret_column = room_code_edit.text.length()
+func _render_energy_code(container: HBoxContainer, code: String, show_empty: bool) -> void:
+	for child: Node in container.get_children():
+		child.queue_free()
+	for index: int in 6:
+		var slot := TextureRect.new()
+		slot.custom_minimum_size = Vector2(48, 48)
+		slot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		slot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		if index < code.length() and ENERGY_CODES.has(code[index]):
+			slot.texture = ICONS.load_energy_icon(ENERGY_CODES[code[index]])
+		elif show_empty:
+			slot.tooltip_text = "—"
+		container.add_child(slot)
 
 
 func _on_connection_state_changed(_state: StringName) -> void:
@@ -226,7 +218,7 @@ func _on_connection_state_changed(_state: StringName) -> void:
 	server_url_edit.editable = not connected and not connecting
 	connect_button.disabled = connecting
 	create_room_button.disabled = not connected
-	join_room_button.disabled = not connected
+	join_room_button.disabled = not connected or room_code_edit.text.length() != 6
 	_refresh_connection_text()
 
 
@@ -294,6 +286,8 @@ func _refresh_room_text() -> void:
 	room_code_label.text = LocalizationService.tr_format(
 		"online.room_code", {"code": String(room.get("code", "------"))}, "ROOM: {code}"
 	)
+	room_code_label.visible = false
+	_render_energy_code(room_energy_code, String(room.get("code", "")), false)
 	var names: PackedStringArray = []
 	for player_value: Variant in Array(room.get("players", [])):
 		var player: Dictionary = Dictionary(player_value)

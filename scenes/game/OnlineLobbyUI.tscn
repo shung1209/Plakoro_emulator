@@ -123,12 +123,13 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Join Room"
 
-[node name="JoinRow" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content"]
+[node name="JoinRow" type="VBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="RoomCodeEdit" type="LineEdit" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -136,9 +137,39 @@ max_length = 6
 placeholder_text = "ABC123"
 alignment = 1
 
-[node name="JoinRoomButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
+[node name="CodeDisplay" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(150, 52)
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="EnergyPalette" type="GridContainer" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 9
+
+[node name="JoinControls" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="CodeBackButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow/JoinControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 52)
+layout_mode = 2
+text = "⌫"
+
+[node name="CodeClearButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow/JoinControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 52)
+layout_mode = 2
+text = "CLEAR"
+
+[node name="JoinRoomButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow/JoinControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 52)
 layout_mode = 2
 disabled = true
 text = "JOIN"
@@ -165,6 +196,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "ROOM: ------"
 horizontal_alignment = 1
+
+[node name="RoomEnergyCode" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
 
 [node name="PlayersLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo"]
 unique_name_in_owner = true

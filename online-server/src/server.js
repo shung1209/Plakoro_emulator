@@ -657,7 +657,9 @@ function cleanCode(value) {
 }
 
 function createRoomCode() {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  // A-I map one-to-one to the nine Energy icons in the client. Keeping the
+  // transport as a six-character string avoids changing the room protocol.
+  const alphabet = "ABCDEFGHI";
   const bytes = randomBytes(ROOM_CODE_LENGTH);
   return [...bytes].map((byte) => alphabet[byte % alphabet.length]).join("");
 }
