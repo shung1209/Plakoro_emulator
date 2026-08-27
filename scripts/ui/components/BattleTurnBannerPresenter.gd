@@ -46,8 +46,8 @@ static func show_turn(
                 )
                 if is_player
                 else LocalizationService.tr_key(
-                    "battle.ai_turn",
-                    "AI TURN"
+                    "online.opponent_turn_short" if GameFlow.online_battle_mode else "battle.ai_turn",
+                    "OPPONENT TURN" if GameFlow.online_battle_mode else "AI TURN"
                 )
                 )
             )

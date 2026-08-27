@@ -139,7 +139,8 @@ function submitLoadout(client, rawLoadout) {
 function startMatch(room) {
   if (room.match) return;
   const players = [...room.players.values()];
-  const firstPlayer = players[randomBytes(1)[0] % players.length];
+  const coinHeads = randomBytes(1)[0] % 2 === 0;
+  const firstPlayer = players[coinHeads ? 0 : 1];
   room.match = {
     id: randomBytes(12).toString("hex"),
     turn: 1,
@@ -147,6 +148,7 @@ function startMatch(room) {
     phase: "awaiting_move",
     createdAt: Date.now(),
     winnerId: null,
+    coinHeads,
     hp: Object.fromEntries(players.map((player) => [
       player.id,
       loadPokemon(player.loadout.pokemon_id).max_hp ?? 120
@@ -256,6 +258,7 @@ function serializeMatch(match) {
     phase: match.phase,
     created_at: match.createdAt,
     winner_id: match.winnerId,
+    coin_heads: match.coinHeads,
     hp: { ...match.hp }
   };
 }
@@ -267,6 +270,7 @@ function resolveTurn(client, moveId) {
     return;
   }
   const match = room.match;
+  const resolvedTurn = match.turn;
   if (match.phase !== "awaiting_move" || match.currentPlayerId !== client.id) {
     sendError(client.socket, "not_your_turn", "Wait for your turn.");
     return;
@@ -365,6 +369,7 @@ function resolveTurn(client, moveId) {
     damage,
     healing,
     recoil,
+    resolved_turn: resolvedTurn,
     energy_dice_modifier: energyDiceModifier,
     match: serializeMatch(match)
   };

@@ -286,6 +286,8 @@ func _turn_header(
         )
     elif turn.actor_id == &"player":
         actor_name = LocalizationService.tr_key("battle.you", "YOU")
+    elif GameFlow.online_battle_mode:
+        actor_name = LocalizationService.tr_key("online.opponent", "OPPONENT")
 
     return (
         "TURN "

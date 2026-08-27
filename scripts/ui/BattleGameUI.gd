@@ -1243,6 +1243,10 @@ func _set_battle_action_state(
 			actor_key = "battle.player_one"
 		elif actor_key == "battle.ai_turn":
 			actor_key = "battle.player_two"
+	elif GameFlow.online_battle_mode and actor_key == "battle.ai_turn":
+		actor_key = "online.opponent_turn_short"
+		if phase == &"ai_thinking":
+			phase_key = "online.opponent_choosing"
 
 	var actor_text: String = LocalizationService.tr_key(
 		actor_key,
@@ -1282,7 +1286,7 @@ func _set_battle_action_state(
 		)
 
 	var actor_color: Color = TURN_BANNER.PLAYER_COLOR
-	if actor_key in ["battle.ai_turn", "battle.player_two"]:
+	if actor_key in ["battle.ai_turn", "battle.player_two", "online.opponent_turn_short"]:
 		actor_color = TURN_BANNER.AI_COLOR
 	elif actor_key == "battle.finished":
 		actor_color = Color(
@@ -1724,6 +1728,17 @@ func _start_online_battle() -> void:
 	_refresh_enemy_move_reveal()
 	_create_move_buttons()
 	_refresh_ui()
+	var first_player_name: String = LocalizationService.tr_key("online.opponent", "Opponent")
+	if local_starts:
+		first_player_name = LocalizationService.tr_key("battle.you", "You")
+	await _present_coin_toss(
+		bool(session.get("coin_heads", local_starts)),
+		LocalizationService.tr_format(
+			"online.coin_first",
+			{"player": first_player_name},
+			"{player} goes first!"
+		)
+	)
 	_refresh_online_turn_prompt()
 
 
@@ -1858,6 +1873,12 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 				"online.recoil_result", {"amount": int(result.get("recoil", 0))}, "RECOIL • {amount} DAMAGE"
 			))
 	message_label.text = "\n".join(lines)
+	await _add_timeline_turn(TIMELINE_BUILDER.build_online_turn(
+		result,
+		&"player" if actor_is_local else &"enemy",
+		move_card,
+		dice_result
+	))
 	if bool(result.get("energy_met", false)) and move_card != null:
 		var actor: Variant = battle.state.player if actor_is_local else battle.state.enemy
 		actor.last_move_name_id = StringName(move_card.move_name_id)
@@ -1868,6 +1889,7 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 	_show_hp_delta_feedback(enemy_hero_container, enemy_hp_before, int(battle.state.enemy.current_hp))
 	await _animate_hp_bars()
 	_refresh_online_turn_prompt()
+	message_label.text = "\n".join(lines)
 
 
 func _on_online_battle_error(_code: String, error_message: String) -> void:
@@ -1892,7 +1914,7 @@ func _on_online_match_ended(result: Dictionary) -> void:
 	)
 
 
-func _present_coin_toss(coin_heads: bool) -> void:
+func _present_coin_toss(coin_heads: bool, result_override: String = "") -> void:
 	coin_toss_title.text = LocalizationService.tr_key(
 		"battle.coin_toss.title",
 		"COIN TOSS"
@@ -1911,7 +1933,7 @@ func _present_coin_toss(coin_heads: bool) -> void:
 		else "battle.coin_toss.tails",
 		"HEADS" if coin_heads else "TAILS"
 	)
-	coin_result_label.text = LocalizationService.tr_key(
+	coin_result_label.text = result_override if not result_override.is_empty() else LocalizationService.tr_key(
 		(
 			"battle.local.coin_toss.player_one_first"
 			if coin_heads
@@ -3012,13 +3034,16 @@ func _show_charakoro_feedback(
 			else (
 				"battle.you"
 				if actor_side == &"player"
-				else "battle.ai"
+				else "online.opponent" if GameFlow.online_battle_mode else "battle.ai"
 			)
 		),
 		(
 			("PLAYER 1" if actor_side == &"player" else "PLAYER 2")
 			if GameFlow.local_battle_mode
-			else ("YOU" if actor_side == &"player" else "AI")
+			else (
+				"YOU" if actor_side == &"player"
+				else "OPPONENT" if GameFlow.online_battle_mode else "AI"
+			)
 		)
 	)
 	charakoro_feedback_title.text = LocalizationService.tr_format(

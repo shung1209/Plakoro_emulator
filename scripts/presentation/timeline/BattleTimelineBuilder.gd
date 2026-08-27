@@ -254,6 +254,70 @@ static func build_turn(
 	return turn
 
 
+static func build_online_turn(
+	result: Dictionary,
+	actor_id: StringName,
+	move_card: Variant,
+	dice_result: Variant
+) -> Variant:
+	var turn: Variant = TURN_DATA.new()
+	turn.turn_number = int(result.get("resolved_turn", 1))
+	turn.actor_id = actor_id
+	turn.move_card_id = StringName(result.get("move_id", ""))
+	turn.move_name = (
+		GameContentLocalizationService.localize_move(move_card)
+		if move_card != null
+		else String(result.get("move_name_id", result.get("move_id", "")))
+	)
+	turn.add_entry(ENTRY_DATA.new(
+		&"move",
+		actor_id,
+		LocalizationService.tr_key("battle.timeline.move", "Move"),
+		[LocalizationService.tr_format(
+			"battle.timeline.move_selected",
+			{"actor": _actor_label(actor_id), "move": turn.move_name},
+			"{actor} selected {move}."
+		)],
+		&"actor"
+	))
+	var result_lines: Array[String] = []
+	if not bool(result.get("energy_met", false)):
+		result_lines.append(LocalizationService.tr_key(
+			"online.energy_failed", "ENERKORO ENERGY FAILED • ATTACK FAILED"
+		))
+	else:
+		result_lines.append(LocalizationService.tr_key(
+			"online.energy_ok", "ENERKORO ENERGY CONFIRMED"
+		))
+		result_lines.append(LocalizationService.tr_format(
+			"online.charakoro_result",
+			{
+				"result": String(dice_result.kyokoro_orientation),
+				"bonus": int(result.get("charakoro_bonus", 0))
+			},
+			"CHARAKORO {result} • +{bonus}"
+		))
+		if int(result.get("weakness_bonus", 0)) > 0:
+			result_lines.append(LocalizationService.tr_format(
+				"online.weakness_bonus",
+				{"bonus": int(result.get("weakness_bonus", 0))},
+				"WEAKNESS • +{bonus}"
+			))
+		result_lines.append(LocalizationService.tr_format(
+			"online.damage_result",
+			{"damage": int(result.get("damage", 0))},
+			"ATTACK DEALT {damage} DAMAGE"
+		))
+	turn.add_entry(ENTRY_DATA.new(
+		&"result",
+		actor_id,
+		LocalizationService.tr_key("battle.timeline.turn_result", "Turn Result"),
+		result_lines,
+		&"result"
+	))
+	return turn
+
+
 static func _append_effect_lifecycle_entries(
 	turn: Variant,
 	actor_id: StringName,
@@ -666,6 +730,8 @@ static func _actor_label(
 		)
 	if actor_id == &"player":
 		return LocalizationService.tr_key("battle.actor.you", "You")
+	if GameFlow.online_battle_mode:
+		return LocalizationService.tr_key("online.opponent", "Opponent")
 
 	return LocalizationService.tr_key("battle.ai", "AI")
 
