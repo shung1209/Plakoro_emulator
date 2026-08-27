@@ -191,6 +191,11 @@ text = "PLAYER GOES FIRST"
 horizontal_alignment = 1
 autowrap_mode = 2
 
+[node name="RepeatFixedEnergyToggle" type="CheckButton" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ALLOW REPEATED FIXED ENERGY"
+
 [node name="ConfigureButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo"]
 unique_name_in_owner = true
 visible = false

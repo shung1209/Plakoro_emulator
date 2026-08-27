@@ -80,6 +80,15 @@ func submit_loadout(loadout: Dictionary) -> void:
 	_send({"type": "submit_loadout", "loadout": loadout})
 
 
+func set_room_rules(allow_repeated_fixed_energy: bool) -> void:
+	_send({
+		"type": "set_room_rules",
+		"rules": {
+			"allow_repeated_fixed_energy": allow_repeated_fixed_energy
+		}
+	})
+
+
 func choose_move(move_id: String) -> void:
 	_send({"type": "choose_move", "move_id": move_id})
 

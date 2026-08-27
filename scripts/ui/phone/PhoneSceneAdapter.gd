@@ -470,6 +470,12 @@ func _adapt_battle() -> void:
 		var panel: Control = source.get(property) as Control
 		if panel != null:
 			panel.reparent(arena)
+	var arena_message_panel: Control = source.get("message_panel") as Control
+	if arena_message_panel != null:
+		# Phone battle details belong with the dice sequence in the ROLL tab.
+		# Keeping the legacy message panel in ARENA duplicates the result and
+		# pushes both combatant cards below the fold.
+		arena_message_panel.visible = false
 	var moves_panel: Control = source.get("moves_panel") as Control
 	var roll_panel: Control = source.get("roll_result_panel") as Control
 	if moves_panel != null:
@@ -671,7 +677,9 @@ func _on_battle_phase_changed(phase: StringName) -> void:
 			if phase != &"select_target":
 				_clear_phone_roll_confirmations()
 			_show_battle_view(&"roll")
-		&"resolving", &"ai_resolving", &"ai_thinking", &"battle_finished":
+		&"resolving", &"ai_resolving", &"ai_thinking":
+			_show_battle_view(&"roll")
+		&"battle_finished":
 			_show_battle_view(&"arena")
 
 

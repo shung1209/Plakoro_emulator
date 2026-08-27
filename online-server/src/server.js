@@ -66,6 +66,9 @@ function handleMessage(client, buffer) {
     case "submit_loadout":
       submitLoadout(client, message.loadout);
       break;
+    case "set_room_rules":
+      setRoomRules(client, message.rules);
+      break;
     case "choose_move":
       resolveTurn(client, String(message.move_id ?? ""));
       break;
@@ -84,7 +87,13 @@ function createRoom(client, playerName) {
   leaveRoom(client, false);
   let code = createRoomCode();
   while (rooms.has(code)) code = createRoomCode();
-  const room = { code, hostId: client.id, players: new Map(), match: null };
+  const room = {
+    code,
+    hostId: client.id,
+    players: new Map(),
+    match: null,
+    rules: { allow_repeated_fixed_energy: false }
+  };
   rooms.set(code, room);
   addPlayer(room, client, playerName);
   send(client.socket, { type: "room_joined", player_id: client.id, room: serializeRoom(room) });
@@ -114,6 +123,17 @@ function addPlayer(room, client, playerName) {
   client.loadout = null;
 }
 
+function setRoomRules(client, rawRules) {
+  const room = rooms.get(client.roomCode);
+  if (!room || room.hostId !== client.id || room.match) {
+    sendError(client.socket, "room_rules_locked", "Only the host can change rules before the match.");
+    return;
+  }
+  room.rules.allow_repeated_fixed_energy = Boolean(rawRules?.allow_repeated_fixed_energy);
+  for (const player of room.players.values()) player.loadout = null;
+  broadcastRoom(room);
+}
+
 function submitLoadout(client, rawLoadout) {
   const room = rooms.get(client.roomCode);
   if (!room || !room.players.has(client.id)) {
@@ -127,6 +147,10 @@ function submitLoadout(client, rawLoadout) {
   const validation = validateLoadout(rawLoadout);
   if (!validation.ok) {
     sendError(client.socket, "invalid_loadout", validation.message);
+    return;
+  }
+  if (!room.rules.allow_repeated_fixed_energy && hasRepeatedFixedEnergy(rawLoadout)) {
+    sendError(client.socket, "repeated_fixed_energy", "Repeated Fixed Energy is disabled by the host.");
     return;
   }
   client.loadout = structuredClone(rawLoadout);
@@ -240,6 +264,7 @@ function serializeRoom(room) {
     code: room.code,
     host_id: room.hostId,
     match_started: room.match !== null,
+    rules: { ...room.rules },
     max_players: MAX_PLAYERS,
     players: [...room.players.values()].map((player) => ({
       id: player.id,
@@ -517,6 +542,17 @@ function validateLoadout(value) {
     return { ok: false, message: "Loadout references unavailable content." };
   }
   return { ok: true };
+}
+
+function hasRepeatedFixedEnergy(loadout) {
+  const seen = new Set();
+  for (const die of loadout.energy_dice_setup?.dice ?? []) {
+    for (const energy of die.fixed ?? []) {
+      if (seen.has(energy)) return true;
+      seen.add(energy);
+    }
+  }
+  return false;
 }
 
 server.listen(PORT, "0.0.0.0", () => {

@@ -80,6 +80,7 @@
     "online.invalid_code": "Introduce un código de sala de seis caracteres.",
     "online.foundation_notice": "EQUIPOS SINCRONIZADOS • INICIO DE BATALLA EN LA PRÓXIMA FASE",
     "online.configure": "CONFIGURAR MI EQUIPO",
+    "online.allow_repeated_fixed_energy": "PERMITIR ENERGÍA FIJA REPETIDA",
     "online.ready_waiting": "LISTO • ESPERANDO AL OPONENTE",
     "online.both_ready": "AMBOS JUGADORES LISTOS • EQUIPOS SINCRONIZADOS",
     "online.choose_loadout": "ELIGE TU POKÉMON",

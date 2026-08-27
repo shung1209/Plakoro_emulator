@@ -80,6 +80,7 @@
     "online.invalid_code": "請輸入六位數房號。",
     "online.foundation_notice": "配置同步完成 • 下一階段加入線上對戰啟動",
     "online.configure": "設定我的對戰配置",
+    "online.allow_repeated_fixed_energy": "允許固定能量重複",
     "online.ready_waiting": "準備完成 • 等待對手",
     "online.both_ready": "雙方準備完成 • 配置已同步",
     "online.choose_loadout": "選擇你的寶可夢",

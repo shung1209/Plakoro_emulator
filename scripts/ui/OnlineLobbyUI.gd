@@ -22,6 +22,7 @@ const MOVE_AUTHORING: Script = preload("res://scripts/content/MoveCardAuthoringS
 @onready var room_code_label: Label = %RoomCodeLabel
 @onready var players_label: Label = %PlayersLabel
 @onready var first_turn_label: Label = %FirstTurnLabel
+@onready var repeat_fixed_energy_toggle: CheckButton = %RepeatFixedEnergyToggle
 @onready var configure_button: Button = %ConfigureButton
 @onready var turn_panel: PanelContainer = %TurnPanel
 @onready var turn_label: Label = %TurnLabel
@@ -40,6 +41,7 @@ func _ready() -> void:
 	create_room_button.pressed.connect(_create_room)
 	join_room_button.pressed.connect(_join_room)
 	leave_room_button.pressed.connect(OnlineBattleService.leave_room)
+	repeat_fixed_energy_toggle.toggled.connect(_on_repeat_fixed_energy_toggled)
 	configure_button.pressed.connect(GameFlow.open_online_loadout_setup)
 	submit_move_button.pressed.connect(_submit_selected_move)
 	back_button.pressed.connect(_go_back)
@@ -102,6 +104,9 @@ func _apply_localized_text() -> void:
 	leave_room_button.text = LocalizationService.tr_key("online.leave", "LEAVE ROOM")
 	configure_button.text = LocalizationService.tr_key(
 		"online.configure", "CONFIGURE MY LOADOUT"
+	)
+	repeat_fixed_energy_toggle.text = LocalizationService.tr_key(
+		"online.allow_repeated_fixed_energy", "ALLOW REPEATED FIXED ENERGY"
 	)
 	submit_move_button.text = LocalizationService.tr_key("online.submit_move", "USE MOVE")
 	back_button.text = LocalizationService.tr_key("common.back", "BACK")
@@ -169,7 +174,21 @@ func _on_room_changed(room: Dictionary) -> void:
 	join_label.visible = room.is_empty()
 	room_code_edit.get_parent().visible = room.is_empty()
 	_refresh_configure_button(room)
+	var rules: Dictionary = Dictionary(room.get("rules", {}))
+	var allow_repeated: bool = bool(rules.get("allow_repeated_fixed_energy", false))
+	GameFlow.free_mode_allow_repeated_fixed_energy = allow_repeated
+	repeat_fixed_energy_toggle.set_pressed_no_signal(allow_repeated)
+	repeat_fixed_energy_toggle.visible = not room.is_empty()
+	repeat_fixed_energy_toggle.disabled = (
+		room.is_empty()
+		or String(room.get("host_id", "")) != OnlineBattleService.player_id
+		or bool(room.get("match_started", false))
+	)
 	_refresh_room_text()
+
+
+func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
+	OnlineBattleService.set_room_rules(enabled)
 
 
 func _refresh_configure_button(room: Dictionary) -> void:

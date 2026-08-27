@@ -178,7 +178,10 @@ func _ready() -> void:
         _on_advanced_toggled
     )
     advanced_toggle.visible = not GameFlow.local_battle_mode
-    repeat_fixed_energy_toggle.visible = GameFlow.free_mode
+    repeat_fixed_energy_toggle.visible = (
+        GameFlow.free_mode
+        and not GameFlow.online_battle_mode
+    )
     repeat_fixed_energy_toggle.button_pressed = (
         GameFlow.free_mode
         and GameFlow.free_mode_allow_repeated_fixed_energy

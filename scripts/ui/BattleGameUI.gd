@@ -1121,12 +1121,14 @@ func _on_back_to_preparation_pressed() -> void:
 	if GameFlow.online_battle_mode:
 		if battle != null and battle.state != null and not battle.state.is_finished:
 			_set_player_input_enabled(false)
-			_set_battle_navigation_locked(true)
 			message_label.text = LocalizationService.tr_key(
 				"online.forfeiting", "FORFEITING MATCH..."
 			)
 			OnlineBattleService.forfeit_match()
+			OnlineBattleService.leave_room()
+		GameFlow.return_to_online_lobby()
 		else:
+			OnlineBattleService.leave_room()
 			GameFlow.return_to_online_lobby()
 	else:
 		GameFlow.open_preparation()
@@ -1813,12 +1815,14 @@ func _refresh_online_turn_prompt() -> void:
 func _on_online_turn_resolved(result: Dictionary) -> void:
 	if not GameFlow.online_battle_mode or battle == null:
 		return
+	var actor_is_local: bool = String(result.get("actor_id", "")) == OnlineBattleService.player_id
+	_set_player_input_enabled(false)
+	_set_battle_action_state(&"rolling" if actor_is_local else &"ai_rolling")
 	var dice_result: Variant = DICE_RESULT_DATA.new()
 	for key: Variant in Dictionary(result.get("energy_counts", {})).keys():
 		dice_result.energy_counts[StringName(key)] = int(result["energy_counts"][key])
 	if bool(result.get("energy_met", false)):
 		dice_result.kyokoro_orientation = StringName(result.get("charakoro_orientation", ""))
-	var actor_is_local: bool = String(result.get("actor_id", "")) == OnlineBattleService.player_id
 	var actor_loadout: Variant = player_loadout if actor_is_local else enemy_loadout
 	var energy_profiles: Array = _create_profiles(actor_loadout)
 	var roll_record: Variant = DICE_ROLL_RECORD_DATA.new()
@@ -1843,6 +1847,11 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 	var move_name: String = String(move_id)
 	if move_card != null:
 		move_name = GameContentLocalizationService.localize_move(move_card)
+	var actor_name: String = (
+		LocalizationService.tr_key("battle.you", "You")
+		if actor_is_local
+		else LocalizationService.tr_key("online.opponent", "Opponent")
+	)
 	var lines: PackedStringArray = [LocalizationService.tr_format(
 		"online.used_move", {"move": move_name}, "USED {move}"
 	)]
@@ -1873,6 +1882,8 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 				"online.recoil_result", {"amount": int(result.get("recoil", 0))}, "RECOIL • {amount} DAMAGE"
 			))
 	message_label.text = "\n".join(lines)
+	prototype_battle_message_label.text = "\n".join(lines)
+	await _present_online_phone_turn(actor_name, move_name, result)
 	await _add_timeline_turn(TIMELINE_BUILDER.build_online_turn(
 		result,
 		&"player" if actor_is_local else &"enemy",
@@ -1884,12 +1895,57 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 		actor.last_move_name_id = StringName(move_card.move_name_id)
 	var player_hp_before: int = int(battle.state.player.current_hp)
 	var enemy_hp_before: int = int(battle.state.enemy.current_hp)
+	if bool(result.get("energy_met", false)) and move_card != null:
+		await _play_attack_vfx(
+			move_card,
+			&"player" if actor_is_local else &"enemy"
+		)
 	_sync_online_battle_state(Dictionary(result.get("match", {})))
 	_show_hp_delta_feedback(player_hero_container, player_hp_before, int(battle.state.player.current_hp))
 	_show_hp_delta_feedback(enemy_hero_container, enemy_hp_before, int(battle.state.enemy.current_hp))
 	await _animate_hp_bars()
 	_refresh_online_turn_prompt()
 	message_label.text = "\n".join(lines)
+	prototype_battle_message_label.text = "\n".join(lines)
+
+
+func _present_online_phone_turn(
+	actor_name: String,
+	move_name: String,
+	result: Dictionary
+) -> void:
+	if not GameFlow.phone_mode:
+		await get_tree().create_timer(0.7).timeout
+		return
+	phone_roll_confirmation_changed.emit(
+		&"move", true, actor_name + "\n" + move_name, 0
+	)
+	var energy_met: bool = bool(result.get("energy_met", false))
+	phone_roll_confirmation_changed.emit(
+		&"enerkoro",
+		energy_met,
+		"",
+		int(result.get("printed_damage", 0))
+	)
+	await get_tree().create_timer(1.0).timeout
+	if not energy_met:
+		phone_roll_confirmation_changed.emit(&"attack", false, "", 0)
+		await get_tree().create_timer(1.4).timeout
+		return
+	phone_roll_confirmation_changed.emit(
+		&"charakoro", true, "", int(result.get("charakoro_bonus", 0))
+	)
+	await get_tree().create_timer(1.0).timeout
+	var weakness_bonus: int = int(result.get("weakness_bonus", 0))
+	if weakness_bonus > 0:
+		phone_roll_confirmation_changed.emit(
+			&"weakness", true, "", weakness_bonus
+		)
+		await get_tree().create_timer(1.0).timeout
+	phone_roll_confirmation_changed.emit(
+		&"attack", true, "", int(result.get("damage", 0))
+	)
+	await get_tree().create_timer(1.4).timeout
 
 
 func _on_online_battle_error(_code: String, error_message: String) -> void:

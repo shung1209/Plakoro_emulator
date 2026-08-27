@@ -80,6 +80,7 @@
     "online.invalid_code": "6文字のルームコードを入力してください。",
     "online.foundation_notice": "構成同期完了 • 次の段階でオンラインバトルを開始",
     "online.configure": "自分の構成を設定",
+    "online.allow_repeated_fixed_energy": "固定エネルギーの重複を許可",
     "online.ready_waiting": "準備完了 • 相手を待っています",
     "online.both_ready": "両プレイヤー準備完了 • 構成を同期しました",
     "online.choose_loadout": "ポケモンを選択",

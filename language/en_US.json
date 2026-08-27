@@ -80,6 +80,7 @@
     "online.invalid_code": "Enter a six-character room code.",
     "online.foundation_notice": "LOADOUT SYNC READY • ONLINE BATTLE START COMING NEXT",
     "online.configure": "CONFIGURE MY LOADOUT",
+    "online.allow_repeated_fixed_energy": "ALLOW REPEATED FIXED ENERGY",
     "online.ready_waiting": "READY • WAITING FOR OPPONENT",
     "online.both_ready": "BOTH PLAYERS READY • LOADOUTS SYNCHRONIZED",
     "online.choose_loadout": "CHOOSE YOUR POKÉMON",
