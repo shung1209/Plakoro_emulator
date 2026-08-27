@@ -103,6 +103,8 @@
     "online.runtime_failed": "無法建立線上對戰配置。",
     "online.match_finished": "線上對戰結束",
     "online.return_lobby": "返回線上大廳",
+    "online.connection_lost": "連線中斷",
+    "online.connection_lost_message": "與這場對戰的連線已中斷。",
     "online.opponent": "對手",
     "online.coin_first": "{player} 先攻！",
     "online.charakoro_ready": "Charakoro 已就緒",

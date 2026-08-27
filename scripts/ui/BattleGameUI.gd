@@ -309,6 +309,7 @@ var online_turn_transition_layer: Control = null
 var online_turn_transition_label: Label = null
 var online_turn_transition_tween: Tween = null
 var last_online_turn_transition_key: String = ""
+var online_connection_lost: bool = false
 
 
 func _ready() -> void:
@@ -353,6 +354,12 @@ func _ready() -> void:
 		OnlineBattleService.match_ended.connect(_on_online_match_ended)
 	if not OnlineBattleService.server_error.is_connected(_on_online_battle_error):
 		OnlineBattleService.server_error.connect(_on_online_battle_error)
+	if not OnlineBattleService.connection_state_changed.is_connected(
+		_on_online_connection_state_changed
+	):
+		OnlineBattleService.connection_state_changed.connect(
+			_on_online_connection_state_changed
+		)
 
 	# Prevent the OS close button from quitting immediately. The close request
 	# is handled by _notification() so the player can confirm first.
@@ -2093,9 +2100,47 @@ func _set_online_staged_feedback(lines: PackedStringArray) -> void:
 func _on_online_battle_error(_code: String, error_message: String) -> void:
 	if not GameFlow.online_battle_mode:
 		return
+	if _code == "connection_closed":
+		_show_online_connection_lost()
+		return
 	if battle != null and battle.state != null and not battle.state.is_finished:
 		_refresh_online_turn_prompt()
 	message_label.text = error_message
+
+
+func _on_online_connection_state_changed(state: StringName) -> void:
+	if not GameFlow.online_battle_mode or state != &"disconnected":
+		return
+	_show_online_connection_lost()
+
+
+func _show_online_connection_lost() -> void:
+	if online_connection_lost:
+		return
+	online_connection_lost = true
+	_set_player_input_enabled(false)
+	_set_battle_navigation_locked(false)
+	_set_battle_action_state(&"battle_finished")
+	result_panel.visible = true
+	result_actions.visible = true
+	result_restart_button.visible = false
+	result_preparation_button.visible = true
+	result_preparation_button.text = LocalizationService.tr_key(
+		"online.return_lobby", "RETURN TO ONLINE LOBBY"
+	)
+	result_title_label.text = LocalizationService.tr_key(
+		"online.connection_lost", "CONNECTION LOST"
+	)
+	result_summary_label.text = LocalizationService.tr_key(
+		"online.connection_lost_message",
+		"The connection to the match was interrupted."
+	)
+	result_hp_label.text = ""
+	var connection_text: String = LocalizationService.tr_key(
+		"online.connection_lost", "CONNECTION LOST"
+	)
+	message_label.text = connection_text
+	prototype_battle_message_label.text = connection_text
 
 
 func _on_online_match_ended(result: Dictionary) -> void:
@@ -4192,6 +4237,9 @@ func _on_result_primary_pressed() -> void:
 
 
 func _open_battle_report(advance_to_next_opponent: bool = false) -> void:
+	if GameFlow.online_battle_mode and online_connection_lost:
+		GameFlow.return_to_online_lobby()
+		return
 	if battle == null or battle.state == null or not battle.state.is_finished:
 		return
 	if GameFlow.online_battle_mode:

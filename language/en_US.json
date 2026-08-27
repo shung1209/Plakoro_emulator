@@ -103,6 +103,8 @@
     "online.runtime_failed": "Online battle loadout could not be prepared.",
     "online.match_finished": "ONLINE MATCH FINISHED",
     "online.return_lobby": "RETURN TO ONLINE LOBBY",
+    "online.connection_lost": "CONNECTION LOST",
+    "online.connection_lost_message": "The connection to the match was interrupted.",
     "online.opponent": "Opponent",
     "online.coin_first": "{player} goes first!",
     "online.charakoro_ready": "Charakoro ready",

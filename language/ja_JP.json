@@ -103,6 +103,8 @@
     "online.runtime_failed": "オンラインバトルの構成を準備できませんでした。",
     "online.match_finished": "オンラインバトル終了",
     "online.return_lobby": "オンラインロビーに戻る",
+    "online.connection_lost": "接続が切断されました",
+    "online.connection_lost_message": "対戦への接続が中断されました。",
     "online.opponent": "相手",
     "online.coin_first": "{player}が先攻！",
     "online.charakoro_ready": "Charakoro 準備完了",
