@@ -46,6 +46,7 @@
     "phone_mode.story_new": "STORY MODE  |  NEW GAME",
     "phone_mode.story_continue": "STORY MODE  |  CONTINUE",
     "phone_mode.free_mode": "FREE MODE",
+    "phone_mode.local_battle": "LOCAL VS",
     "phone_mode.back": "BACK",
     "phone_mode.rotate_title": "ROTATE YOUR PHONE",
     "phone_mode.rotate_message": "Turn your phone upright. If it does not rotate automatically, retry fullscreen portrait mode.",

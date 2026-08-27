@@ -11,11 +11,16 @@ const PORTRAIT: PackedScene = preload("res://scenes/ui/components/PlakoroPortrai
 const ATTRIBUTE_ICONS: Script = preload("res://scripts/ui/components/PokemonAttributeIconDisplay.gd")
 
 @onready var database: Node = $Database
+@onready var setup_panel: PanelContainer = $Center/Panel
+@onready var setup_margin: MarginContainer = $Center/Panel/Margin
 @onready var title_label: Label = %TitleLabel
 @onready var player_label: Label = %PlayerLabel
 @onready var ready_panel: PanelContainer = %ReadyPanel
 @onready var ready_title: Label = %ReadyTitle
 @onready var ready_message: Label = %ReadyMessage
+@onready var ready_actions: BoxContainer = %ReadyActions
+@onready var ready_back_button: Button = %ReadyBackButton
+@onready var start_battle_button: Button = %StartBattleButton
 @onready var pokemon_option: OptionButton = %PokemonOption
 @onready var pokemon_summary: HBoxContainer = %PokemonSummary
 @onready var portrait_slot: CenterContainer = %PortraitSlot
@@ -45,11 +50,15 @@ func _ready() -> void:
 		GameFlow.local_battle_setup_phase = &"player1_pokemon"
 	continue_button.pressed.connect(_continue_setup)
 	back_button.pressed.connect(_go_back)
+	ready_back_button.pressed.connect(_return_to_player_two_setup)
+	start_battle_button.pressed.connect(GameFlow.open_battle)
 	pokemon_option.item_selected.connect(func(_index: int) -> void: _refresh_pokemon_summary())
 	LocalizationService.locale_changed.connect(_on_locale_changed)
+	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_populate_pokemon()
 	_refresh_pokemon_summary()
 	_apply_text()
+	_apply_responsive_layout()
 	if GameFlow.local_battle_setup_phase == &"player2_pokemon":
 		call_deferred("_present_player_two_handoff")
 	elif GameFlow.local_battle_setup_phase == &"ready":
@@ -60,6 +69,32 @@ func _on_locale_changed(_locale: String) -> void:
 	_apply_text()
 	_populate_pokemon()
 	_refresh_pokemon_summary()
+
+
+func _apply_responsive_layout() -> void:
+	var viewport_size: Vector2 = get_viewport_rect().size
+	var portrait_layout: bool = GameFlow.phone_mode or viewport_size.x < 760.0
+	if portrait_layout:
+		ready_actions.vertical = true
+		setup_panel.custom_minimum_size = Vector2(
+			minf(440.0, maxf(320.0, viewport_size.x - 24.0)),
+			minf(820.0, maxf(620.0, viewport_size.y - 24.0))
+		)
+		setup_margin.add_theme_constant_override("margin_left", 18)
+		setup_margin.add_theme_constant_override("margin_right", 18)
+		setup_margin.add_theme_constant_override("margin_top", 22)
+		setup_margin.add_theme_constant_override("margin_bottom", 22)
+		move_rows.columns = 1
+		move_scroll.custom_minimum_size.y = 480
+	else:
+		ready_actions.vertical = false
+		setup_panel.custom_minimum_size = Vector2(880, 820)
+		setup_margin.add_theme_constant_override("margin_left", 28)
+		setup_margin.add_theme_constant_override("margin_right", 28)
+		setup_margin.add_theme_constant_override("margin_top", 42)
+		setup_margin.add_theme_constant_override("margin_bottom", 42)
+		move_rows.columns = 2
+		move_scroll.custom_minimum_size.y = 500
 
 
 func _apply_text() -> void:
@@ -175,7 +210,10 @@ func _build_move_cards(pokemon: Dictionary) -> void:
 			continue
 		var card := Button.new()
 		card.set_script(MOVE_BUTTON)
-		card.custom_minimum_size = Vector2(340, 220)
+		card.custom_minimum_size = Vector2(
+			300 if GameFlow.phone_mode else 340,
+			200 if GameFlow.phone_mode else 220
+		)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.setup_battle_summary(move_card, _format_damage(move_card), "-")
 		card.set_battle_availability(true, "", "-")
@@ -253,7 +291,11 @@ func _finish_player_setup() -> void:
 	):
 		status_label.text = "Could not prepare Enerkoro editor context."
 		return
-	get_tree().change_scene_to_file("res://scenes/ui/EnergyDiceVisualBuilderUI.tscn")
+	get_tree().change_scene_to_file(
+		GameFlow.PHONE_ENERKORO_BUILDER_SCENE
+		if GameFlow.phone_mode
+		else "res://scenes/ui/EnergyDiceVisualBuilderUI.tscn"
+	)
 
 
 func _go_back() -> void:
@@ -268,22 +310,70 @@ func _go_back() -> void:
 		_apply_text()
 		_refresh_pokemon_summary()
 		return
-	GameFlow.exit_phone_mode()
+	if GameFlow.phone_mode:
+		GameFlow.open_phone_mode_menu()
+	else:
+		GameFlow.exit_phone_mode()
 
 
 func _present_player_two_handoff() -> void:
-	var dialog: AcceptDialog = AcceptDialog.new()
-	dialog.title = LocalizationService.tr_format(
+	var overlay := ColorRect.new()
+	overlay.name = "PlayerHandoffOverlay"
+	overlay.color = Color(0.018, 0.027, 0.047, 0.98)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 100
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(overlay)
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(
+		minf(520.0, maxf(300.0, get_viewport_rect().size.x - 40.0)),
+		340.0
+	)
+	center.add_child(panel)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 32)
+	margin.add_theme_constant_override("margin_right", 32)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 32)
+	panel.add_child(margin)
+
+	var box := VBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 26)
+	margin.add_child(box)
+
+	var heading := Label.new()
+	heading.text = LocalizationService.tr_format(
 		"battle.local.handoff_title", {"player": 2}, "PASS TO PLAYER {player}"
 	)
-	dialog.dialog_text = LocalizationService.tr_key(
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	heading.add_theme_font_size_override("font_size", 30)
+	box.add_child(heading)
+
+	var hint := Label.new()
+	hint.text = LocalizationService.tr_key(
 		"battle.local.handoff_hint", "Only the active player should look at the screen."
 	)
-	dialog.ok_button_text = LocalizationService.tr_format(
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.add_theme_font_size_override("font_size", 18)
+	box.add_child(hint)
+
+	var ready_button := Button.new()
+	ready_button.text = LocalizationService.tr_format(
 		"battle.local.ready", {"player": 2}, "PLAYER {player} READY"
 	)
-	add_child(dialog)
-	dialog.popup_centered(Vector2i(560, 220))
+	ready_button.custom_minimum_size = Vector2(0, 68)
+	ready_button.add_theme_font_size_override("font_size", 20)
+	ready_button.pressed.connect(overlay.queue_free)
+	box.add_child(ready_button)
+	ready_button.grab_focus()
 
 
 func _format_damage(move_card: Variant) -> String:
@@ -308,17 +398,13 @@ func _show_ready_confirmation() -> void:
 	ready_message.text = LocalizationService.tr_key(
 		"preparation.local.ready_message", "Both players are configured. Start the battle?"
 	)
-	var dialog: ConfirmationDialog = ConfirmationDialog.new()
-	dialog.title = LocalizationService.tr_key("preparation.local.ready_title", "LOCAL VS READY")
-	dialog.dialog_text = LocalizationService.tr_key(
-		"preparation.local.ready_message", "Both players are configured. Start the battle?"
+	ready_back_button.text = LocalizationService.tr_key(
+		"common.back", "Back"
 	)
-	dialog.ok_button_text = LocalizationService.tr_key("preparation.start_battle", "Start Battle")
-	dialog.cancel_button_text = LocalizationService.tr_key("common.cancel", "Cancel")
-	add_child(dialog)
-	dialog.confirmed.connect(func() -> void: GameFlow.open_battle())
-	dialog.canceled.connect(_return_to_player_two_setup)
-	dialog.popup_centered(Vector2i(560, 220))
+	start_battle_button.text = LocalizationService.tr_key(
+		"preparation.start_battle", "Start Battle"
+	)
+	start_battle_button.grab_focus()
 
 
 func _return_to_player_two_setup() -> void:

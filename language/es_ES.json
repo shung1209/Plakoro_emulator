@@ -46,6 +46,7 @@
     "phone_mode.story_new": "HISTORIA  |  NUEVA PARTIDA",
     "phone_mode.story_continue": "HISTORIA  |  CONTINUAR",
     "phone_mode.free_mode": "MODO LIBRE",
+    "phone_mode.local_battle": "VS LOCAL",
     "phone_mode.back": "VOLVER",
     "phone_mode.rotate_title": "GIRA EL TELÉFONO",
     "phone_mode.rotate_message": "Pon el teléfono en vertical. Si no gira automáticamente, vuelve a intentar el modo vertical a pantalla completa.",

@@ -46,6 +46,7 @@
     "phone_mode.story_new": "ストーリー｜ニューゲーム",
     "phone_mode.story_continue": "ストーリー｜コンティニュー",
     "phone_mode.free_mode": "フリーモード",
+    "phone_mode.local_battle": "ローカル対戦",
     "phone_mode.back": "戻る",
     "phone_mode.rotate_title": "スマホを縦にしてください",
     "phone_mode.rotate_message": "スマホを縦向きにしてください。自動で回転しない場合は、全画面の縦向きモードを再試行してください。",

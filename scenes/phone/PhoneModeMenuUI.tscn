@@ -37,7 +37,7 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="Panel" type="PanelContainer" parent="Margin/Center"]
-custom_minimum_size = Vector2(440, 650)
+custom_minimum_size = Vector2(440, 740)
 layout_mode = 2
 
 [node name="PanelMargin" type="MarginContainer" parent="Margin/Center/Panel"]
@@ -90,6 +90,13 @@ custom_minimum_size = Vector2(0, 74)
 layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "FREE MODE"
+
+[node name="LocalBattleButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "LOCAL VS"
 
 [node name="BackButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
 unique_name_in_owner = true

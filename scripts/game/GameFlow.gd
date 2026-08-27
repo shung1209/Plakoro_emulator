@@ -129,6 +129,21 @@ func open_phone_free_mode() -> void:
 	_change_scene(PHONE_PREPARATION_SCENE)
 
 
+func open_phone_local_battle() -> void:
+	battle_outcome = null
+	advance_after_battle_result = false
+	collection_mode = false
+	free_mode = true
+	local_battle_mode = true
+	local_battle_setup_phase = &"player1_pokemon"
+	free_mode_allow_repeated_fixed_energy = (
+		PLAKORO_THEME.get_free_mode_allow_repeated_fixed_energy()
+	)
+	EncounterSession.clear()
+	_set_phone_mode(true)
+	_change_scene(LOCAL_BATTLE_SETUP_SCENE)
+
+
 func open_phone_battle_loadout() -> void:
 	if not phone_mode:
 		return
