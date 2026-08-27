@@ -1260,6 +1260,14 @@ func _set_battle_action_state(
 		if phase == &"ai_thinking":
 			phase_key = "online.opponent_choosing"
 
+	var story_battle: bool = (
+		not GameFlow.free_mode
+		and not GameFlow.local_battle_mode
+		and not GameFlow.online_battle_mode
+	)
+	if story_battle and phase in [&"choose_move", &"ai_thinking"]:
+		_present_online_turn_transition_if_needed(phase == &"choose_move")
+
 	var actor_text: String = LocalizationService.tr_key(
 		actor_key,
 		"YOUR TURN"
@@ -1859,7 +1867,16 @@ func _create_online_turn_transition_layer() -> void:
 
 
 func _present_online_turn_transition_if_needed(my_turn: bool) -> void:
-	if not GameFlow.online_battle_mode or battle == null or battle.state == null:
+	var story_battle: bool = (
+		not GameFlow.free_mode
+		and not GameFlow.local_battle_mode
+		and not GameFlow.online_battle_mode
+	)
+	if (
+		(not GameFlow.online_battle_mode and not story_battle)
+		or battle == null
+		or battle.state == null
+	):
 		return
 	var transition_key: String = "%d:%s" % [
 		int(battle.state.turn_number),
@@ -3186,6 +3203,10 @@ func _present_phone_roll_confirmation(
 	turn_result: Variant
 ) -> void:
 	if not GameFlow.phone_mode:
+		if not GameFlow.local_battle_mode:
+			await _present_desktop_roll_confirmation(
+				actor_name, move_name, enerkoro_succeeded, turn_result
+			)
 		return
 	phone_roll_confirmation_changed.emit(
 		&"move",
@@ -3245,6 +3266,84 @@ func _present_phone_roll_confirmation(
 		int(turn_result.applied_damage) if attack_succeeded else 0
 	)
 	await get_tree().create_timer(2.0).timeout
+
+
+func _present_desktop_roll_confirmation(
+	actor_name: String,
+	move_name: String,
+	enerkoro_succeeded: bool,
+	turn_result: Variant
+) -> void:
+	var staged_lines: PackedStringArray = [LocalizationService.tr_format(
+		"phone_mode.roll_move",
+		{"actor": actor_name, "move": move_name},
+		"{actor} used {move}"
+	)]
+	_set_online_staged_feedback(staged_lines)
+
+	var damage_context: Variant = turn_result.damage_context
+	var base_damage: int = 0
+	var charakoro_damage: int = 0
+	var weakness_damage: int = 0
+	if damage_context != null:
+		base_damage = int(damage_context.base_damage)
+		charakoro_damage = int(damage_context.outcome_bonus)
+		weakness_damage = int(damage_context.weakness_bonus)
+
+	staged_lines.append(
+		LocalizationService.tr_format(
+			"phone_mode.roll_enerkoro_damage",
+			{"damage": base_damage},
+			"ENERKORO energy confirmed  +{damage}"
+		)
+		if enerkoro_succeeded
+		else LocalizationService.tr_key(
+			"phone_mode.roll_enerkoro_failed", "ENERKORO ENERGY FAILED"
+		)
+	)
+	_set_online_staged_feedback(staged_lines)
+	await get_tree().create_timer(1.0).timeout
+	if not enerkoro_succeeded:
+		staged_lines.append(LocalizationService.tr_key(
+			"phone_mode.roll_attack_failed", "ATTACK FAILED!"
+		))
+		_set_online_staged_feedback(staged_lines)
+		await get_tree().create_timer(1.4).timeout
+		return
+
+	staged_lines.append(LocalizationService.tr_format(
+		"phone_mode.roll_charakoro_damage",
+		{"damage": charakoro_damage},
+		"CHARAKORO result confirmed  +{damage}"
+	))
+	_set_online_staged_feedback(staged_lines)
+	await get_tree().create_timer(1.0).timeout
+	if weakness_damage > 0:
+		staged_lines.append(LocalizationService.tr_format(
+			"phone_mode.roll_weakness_damage",
+			{"damage": weakness_damage},
+			"Weakness  +{damage}"
+		))
+		_set_online_staged_feedback(staged_lines)
+		await get_tree().create_timer(1.0).timeout
+
+	var attack_succeeded: bool = (
+		turn_result.success
+		and _turn_attack_executed(turn_result, true)
+	)
+	staged_lines.append(
+		LocalizationService.tr_format(
+			"phone_mode.roll_attack_damage",
+			{"damage": int(turn_result.applied_damage)},
+			"Attack succeeded  •  {damage} damage"
+		)
+		if attack_succeeded
+		else LocalizationService.tr_key(
+			"phone_mode.roll_attack_failed", "ATTACK FAILED!"
+		)
+	)
+	_set_online_staged_feedback(staged_lines)
+	await get_tree().create_timer(1.4).timeout
 
 
 func _show_charakoro_feedback(
