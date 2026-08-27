@@ -659,10 +659,15 @@ static func _format_costs(
 static func _actor_label(
 	actor_id: StringName
 ) -> String:
+	if GameFlow.local_battle_mode:
+		return LocalizationService.tr_key(
+			"battle.player_one" if actor_id == &"player" else "battle.player_two",
+			"Player 1" if actor_id == &"player" else "Player 2"
+		)
 	if actor_id == &"player":
 		return LocalizationService.tr_key("battle.actor.you", "You")
 
-	return "AI"
+	return LocalizationService.tr_key("battle.ai", "AI")
 
 
 static func _signed(value: int) -> String:

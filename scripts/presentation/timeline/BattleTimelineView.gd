@@ -278,10 +278,14 @@ func _entry_color(
 func _turn_header(
     turn: Variant
 ) -> String:
-    var actor_name: String = "AI"
-
-    if turn.actor_id == &"player":
-        actor_name = "YOU"
+    var actor_name: String = LocalizationService.tr_key("battle.ai", "AI")
+    if GameFlow.local_battle_mode:
+        actor_name = LocalizationService.tr_key(
+            "battle.player_one" if turn.actor_id == &"player" else "battle.player_two",
+            "PLAYER 1" if turn.actor_id == &"player" else "PLAYER 2"
+        )
+    elif turn.actor_id == &"player":
+        actor_name = LocalizationService.tr_key("battle.you", "YOU")
 
     return (
         "TURN "

@@ -9,6 +9,12 @@ const DICE_CONTEXT: Script = preload("res://scripts/dice/setup/EnergyDiceBuilder
 const MOVE_BUTTON: Script = preload("res://scripts/ui/components/PlakoroMoveButton.gd")
 const PORTRAIT: PackedScene = preload("res://scenes/ui/components/PlakoroPortrait.tscn")
 const ATTRIBUTE_ICONS: Script = preload("res://scripts/ui/components/PokemonAttributeIconDisplay.gd")
+const PLAYER_LOADOUT_PROVIDER: Script = preload(
+	"res://scripts/loadout/PlayerBattleLoadoutProvider.gd"
+)
+const PLAYER_TWO_LOADOUT_PROVIDER: Script = preload(
+	"res://scripts/loadout/AIBattleLoadoutProvider.gd"
+)
 
 @onready var database: Node = $Database
 @onready var setup_panel: PanelContainer = $Center/Panel
@@ -395,9 +401,7 @@ func _show_ready_confirmation() -> void:
 	ready_title.text = LocalizationService.tr_key(
 		"preparation.local.ready_title", "LOCAL VS READY"
 	)
-	ready_message.text = LocalizationService.tr_key(
-		"preparation.local.ready_message", "Both players are configured. Start the battle?"
-	)
+	ready_message.text = _build_ready_summary()
 	ready_back_button.text = LocalizationService.tr_key(
 		"common.back", "Back"
 	)
@@ -405,6 +409,43 @@ func _show_ready_confirmation() -> void:
 		"preparation.start_battle", "Start Battle"
 	)
 	start_battle_button.grab_focus()
+
+
+func _build_ready_summary() -> String:
+	var player_one: Variant = PLAYER_LOADOUT_PROVIDER.load_player_loadout()
+	var player_two: Variant = PLAYER_TWO_LOADOUT_PROVIDER.load_ai_loadout()
+	if player_one == null or player_two == null:
+		return LocalizationService.tr_key(
+			"preparation.local.ready_message",
+			"Both players are configured. Start the battle?"
+		)
+	return LocalizationService.tr_format(
+		"preparation.local.ready_summary",
+		{
+			"player_one_pokemon": _loadout_pokemon_name(player_one),
+			"player_one_moves": _loadout_move_names(player_one),
+			"player_two_pokemon": _loadout_pokemon_name(player_two),
+			"player_two_moves": _loadout_move_names(player_two)
+		},
+		"Player 1: {player_one_pokemon}\n{player_one_moves}\n\n"
+		+ "Player 2: {player_two_pokemon}\n{player_two_moves}"
+	)
+
+
+func _loadout_pokemon_name(loadout: Variant) -> String:
+	var pokemon: Variant = database.get_pokemon(loadout.pokemon_id)
+	if pokemon == null:
+		return String(loadout.pokemon_id)
+	return GameContentLocalizationService.localize_pokemon(pokemon)
+
+
+func _loadout_move_names(loadout: Variant) -> String:
+	var names: Array[String] = []
+	for move_id: Variant in loadout.move_card_ids:
+		var move_card: Variant = database.get_move_card(StringName(move_id))
+		if move_card != null:
+			names.append(GameContentLocalizationService.localize_move(move_card))
+	return " • ".join(names)
 
 
 func _return_to_player_two_setup() -> void:
