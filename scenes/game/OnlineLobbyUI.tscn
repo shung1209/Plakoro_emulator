@@ -111,18 +111,6 @@ custom_minimum_size = Vector2(150, 52)
 layout_mode = 2
 text = "CONNECT"
 
-[node name="PlayerNameLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Content"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Player Name"
-
-[node name="PlayerNameEdit" type="LineEdit" parent="Margin/Center/Panel/PanelMargin/Content"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-max_length = 24
-text = "Player"
-
 [node name="CreateRoomButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 58)

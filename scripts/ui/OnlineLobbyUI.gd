@@ -4,6 +4,7 @@ const PLAKORO_THEME: Script = preload(
 	"res://scripts/ui/theme/PlakoroThemeFactory.gd"
 )
 const MOVE_AUTHORING: Script = preload("res://scripts/content/MoveCardAuthoringService.gd")
+const DEFAULT_ONLINE_PLAYER_NAME: String = "Player"
 
 @onready var panel: PanelContainer = %Panel
 @onready var title_label: Label = %TitleLabel
@@ -12,8 +13,6 @@ const MOVE_AUTHORING: Script = preload("res://scripts/content/MoveCardAuthoringS
 @onready var server_label: Label = %ServerLabel
 @onready var server_url_edit: LineEdit = %ServerUrlEdit
 @onready var connect_button: Button = %ConnectButton
-@onready var player_name_label: Label = %PlayerNameLabel
-@onready var player_name_edit: LineEdit = %PlayerNameEdit
 @onready var create_room_button: Button = %CreateRoomButton
 @onready var join_label: Label = %JoinLabel
 @onready var room_code_edit: LineEdit = %RoomCodeEdit
@@ -95,7 +94,6 @@ func _apply_localized_text() -> void:
 		"online.subtitle", "Create a private room or join with a room code."
 	)
 	server_label.text = LocalizationService.tr_key("online.server", "Server")
-	player_name_label.text = LocalizationService.tr_key("online.player_name", "Player Name")
 	create_room_button.text = LocalizationService.tr_key(
 		"online.create_room", "CREATE PRIVATE ROOM"
 	)
@@ -125,7 +123,7 @@ func _toggle_connection() -> void:
 
 
 func _create_room() -> void:
-	OnlineBattleService.create_room(player_name_edit.text)
+	OnlineBattleService.create_room(DEFAULT_ONLINE_PLAYER_NAME)
 
 
 func _join_room() -> void:
@@ -134,7 +132,10 @@ func _join_room() -> void:
 			"online.invalid_code", "Enter a six-character room code."
 		))
 		return
-	OnlineBattleService.join_room(room_code_edit.text, player_name_edit.text)
+	OnlineBattleService.join_room(
+		room_code_edit.text,
+		DEFAULT_ONLINE_PLAYER_NAME
+	)
 
 
 func _normalize_room_code(value: String) -> void:

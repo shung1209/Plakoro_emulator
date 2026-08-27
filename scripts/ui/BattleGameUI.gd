@@ -305,10 +305,15 @@ var battle_report_transition_requested: bool = false
 
 var player_damage_dealt: int = 0
 var enemy_damage_dealt: int = 0
+var online_turn_transition_layer: Control = null
+var online_turn_transition_label: Label = null
+var online_turn_transition_tween: Tween = null
+var last_online_turn_transition_key: String = ""
 
 
 func _ready() -> void:
 
+	_create_online_turn_transition_layer()
 	if not layout_prototype_button.pressed.is_connected(_toggle_layout_prototype):
 		layout_prototype_button.pressed.connect(_toggle_layout_prototype)
 	PLAKORO_THEME.apply_to(self)
@@ -1732,7 +1737,7 @@ func _start_online_battle() -> void:
 	if local_starts:
 		first_player_name = LocalizationService.tr_key("battle.you", "You")
 	await _present_coin_toss(
-		bool(session.get("coin_heads", local_starts)),
+		local_starts,
 		LocalizationService.tr_format(
 			"online.coin_first",
 			{"player": first_player_name},
@@ -1795,6 +1800,7 @@ func _refresh_online_turn_prompt() -> void:
 		]
 		return
 	var my_turn: bool = battle.state.current_participant_id == &"player"
+	_present_online_turn_transition_if_needed(my_turn)
 	_set_battle_action_state(&"choose_move" if my_turn else &"ai_thinking")
 	_set_player_input_enabled(my_turn)
 	_set_battle_navigation_locked(false)
@@ -1808,6 +1814,83 @@ func _refresh_online_turn_prompt() -> void:
 			message_label,
 			LocalizationService.tr_key("online.opponent_turn", "OPPONENT'S TURN • WAITING")
 		)
+
+
+func _create_online_turn_transition_layer() -> void:
+	online_turn_transition_layer = Control.new()
+	online_turn_transition_layer.name = "OnlineTurnTransitionLayer"
+	online_turn_transition_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	online_turn_transition_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	online_turn_transition_layer.z_index = 500
+	online_turn_transition_layer.visible = false
+	add_child(online_turn_transition_layer)
+
+	var band: ColorRect = ColorRect.new()
+	band.set_anchors_preset(Control.PRESET_CENTER)
+	band.anchor_left = 0.0
+	band.anchor_right = 1.0
+	band.offset_top = -82.0
+	band.offset_bottom = 82.0
+	band.color = Color(0.025, 0.045, 0.075, 0.94)
+	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	online_turn_transition_layer.add_child(band)
+
+	online_turn_transition_label = Label.new()
+	online_turn_transition_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	online_turn_transition_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	online_turn_transition_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	online_turn_transition_label.add_theme_font_size_override("font_size", 52)
+	online_turn_transition_label.add_theme_constant_override("outline_size", 8)
+	online_turn_transition_label.add_theme_color_override("font_outline_color", Color(0.01, 0.02, 0.04, 1.0))
+	online_turn_transition_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	band.add_child(online_turn_transition_label)
+
+
+func _present_online_turn_transition_if_needed(my_turn: bool) -> void:
+	if not GameFlow.online_battle_mode or battle == null or battle.state == null:
+		return
+	var transition_key: String = "%d:%s" % [
+		int(battle.state.turn_number),
+		"local" if my_turn else "opponent"
+	]
+	if transition_key == last_online_turn_transition_key:
+		return
+	last_online_turn_transition_key = transition_key
+	_play_online_turn_transition(my_turn)
+
+
+func _play_online_turn_transition(my_turn: bool) -> void:
+	if online_turn_transition_layer == null or online_turn_transition_label == null:
+		return
+	if online_turn_transition_tween != null and online_turn_transition_tween.is_valid():
+		online_turn_transition_tween.kill()
+	var viewport_width: float = maxf(get_viewport_rect().size.x, 480.0)
+	online_turn_transition_label.text = LocalizationService.tr_key(
+		"online.your_turn_short" if my_turn else "online.opponent_turn_short",
+		"YOUR TURN" if my_turn else "OPPONENT TURN"
+	)
+	online_turn_transition_label.add_theme_color_override(
+		"font_color",
+		TURN_BANNER.PLAYER_COLOR if my_turn else TURN_BANNER.AI_COLOR
+	)
+	online_turn_transition_layer.visible = true
+	online_turn_transition_layer.position = Vector2(-viewport_width, 0.0)
+	online_turn_transition_tween = create_tween()
+	online_turn_transition_tween.set_trans(Tween.TRANS_QUART)
+	online_turn_transition_tween.set_ease(Tween.EASE_OUT)
+	online_turn_transition_tween.tween_property(
+		online_turn_transition_layer, "position:x", 0.0, 0.32
+	)
+	online_turn_transition_tween.tween_interval(0.72)
+	online_turn_transition_tween.set_ease(Tween.EASE_IN)
+	online_turn_transition_tween.tween_property(
+		online_turn_transition_layer, "position:x", viewport_width, 0.32
+	)
+	online_turn_transition_tween.tween_callback(
+		func() -> void:
+			online_turn_transition_layer.visible = false
+			online_turn_transition_layer.position = Vector2.ZERO
+	)
 
 
 func _on_online_turn_resolved(result: Dictionary) -> void:
@@ -2061,7 +2144,9 @@ func _present_coin_toss(coin_heads: bool, result_override: String = "") -> void:
 		if GameFlow.local_battle_mode
 		else ("You go first!" if coin_heads else "AI goes first!")
 	)
-	await get_tree().create_timer(1.25).timeout
+	# Keep the resolved face and first-player message readable on desktop as
+	# well as phone layouts before the battle view takes focus again.
+	await get_tree().create_timer(2.5).timeout
 	coin_toss_window.hide()
 
 
