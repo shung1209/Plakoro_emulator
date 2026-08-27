@@ -53,7 +53,12 @@ static func build_turn(
 		)
 	)
 
-	if ai_decision != null and ai_decision.is_valid():
+	if (
+		ai_decision != null
+		and ai_decision.has_method("is_valid")
+		and ai_decision.is_valid()
+		and not (ai_decision.selected_evaluation is Dictionary)
+	):
 		turn.add_entry(
 			_build_ai_entry(
 				actor_id,
@@ -654,10 +659,15 @@ static func _format_costs(
 static func _actor_label(
 	actor_id: StringName
 ) -> String:
+	if GameFlow.local_battle_mode:
+		return LocalizationService.tr_key(
+			"battle.player_one" if actor_id == &"player" else "battle.player_two",
+			"Player 1" if actor_id == &"player" else "Player 2"
+		)
 	if actor_id == &"player":
 		return LocalizationService.tr_key("battle.actor.you", "You")
 
-	return "AI"
+	return LocalizationService.tr_key("battle.ai", "AI")
 
 
 static func _signed(value: int) -> String:

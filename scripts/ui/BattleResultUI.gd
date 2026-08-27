@@ -62,33 +62,34 @@ func _ready() -> void:
 
 
 func _apply_localized_text() -> void:
+	var local_battle: bool = GameFlow.local_battle_mode
 	report_brand.text = LocalizationService.tr_key(
-		"battle_result.report",
-		"PLAKORO  |  BATTLE REPORT"
+		"battle_result.local.report" if local_battle else "battle_result.report",
+		"PLAKORO  |  LOCAL VS RESULT" if local_battle else "PLAKORO  |  BATTLE REPORT"
 	)
 	turns_label.text = LocalizationService.tr_key(
 		"battle_result.turns",
 		"TURNS"
 	)
 	damage_dealt_label.text = LocalizationService.tr_key(
-		"battle_result.damage_dealt",
-		"DAMAGE DEALT"
+		"battle_result.local.player_one_damage" if local_battle else "battle_result.damage_dealt",
+		"PLAYER 1 DAMAGE" if local_battle else "DAMAGE DEALT"
 	)
 	damage_taken_label.text = LocalizationService.tr_key(
-		"battle_result.damage_taken",
-		"DAMAGE TAKEN"
+		"battle_result.local.player_two_damage" if local_battle else "battle_result.damage_taken",
+		"PLAYER 2 DAMAGE" if local_battle else "DAMAGE TAKEN"
 	)
 	career_title.text = LocalizationService.tr_key(
 		"battle_result.career",
 		"CAREER RECORD"
 	)
 	rematch_button.text = LocalizationService.tr_key(
-		"battle_result.rematch",
-		"Rematch"
+		"battle_result.local.rematch" if local_battle else "battle_result.rematch",
+		"Rematch with Same Setup" if local_battle else "Rematch"
 	)
 	preparation_button.text = LocalizationService.tr_key(
-		"battle_result.preparation",
-		"Change Loadout"
+		"battle_result.local.reconfigure" if local_battle else "battle_result.preparation",
+		"Reconfigure Players" if local_battle else "Change Loadout"
 	)
 	encounters_button.text = LocalizationService.tr_key(
 		"battle_result.encounters",
@@ -103,10 +104,18 @@ func _apply_localized_text() -> void:
 		_show_missing_outcome()
 		return
 
-	result_title.text = LocalizationService.tr_key(
-		"battle.victory" if outcome.player_won() else "battle.defeat",
-		"VICTORY" if outcome.player_won() else "DEFEAT"
-	)
+	if local_battle:
+		result_title.text = LocalizationService.tr_key(
+			"battle_result.local.player_one_wins"
+			if outcome.player_won()
+			else "battle_result.local.player_two_wins",
+			"PLAYER 1 WINS" if outcome.player_won() else "PLAYER 2 WINS"
+		)
+	else:
+		result_title.text = LocalizationService.tr_key(
+			"battle.victory" if outcome.player_won() else "battle.defeat",
+			"VICTORY" if outcome.player_won() else "DEFEAT"
+		)
 	result_title.add_theme_color_override(
 		"font_color",
 		Color(0.36, 0.92, 0.56, 1.0)
@@ -125,20 +134,20 @@ func _apply_localized_text() -> void:
 	damage_dealt_value.text = str(outcome.player_damage_dealt)
 	damage_taken_value.text = str(outcome.enemy_damage_dealt)
 	player_hp_label.text = LocalizationService.tr_format(
-		"battle_result.player_hp",
+		"battle_result.local.player_one_hp" if local_battle else "battle_result.player_hp",
 		{
 			"current": outcome.player_hp,
 			"maximum": outcome.player_max_hp
 		},
-		"YOUR HP  {current} / {maximum}"
+		"PLAYER 1 HP  {current} / {maximum}" if local_battle else "YOUR HP  {current} / {maximum}"
 	)
 	enemy_hp_label.text = LocalizationService.tr_format(
-		"battle_result.enemy_hp",
+		"battle_result.local.player_two_hp" if local_battle else "battle_result.enemy_hp",
 		{
 			"current": outcome.enemy_hp,
 			"maximum": outcome.enemy_max_hp
 		},
-		"OPPONENT HP  {current} / {maximum}"
+		"PLAYER 2 HP  {current} / {maximum}" if local_battle else "OPPONENT HP  {current} / {maximum}"
 	)
 	_apply_progress_text()
 

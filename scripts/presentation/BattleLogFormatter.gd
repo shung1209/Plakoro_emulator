@@ -211,9 +211,14 @@ static func _actor_tag(
 	var color: String = ENEMY_COLOR
 	var prefix: String = "AI"
 
-	if participant_id == &"player":
+	if GameFlow.local_battle_mode:
+		prefix = "PLAYER 1" if participant_id == &"player" else "PLAYER 2"
+	elif participant_id == &"player":
 		color = PLAYER_COLOR
 		prefix = "YOU"
+
+	if participant_id == &"player":
+		color = PLAYER_COLOR
 
 	return "[color=%s][b][%s] %s[/b][/color]" % [
 		color,

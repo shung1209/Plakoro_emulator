@@ -35,6 +35,12 @@ static func show_turn(
             "turn": turn_number,
             "actor": (
                 LocalizationService.tr_key(
+                    "battle.player_one" if is_player else "battle.player_two",
+                    "PLAYER 1" if is_player else "PLAYER 2"
+                )
+                if GameFlow.local_battle_mode
+                else (
+                LocalizationService.tr_key(
                     "battle.player_turn",
                     "PLAYER TURN"
                 )
@@ -42,6 +48,7 @@ static func show_turn(
                 else LocalizationService.tr_key(
                     "battle.ai_turn",
                     "AI TURN"
+                )
                 )
             )
         },

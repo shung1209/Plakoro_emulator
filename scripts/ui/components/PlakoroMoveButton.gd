@@ -36,6 +36,7 @@ var _web_info_popup: PopupPanel = null
 var _web_popup_allow_use: bool = false
 var _battle_usable: bool = true
 var _battle_unavailable_reason: String = ""
+var _hover_preview_enabled: bool = true
 
 signal web_move_use_requested(move_card_id: StringName)
 
@@ -56,6 +57,9 @@ func set_move_card(
         _hide_manual_battle_hover_popup()
         return
 
+    if not _hover_preview_enabled:
+        return
+
     if not mouse_entered.is_connected(
         _on_battle_hover_entered
     ):
@@ -69,6 +73,24 @@ func set_move_card(
         mouse_exited.connect(
             _on_battle_hover_exited
         )
+
+
+func set_hover_preview_enabled(enabled: bool) -> void:
+    _hover_preview_enabled = enabled
+    var enter_callable := Callable(self, "_on_battle_hover_entered")
+    var exit_callable := Callable(self, "_on_battle_hover_exited")
+    if not enabled:
+        _hover_request_serial += 1
+        _hide_manual_battle_hover_popup()
+        if mouse_entered.is_connected(enter_callable):
+            mouse_entered.disconnect(enter_callable)
+        if mouse_exited.is_connected(exit_callable):
+            mouse_exited.disconnect(exit_callable)
+    elif not OS.has_feature("web"):
+        if not mouse_entered.is_connected(enter_callable):
+            mouse_entered.connect(enter_callable)
+        if not mouse_exited.is_connected(exit_callable):
+            mouse_exited.connect(exit_callable)
 
 
 func setup_battle_summary(

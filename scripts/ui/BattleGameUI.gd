@@ -381,7 +381,7 @@ func _on_locale_changed(
 
 
 func _rebuild_localized_move_buttons() -> void:
-	if player_loadout == null:
+	if player_loadout == null or enemy_loadout == null:
 		return
 	_clear_move_buttons()
 	_create_move_buttons()
@@ -395,13 +395,19 @@ func _apply_localized_text() -> void:
 	back_to_preparation_button.text = (
 		"<- "
 		+ LocalizationService.tr_key(
-			"battle.back_preparation",
-			"Back to Preparation"
+			"battle.local.reconfigure"
+			if GameFlow.local_battle_mode
+			else "battle.back_preparation",
+			"Reconfigure Players"
+			if GameFlow.local_battle_mode
+			else "Back to Preparation"
 		)
 	)
 	restart_button.text = LocalizationService.tr_key(
-		"battle.restart",
-		"Restart"
+		"battle.local.restart_match"
+		if GameFlow.local_battle_mode
+		else "battle.restart",
+		"Restart Match" if GameFlow.local_battle_mode else "Restart"
 	)
 	_refresh_result_primary_button()
 	result_preparation_button.text = LocalizationService.tr_key(
@@ -421,20 +427,28 @@ func _apply_localized_text() -> void:
 		"Battle Timeline"
 	)
 	player_header_label.text = LocalizationService.tr_key(
-		"battle.you",
-		"YOU"
+		"battle.player_one" if GameFlow.local_battle_mode else "battle.you",
+		"PLAYER 1" if GameFlow.local_battle_mode else "YOU"
 	)
 	enemy_header_label.text = LocalizationService.tr_key(
-		"battle.ai",
-		"AI"
+		"battle.player_two" if GameFlow.local_battle_mode else "battle.ai",
+		"PLAYER 2" if GameFlow.local_battle_mode else "AI"
 	)
 	enemy_charakoro_button.tooltip_text = LocalizationService.tr_key(
-		"battle.opponent_moves_open",
-		"View opponent Charakoro and Moves"
+		"battle.local.player_two_moves_open"
+		if GameFlow.local_battle_mode
+		else "battle.opponent_moves_open",
+		"View Player 2 Charakoro and Moves"
+		if GameFlow.local_battle_mode
+		else "View opponent Charakoro and Moves"
 	)
 	enemy_move_window_title.text = LocalizationService.tr_key(
-		"battle.opponent_moves_title",
-		"OPPONENT CHARAKORO / MOVES"
+		"battle.local.player_two_moves_title"
+		if GameFlow.local_battle_mode
+		else "battle.opponent_moves_title",
+		"PLAYER 2 CHARAKORO / MOVES"
+		if GameFlow.local_battle_mode
+		else "OPPONENT CHARAKORO / MOVES"
 	)
 	enemy_move_window_hint.text = LocalizationService.tr_key(
 		"battle.opponent_moves_hint",
@@ -1160,7 +1174,8 @@ func _set_battle_action_state(
 
 	match phase:
 		&"choose_move":
-			actor_key = "battle.your_turn"
+			if not GameFlow.local_battle_mode:
+				actor_key = "battle.your_turn"
 			phase_key = "battle.phase.choose_move"
 		&"rolling":
 			actor_key = "battle.your_turn"
@@ -1183,6 +1198,12 @@ func _set_battle_action_state(
 		&"battle_finished":
 			actor_key = "battle.finished"
 			phase_key = "battle.phase.battle_finished"
+
+	if GameFlow.local_battle_mode:
+		if actor_key == "battle.your_turn":
+			actor_key = "battle.player_one"
+		elif actor_key == "battle.ai_turn":
+			actor_key = "battle.player_two"
 
 	var actor_text: String = LocalizationService.tr_key(
 		actor_key,
@@ -1207,13 +1228,13 @@ func _set_battle_action_state(
 
 	if phase == &"rolling":
 		roll_result_title_label.text = LocalizationService.tr_key(
-			"battle.roll.player",
-			"YOUR ROLL"
+			"battle.player_one" if GameFlow.local_battle_mode else "battle.roll.player",
+			"PLAYER 1" if GameFlow.local_battle_mode else "YOUR ROLL"
 		)
 	elif phase == &"ai_rolling":
 		roll_result_title_label.text = LocalizationService.tr_key(
-			"battle.roll.opponent",
-			"OPPONENT ROLL"
+			"battle.player_two" if GameFlow.local_battle_mode else "battle.roll.opponent",
+			"PLAYER 2" if GameFlow.local_battle_mode else "OPPONENT ROLL"
 		)
 	elif phase == &"choose_move":
 		roll_result_title_label.text = LocalizationService.tr_key(
@@ -1222,7 +1243,7 @@ func _set_battle_action_state(
 		)
 
 	var actor_color: Color = TURN_BANNER.PLAYER_COLOR
-	if actor_key == "battle.ai_turn":
+	if actor_key in ["battle.ai_turn", "battle.player_two"]:
 		actor_color = TURN_BANNER.AI_COLOR
 	elif actor_key == "battle.finished":
 		actor_color = Color(
@@ -1244,6 +1265,21 @@ func _set_battle_action_state(
 		},
 		"Turn {turn} - {actor}  |  {phase}"
 	)
+	_refresh_local_active_player(actor_key)
+
+
+func _refresh_local_active_player(actor_key: String) -> void:
+	if not GameFlow.local_battle_mode:
+		player_panel.modulate = Color.WHITE
+		enemy_panel.modulate = Color.WHITE
+		return
+	if actor_key == "battle.finished":
+		player_panel.modulate = Color.WHITE
+		enemy_panel.modulate = Color.WHITE
+		return
+	var player_one_active: bool = actor_key == "battle.player_one"
+	player_panel.modulate = Color.WHITE if player_one_active else Color(0.58, 0.62, 0.70, 0.72)
+	enemy_panel.modulate = Color(0.58, 0.62, 0.70, 0.72) if player_one_active else Color.WHITE
 
 
 
@@ -1326,7 +1362,14 @@ func _start_new_battle() -> void:
 		return
 
 	if ai_loadout_data == null:
-		message_label.text = LocalizationService.tr_key("battle.ai_loadout_failed", "AI loadout load failed.")
+		message_label.text = LocalizationService.tr_key(
+			"battle.local.player_two_loadout_failed"
+			if GameFlow.local_battle_mode
+			else "battle.ai_loadout_failed",
+			"Player 2 loadout load failed."
+			if GameFlow.local_battle_mode
+			else "AI loadout load failed."
+		)
 		return
 
 	var player_resource_report: Dictionary = (
@@ -1410,12 +1453,21 @@ func _start_new_battle() -> void:
 
 	if enemy_loadout == null:
 		message_label.text = (
-			LocalizationService.tr_key("battle.ai_runtime_failed", "AI runtime loadout build failed.")
+			LocalizationService.tr_key(
+				"battle.local.player_two_runtime_failed"
+				if GameFlow.local_battle_mode
+				else "battle.ai_runtime_failed",
+				"Player 2 runtime loadout build failed."
+				if GameFlow.local_battle_mode
+				else "AI runtime loadout build failed."
+			)
 		)
 		return
 
 	setup_source_label.text = LocalizationService.tr_format(
-		"battle.setup_source",
+		"battle.local.setup_source"
+		if GameFlow.local_battle_mode
+		else "battle.setup_source",
 		{
 			"player": String(
 				player_loadout_data.loadout_id
@@ -1424,7 +1476,9 @@ func _start_new_battle() -> void:
 				ai_loadout_data.loadout_id
 			)
 		},
-		"Player: {player} | AI: {ai}"
+		"Player 1: {player} | Player 2: {ai}"
+		if GameFlow.local_battle_mode
+		else "Player: {player} | AI: {ai}"
 	)
 
 	var player_verification: Dictionary = (
@@ -1529,15 +1583,29 @@ func _start_new_battle() -> void:
 			int(battle.state.turn_number),
 			&"enemy"
 		)
-		MESSAGE_PRESENTER.show_ai(
-			message_label,
-			LocalizationService.tr_key(
-				"battle.ai_goes_first",
-				"AI won the coin toss and goes first."
+		if GameFlow.local_battle_mode:
+			_clear_move_buttons()
+			_create_move_buttons()
+			_set_battle_action_state(&"choose_move")
+			MESSAGE_PRESENTER.show_ai(
+				message_label,
+				LocalizationService.tr_key(
+					"battle.local.player_two_choose",
+					"Player 2: choose a move."
+				)
 			)
-		)
-		await _hold_action_state(&"ai_thinking", 0.8)
-		await _execute_ai_turn()
+			_set_player_input_enabled(true)
+			_set_battle_navigation_locked(false)
+		else:
+			MESSAGE_PRESENTER.show_ai(
+				message_label,
+				LocalizationService.tr_key(
+					"battle.ai_goes_first",
+					"AI won the coin toss and goes first."
+				)
+			)
+			await _hold_action_state(&"ai_thinking", 0.8)
+			await _execute_ai_turn()
 		return
 
 	TURN_BANNER.show_turn(
@@ -1579,10 +1647,22 @@ func _present_coin_toss(coin_heads: bool) -> void:
 		"HEADS" if coin_heads else "TAILS"
 	)
 	coin_result_label.text = LocalizationService.tr_key(
-		"battle.coin_toss.player_first"
-		if coin_heads
-		else "battle.coin_toss.ai_first",
-		"You go first!" if coin_heads else "AI goes first!"
+		(
+			"battle.local.coin_toss.player_one_first"
+			if coin_heads
+			else "battle.local.coin_toss.player_two_first"
+		)
+		if GameFlow.local_battle_mode
+		else (
+			"battle.coin_toss.player_first"
+			if coin_heads
+			else "battle.coin_toss.ai_first"
+		),
+		(
+			"Player 1 goes first!" if coin_heads else "Player 2 goes first!"
+		)
+		if GameFlow.local_battle_mode
+		else ("You go first!" if coin_heads else "AI goes first!")
 	)
 	await get_tree().create_timer(1.25).timeout
 	coin_toss_window.hide()
@@ -1625,6 +1705,10 @@ func _refresh_single_portrait(
 
 
 func _refresh_enemy_move_reveal() -> void:
+	# The portrait lives inside this button. Local VS hides the opponent Move
+	# reveal interaction, but must keep Player 2's Charakoro visible.
+	enemy_charakoro_button.visible = true
+	enemy_charakoro_button.disabled = GameFlow.local_battle_mode
 	for child: Node in enemy_move_detail_grid.get_children():
 		child.queue_free()
 	if enemy_loadout == null:
@@ -1638,7 +1722,7 @@ func _refresh_enemy_move_reveal() -> void:
 
 
 func _open_enemy_move_window() -> void:
-	if GameFlow.phone_mode:
+	if GameFlow.phone_mode or GameFlow.local_battle_mode:
 		return
 	if enemy_loadout == null:
 		return
@@ -1681,8 +1765,18 @@ func _build_enemy_move_reveal_card(move_card: Variant) -> Button:
 
 
 func _create_move_buttons() -> void:
+	var displayed_loadout: Variant = player_loadout
+	var displayed_setup: Variant = player_energy_setup
+	if (
+		GameFlow.local_battle_mode
+		and battle != null
+		and battle.state != null
+		and battle.state.current_participant_id == &"enemy"
+	):
+		displayed_loadout = enemy_loadout
+		displayed_setup = ai_loadout_data.energy_dice_setup
 	for move_card: Variant in (
-		player_loadout.selected_move_cards
+		displayed_loadout.selected_move_cards
 	):
 		if move_card == null:
 			push_warning(
@@ -1713,7 +1807,7 @@ func _create_move_buttons() -> void:
 
 		var coverage: Variant = (
 			MOVE_COVERAGE_ANALYZER.analyze_move(
-				player_energy_setup,
+				displayed_setup,
 				move_card
 			)
 		)
@@ -1864,9 +1958,15 @@ func _on_move_pressed(
 		return
 
 	if (
-		battle.state.current_participant_id
-		!= &"player"
+		GameFlow.local_battle_mode
+		and battle.state.current_participant_id == &"enemy"
 	):
+		_set_player_input_enabled(false)
+		_set_battle_navigation_locked(true)
+		await _execute_ai_turn(move_card_id)
+		return
+
+	if battle.state.current_participant_id != &"player":
 		return
 
 	_set_player_input_enabled(false)
@@ -2028,7 +2128,10 @@ func _on_move_pressed(
 	_refresh_current_energy_state(
 		move_card,
 		dice_result,
-		"USER"
+		LocalizationService.tr_key(
+			"battle.player_one" if GameFlow.local_battle_mode else "battle.you",
+			"PLAYER 1" if GameFlow.local_battle_mode else "YOU"
+		)
 	)
 	await _wait_desktop_resolution_step()
 
@@ -2201,21 +2304,29 @@ func _on_move_pressed(
 		_show_battle_result()
 		return
 
-	MESSAGE_PRESENTER.show_ai(
-		message_label,
-		LocalizationService.tr_key(
-			"battle.ai_thinking",
-			"AI is thinking..."
+	if GameFlow.local_battle_mode:
+		_clear_move_buttons()
+		_create_move_buttons()
+		_set_battle_action_state(&"choose_move")
+		MESSAGE_PRESENTER.show_ai(
+			message_label,
+			LocalizationService.tr_key(
+				"battle.local.player_two_choose",
+				"Player 2: choose a move."
+			)
 		)
-	)
-	await _hold_action_state(
-		&"ai_thinking",
-		1.0
-	)
-	await _execute_ai_turn()
+		_set_player_input_enabled(true)
+		_set_battle_navigation_locked(false)
+	else:
+		MESSAGE_PRESENTER.show_ai(
+			message_label,
+			LocalizationService.tr_key("battle.ai_thinking", "AI is thinking...")
+		)
+		await _hold_action_state(&"ai_thinking", 1.0)
+		await _execute_ai_turn()
 
 
-func _execute_ai_turn() -> void:
+func _execute_ai_turn(selected_move_card_id: StringName = &"") -> void:
 	if battle.state.is_finished:
 		# _present_turn_damage() has completed all target/self HP beats before
 		# the KO/result UI is revealed.
@@ -2240,7 +2351,8 @@ func _execute_ai_turn() -> void:
 
 	var execution: Dictionary = (
 		ai_turn_service.execute_ai_turn(
-			StringName(ai_loadout_data.difficulty)
+			StringName(ai_loadout_data.difficulty),
+			selected_move_card_id
 		)
 	)
 
@@ -2280,8 +2392,12 @@ func _execute_ai_turn() -> void:
 		or turn_result == null
 	):
 		message_label.text = LocalizationService.tr_key(
-			"battle.ai_turn_failed",
-			"AI turn failed."
+			"battle.local.player_two_turn_failed"
+			if GameFlow.local_battle_mode
+			else "battle.ai_turn_failed",
+			"Player 2 turn failed."
+			if GameFlow.local_battle_mode
+			else "AI turn failed."
 		)
 		_set_battle_action_state(&"choose_move")
 		_set_player_input_enabled(true)
@@ -2322,7 +2438,10 @@ func _execute_ai_turn() -> void:
 	_refresh_current_energy_state(
 		feedback_move_card,
 		dice_result,
-		"AI"
+		LocalizationService.tr_key(
+			"battle.player_two" if GameFlow.local_battle_mode else "battle.ai",
+			"PLAYER 2" if GameFlow.local_battle_mode else "AI"
+		)
 	)
 	await _wait_desktop_resolution_step()
 
@@ -2425,7 +2544,7 @@ func _execute_ai_turn() -> void:
 				move_card,
 				dice_result,
 				turn_result,
-				decision
+				null if GameFlow.local_battle_mode else decision
 			)
 		)
 	else:
@@ -2460,8 +2579,12 @@ func _execute_ai_turn() -> void:
 
 	if not bool(execution.get("success", false)):
 		message_label.text = LocalizationService.tr_key(
-			"battle.ai_turn_failed",
-			"AI turn failed."
+			"battle.local.player_two_turn_failed"
+			if GameFlow.local_battle_mode
+			else "battle.ai_turn_failed",
+			"Player 2 turn failed."
+			if GameFlow.local_battle_mode
+			else "AI turn failed."
 		)
 		_set_battle_action_state(&"choose_move")
 		_set_player_input_enabled(true)
@@ -2479,6 +2602,9 @@ func _execute_ai_turn() -> void:
 		&"player"
 	)
 	_set_battle_action_state(&"choose_move")
+	if GameFlow.local_battle_mode:
+		_clear_move_buttons()
+		_create_move_buttons()
 	MESSAGE_PRESENTER.show_player(
 		message_label,
 		LocalizationService.tr_key(
@@ -2599,14 +2725,22 @@ func _show_charakoro_feedback(
 
 	var actor_text: String = LocalizationService.tr_key(
 		(
-			"battle.you"
-			if actor_side == &"player"
-			else "battle.ai"
+			(
+				"battle.player_one"
+				if actor_side == &"player"
+				else "battle.player_two"
+			)
+			if GameFlow.local_battle_mode
+			else (
+				"battle.you"
+				if actor_side == &"player"
+				else "battle.ai"
+			)
 		),
 		(
-			"USER"
-			if actor_side == &"player"
-			else "AI"
+			("PLAYER 1" if actor_side == &"player" else "PLAYER 2")
+			if GameFlow.local_battle_mode
+			else ("YOU" if actor_side == &"player" else "AI")
 		)
 	)
 	charakoro_feedback_title.text = LocalizationService.tr_format(
@@ -3363,14 +3497,30 @@ func _refresh_ui() -> void:
 			),
 			"actor": LocalizationService.tr_key(
 				(
-					"battle.player"
-					if state.current_participant_id == &"player"
-					else "battle.ai"
+					(
+						"battle.player_one"
+						if state.current_participant_id == &"player"
+						else "battle.player_two"
+					)
+					if GameFlow.local_battle_mode
+					else (
+						"battle.player"
+						if state.current_participant_id == &"player"
+						else "battle.ai"
+					)
 				),
 				(
-					"Player"
-					if state.current_participant_id == &"player"
-					else "AI"
+					(
+						"Player 1"
+						if state.current_participant_id == &"player"
+						else "Player 2"
+					)
+					if GameFlow.local_battle_mode
+					else (
+						"Player"
+						if state.current_participant_id == &"player"
+						else "AI"
+					)
 				)
 			)
 		},
@@ -3406,19 +3556,24 @@ func _refresh_move_button_states() -> void:
 	if battle == null:
 		return
 
+	var active_loadout: Variant = player_loadout
+	var active_participant: Variant = battle.state.player
+	if GameFlow.local_battle_mode and battle.state.current_participant_id == &"enemy":
+		active_loadout = enemy_loadout
+		active_participant = battle.state.enemy
 	for index: int in range(
 		move_buttons.size()
 	):
 		var button: Button = move_buttons[index]
 		var move_card: Variant = (
-			player_loadout.selected_move_cards[index]
+			active_loadout.selected_move_cards[index]
 		)
 
 		var move_name_id: StringName = StringName(
 			move_card.move_name_id
 		)
 		var usable: bool = (
-			battle.state.player.can_use_move(
+			active_participant.can_use_move(
 				move_name_id
 			)
 		)
@@ -3426,14 +3581,14 @@ func _refresh_move_button_states() -> void:
 
 		if not usable:
 			if STATUS_RESOLVER.is_move_locked(
-				battle.state.player,
+				active_participant,
 				move_name_id
 			):
 				unavailable_reason = LocalizationService.tr_key(
 					"battle.move_unavailable.disabled",
 					"Disabled by an active effect"
 				)
-			elif battle.state.player.last_move_name_id == move_name_id:
+			elif active_participant.last_move_name_id == move_name_id:
 				unavailable_reason = LocalizationService.tr_key(
 					"battle.move_unavailable.repeat",
 					"Cannot repeat this move"
