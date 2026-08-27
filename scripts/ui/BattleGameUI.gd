@@ -91,6 +91,18 @@ const OUTCOME_FEEDBACK: Script = preload(
 const PLAYER_LOADOUT_PROVIDER: Script = preload(
 	"res://scripts/loadout/PlayerBattleLoadoutProvider.gd"
 )
+const PLAYER_LOADOUT_DATA: Script = preload(
+	"res://scripts/loadout/PlayerBattleLoadoutData.gd"
+)
+const AI_LOADOUT_DATA: Script = preload(
+	"res://scripts/loadout/AIBattleLoadoutData.gd"
+)
+const DICE_RESULT_DATA: Script = preload(
+	"res://scripts/battle/data/DiceRollResultData.gd"
+)
+const DICE_ROLL_RECORD_DATA: Script = preload(
+	"res://scripts/dice/data/DiceRollRecordData.gd"
+)
 const RUNTIME_LOADOUT_BUILDER: Script = preload(
 	"res://scripts/loadout/RuntimePlayerLoadoutBuilder.gd"
 )
@@ -329,6 +341,12 @@ func _ready() -> void:
 	)
 	enemy_charakoro_button.pressed.connect(_open_enemy_move_window)
 	enemy_move_window_close_button.pressed.connect(enemy_move_window.hide)
+	if not OnlineBattleService.turn_resolved.is_connected(_on_online_turn_resolved):
+		OnlineBattleService.turn_resolved.connect(_on_online_turn_resolved)
+	if not OnlineBattleService.match_ended.is_connected(_on_online_match_ended):
+		OnlineBattleService.match_ended.connect(_on_online_match_ended)
+	if not OnlineBattleService.server_error.is_connected(_on_online_battle_error):
+		OnlineBattleService.server_error.connect(_on_online_battle_error)
 
 	# Prevent the OS close button from quitting immediately. The close request
 	# is handled by _notification() so the player can confirm first.
@@ -397,9 +415,11 @@ func _apply_localized_text() -> void:
 		+ LocalizationService.tr_key(
 			"battle.local.reconfigure"
 			if GameFlow.local_battle_mode
+			else "online.leave_match" if GameFlow.online_battle_mode
 			else "battle.back_preparation",
 			"Reconfigure Players"
 			if GameFlow.local_battle_mode
+			else "Leave Match" if GameFlow.online_battle_mode
 			else "Back to Preparation"
 		)
 	)
@@ -431,8 +451,16 @@ func _apply_localized_text() -> void:
 		"PLAYER 1" if GameFlow.local_battle_mode else "YOU"
 	)
 	enemy_header_label.text = LocalizationService.tr_key(
-		"battle.player_two" if GameFlow.local_battle_mode else "battle.ai",
-		"PLAYER 2" if GameFlow.local_battle_mode else "AI"
+		(
+			"battle.player_two" if GameFlow.local_battle_mode
+			else "online.opponent" if GameFlow.online_battle_mode
+			else "battle.ai"
+		),
+		(
+			"PLAYER 2" if GameFlow.local_battle_mode
+			else "OPPONENT" if GameFlow.online_battle_mode
+			else "AI"
+		)
 	)
 	enemy_charakoro_button.tooltip_text = LocalizationService.tr_key(
 		"battle.local.player_two_moves_open"
@@ -1090,7 +1118,18 @@ func _on_back_to_preparation_pressed() -> void:
 		return
 
 	# Returning to Preparation is normal navigation, not quitting the game.
-	GameFlow.open_preparation()
+	if GameFlow.online_battle_mode:
+		if battle != null and battle.state != null and not battle.state.is_finished:
+			_set_player_input_enabled(false)
+			_set_battle_navigation_locked(true)
+			message_label.text = LocalizationService.tr_key(
+				"online.forfeiting", "FORFEITING MATCH..."
+			)
+			OnlineBattleService.forfeit_match()
+		else:
+			GameFlow.return_to_online_lobby()
+	else:
+		GameFlow.open_preparation()
 
 
 func _show_quit_confirmation() -> void:
@@ -1348,6 +1387,10 @@ func _start_new_battle() -> void:
 
 	if timeline_view.has_method("clear_timeline"):
 		timeline_view.clear_timeline()
+
+	if GameFlow.online_battle_mode:
+		await _start_online_battle()
+		return
 
 	player_loadout_data = (
 		PLAYER_LOADOUT_PROVIDER.load_player_loadout()
@@ -1625,6 +1668,228 @@ func _start_new_battle() -> void:
 	)
 	_set_player_input_enabled(true)
 	_set_battle_navigation_locked(false)
+
+
+func _start_online_battle() -> void:
+	var session: Dictionary = OnlineBattleService.battle_session
+	if session.is_empty() or OnlineBattleService.revealed_players.size() != 2:
+		message_label.text = LocalizationService.tr_key(
+			"online.session_missing", "Online battle session is unavailable."
+		)
+		return
+
+	var local_entry: Dictionary = {}
+	var opponent_entry: Dictionary = {}
+	for value: Variant in OnlineBattleService.revealed_players:
+		var entry: Dictionary = Dictionary(value)
+		if String(entry.get("id", "")) == OnlineBattleService.player_id:
+			local_entry = entry
+		else:
+			opponent_entry = entry
+	if local_entry.is_empty() or opponent_entry.is_empty():
+		message_label.text = LocalizationService.tr_key(
+			"online.session_missing", "Online battle session is unavailable."
+		)
+		return
+
+	var local_dictionary: Dictionary = Dictionary(local_entry.get("loadout", {})).duplicate(true)
+	local_dictionary["loadout_id"] = "online_local"
+	var opponent_dictionary: Dictionary = Dictionary(opponent_entry.get("loadout", {})).duplicate(true)
+	opponent_dictionary["loadout_id"] = "online_opponent"
+	opponent_dictionary["difficulty"] = "hard"
+	opponent_dictionary["uses_difficulty_dice"] = false
+	player_loadout_data = PLAYER_LOADOUT_DATA.from_dictionary(local_dictionary)
+	ai_loadout_data = AI_LOADOUT_DATA.from_dictionary(opponent_dictionary)
+	player_energy_setup = player_loadout_data.energy_dice_setup
+	player_loadout = RUNTIME_LOADOUT_BUILDER.build_runtime_loadout(
+		player_loadout_data, database, team_rules, &"player", true
+	)
+	enemy_loadout = RUNTIME_AI_LOADOUT_BUILDER.build_runtime_loadout(
+		ai_loadout_data, database, team_rules, &"ai", true
+	)
+	if player_loadout == null or enemy_loadout == null:
+		message_label.text = LocalizationService.tr_key(
+			"online.runtime_failed", "Online battle loadout could not be prepared."
+		)
+		return
+
+	var local_starts: bool = String(session.get("current_player_id", "")) == OnlineBattleService.player_id
+	battle = BATTLE_CONTROLLER.new(database)
+	battle.start_battle(player_loadout, enemy_loadout, &"player" if local_starts else &"enemy")
+	_sync_online_battle_state(session, local_entry, opponent_entry)
+	setup_source_label.text = LocalizationService.tr_key("online.title", "ONLINE VS")
+	restart_button.visible = false
+	enemy_charakoro_button.disabled = false
+	_refresh_plakoro_presentations()
+	_refresh_enemy_move_reveal()
+	_create_move_buttons()
+	_refresh_ui()
+	_refresh_online_turn_prompt()
+
+
+func _sync_online_battle_state(
+	session: Dictionary,
+	local_entry: Dictionary = {},
+	opponent_entry: Dictionary = {}
+) -> void:
+	if battle == null or battle.state == null:
+		return
+	if local_entry.is_empty() or opponent_entry.is_empty():
+		for value: Variant in OnlineBattleService.revealed_players:
+			var entry: Dictionary = Dictionary(value)
+			if String(entry.get("id", "")) == OnlineBattleService.player_id:
+				local_entry = entry
+			else:
+				opponent_entry = entry
+	var hp: Dictionary = Dictionary(session.get("hp", {}))
+	battle.state.player.current_hp = int(hp.get(String(local_entry.get("id", "")), battle.state.player.current_hp))
+	battle.state.enemy.current_hp = int(hp.get(String(opponent_entry.get("id", "")), battle.state.enemy.current_hp))
+	battle.state.turn_number = int(session.get("turn", battle.state.turn_number))
+	battle.state.current_participant_id = (
+		&"player"
+		if String(session.get("current_player_id", "")) == OnlineBattleService.player_id
+		else &"enemy"
+	)
+	battle.state.is_finished = String(session.get("phase", "")) == "finished"
+	if battle.state.is_finished:
+		battle.state.winner_participant_id = (
+			&"player"
+			if String(session.get("winner_id", "")) == OnlineBattleService.player_id
+			else &"enemy"
+		)
+
+
+func _refresh_online_turn_prompt() -> void:
+	_refresh_ui()
+	if battle.state.is_finished:
+		_set_player_input_enabled(false)
+		_set_battle_navigation_locked(false)
+		_set_battle_action_state(&"battle_finished")
+		result_panel.visible = true
+		result_actions.visible = false
+		var won: bool = battle.state.winner_participant_id == &"player"
+		result_title_label.text = LocalizationService.tr_key(
+			"online.you_win" if won else "online.you_lose", "YOU WIN" if won else "YOU LOSE"
+		)
+		result_summary_label.text = LocalizationService.tr_key(
+			"online.match_finished", "ONLINE MATCH FINISHED"
+		)
+		result_hp_label.text = "%d / %d  •  %d / %d" % [
+			int(battle.state.player.current_hp), int(battle.state.player.max_hp),
+			int(battle.state.enemy.current_hp), int(battle.state.enemy.max_hp)
+		]
+		return
+	var my_turn: bool = battle.state.current_participant_id == &"player"
+	_set_battle_action_state(&"choose_move" if my_turn else &"ai_thinking")
+	_set_player_input_enabled(my_turn)
+	_set_battle_navigation_locked(false)
+	if my_turn:
+		MESSAGE_PRESENTER.show_player(
+			message_label,
+			LocalizationService.tr_key("online.your_turn", "YOUR TURN • CHOOSE A MOVE")
+		)
+	else:
+		MESSAGE_PRESENTER.show_ai(
+			message_label,
+			LocalizationService.tr_key("online.opponent_turn", "OPPONENT'S TURN • WAITING")
+		)
+
+
+func _on_online_turn_resolved(result: Dictionary) -> void:
+	if not GameFlow.online_battle_mode or battle == null:
+		return
+	var dice_result: Variant = DICE_RESULT_DATA.new()
+	for key: Variant in Dictionary(result.get("energy_counts", {})).keys():
+		dice_result.energy_counts[StringName(key)] = int(result["energy_counts"][key])
+	if bool(result.get("energy_met", false)):
+		dice_result.kyokoro_orientation = StringName(result.get("charakoro_orientation", ""))
+	var actor_is_local: bool = String(result.get("actor_id", "")) == OnlineBattleService.player_id
+	var actor_loadout: Variant = player_loadout if actor_is_local else enemy_loadout
+	var energy_profiles: Array = _create_profiles(actor_loadout)
+	var roll_record: Variant = DICE_ROLL_RECORD_DATA.new()
+	var face_orientations: Dictionary = {
+		"fixed": [&"FACE_UP", &"FACE_DOWN"],
+		"double": [&"HEAD_UP", &"HEAD_DOWN"],
+		"single": [&"HEAD_LEFT", &"HEAD_RIGHT"]
+	}
+	for roll_value: Variant in Array(result.get("energy_roll", [])):
+		var roll: Dictionary = Dictionary(roll_value)
+		var orientations: Array = Array(face_orientations.get(String(roll.get("face_type", "")), []))
+		var face_index: int = int(roll.get("face_index", -1))
+		if face_index >= 0 and face_index < orientations.size():
+			roll_record.energy_die_face_ids.append(orientations[face_index])
+	roll_record.energy_counts = dice_result.energy_counts.duplicate(true)
+	roll_record.kyokoro_orientation = dice_result.kyokoro_orientation
+	roll_result_panel.visible = true
+	await battle_dice_roll_presenter.play_result(dice_result, energy_profiles, roll_record)
+
+	var move_id: StringName = StringName(result.get("move_id", ""))
+	var move_card: Variant = RESOURCE_RECOVERY.safe_get_move(database, move_id, "Online turn")
+	var move_name: String = String(move_id)
+	if move_card != null:
+		move_name = GameContentLocalizationService.localize_move(move_card)
+	var lines: PackedStringArray = [LocalizationService.tr_format(
+		"online.used_move", {"move": move_name}, "USED {move}"
+	)]
+	if not bool(result.get("energy_met", false)):
+		lines.append(LocalizationService.tr_key(
+			"online.energy_failed", "ENERKORO ENERGY FAILED • ATTACK FAILED"
+		))
+	else:
+		lines.append(LocalizationService.tr_key("online.energy_ok", "ENERKORO ENERGY CONFIRMED"))
+		lines.append(LocalizationService.tr_format(
+			"online.charakoro_result",
+			{"result": String(result.get("charakoro_orientation", "")), "bonus": int(result.get("charakoro_bonus", 0))},
+			"CHARAKORO {result} • +{bonus}"
+		))
+		if int(result.get("weakness_bonus", 0)) > 0:
+			lines.append(LocalizationService.tr_format(
+				"online.weakness_bonus", {"bonus": int(result.get("weakness_bonus", 0))}, "WEAKNESS • +{bonus}"
+			))
+		lines.append(LocalizationService.tr_format(
+			"online.damage_result", {"damage": int(result.get("damage", 0))}, "ATTACK DEALT {damage} DAMAGE"
+		))
+		if int(result.get("healing", 0)) > 0:
+			lines.append(LocalizationService.tr_format(
+				"online.healing_result", {"amount": int(result.get("healing", 0))}, "RECOVERED {amount} HP"
+			))
+		if int(result.get("recoil", 0)) > 0:
+			lines.append(LocalizationService.tr_format(
+				"online.recoil_result", {"amount": int(result.get("recoil", 0))}, "RECOIL • {amount} DAMAGE"
+			))
+	message_label.text = "\n".join(lines)
+	if bool(result.get("energy_met", false)) and move_card != null:
+		var actor: Variant = battle.state.player if actor_is_local else battle.state.enemy
+		actor.last_move_name_id = StringName(move_card.move_name_id)
+	var player_hp_before: int = int(battle.state.player.current_hp)
+	var enemy_hp_before: int = int(battle.state.enemy.current_hp)
+	_sync_online_battle_state(Dictionary(result.get("match", {})))
+	_show_hp_delta_feedback(player_hero_container, player_hp_before, int(battle.state.player.current_hp))
+	_show_hp_delta_feedback(enemy_hero_container, enemy_hp_before, int(battle.state.enemy.current_hp))
+	await _animate_hp_bars()
+	_refresh_online_turn_prompt()
+
+
+func _on_online_battle_error(_code: String, error_message: String) -> void:
+	if not GameFlow.online_battle_mode:
+		return
+	if battle != null and battle.state != null and not battle.state.is_finished:
+		_refresh_online_turn_prompt()
+	message_label.text = error_message
+
+
+func _on_online_match_ended(result: Dictionary) -> void:
+	if not GameFlow.online_battle_mode or battle == null:
+		return
+	_sync_online_battle_state(Dictionary(result.get("match", {})))
+	_refresh_online_turn_prompt()
+	var forfeited_locally: bool = (
+		String(result.get("forfeiting_player_id", "")) == OnlineBattleService.player_id
+	)
+	result_summary_label.text = LocalizationService.tr_key(
+		"online.you_forfeited" if forfeited_locally else "online.opponent_left",
+		"YOU FORFEITED" if forfeited_locally else "OPPONENT LEFT THE MATCH"
+	)
 
 
 func _present_coin_toss(coin_heads: bool) -> void:
@@ -1955,6 +2220,19 @@ func _on_move_pressed(
 		return
 
 	if battle.state.is_finished:
+		return
+
+	if GameFlow.online_battle_mode:
+		if battle.state.current_participant_id != &"player":
+			return
+		_set_player_input_enabled(false)
+		_set_battle_navigation_locked(true)
+		_set_battle_action_state(&"rolling")
+		MESSAGE_PRESENTER.show_normal(
+			message_label,
+			LocalizationService.tr_key("online.waiting_resolution", "Waiting for server result...")
+		)
+		OnlineBattleService.choose_move(String(move_card_id))
 		return
 
 	if (
@@ -3497,30 +3775,24 @@ func _refresh_ui() -> void:
 			),
 			"actor": LocalizationService.tr_key(
 				(
-					(
-						"battle.player_one"
-						if state.current_participant_id == &"player"
-						else "battle.player_two"
-					)
-					if GameFlow.local_battle_mode
-					else (
-						"battle.player"
-						if state.current_participant_id == &"player"
-						else "battle.ai"
-					)
+					"battle.player_one" if state.current_participant_id == &"player"
+					else "battle.player_two"
+				)
+				if GameFlow.local_battle_mode
+				else (
+					"battle.player" if state.current_participant_id == &"player"
+					else "online.opponent" if GameFlow.online_battle_mode
+					else "battle.ai"
 				),
 				(
-					(
-						"Player 1"
-						if state.current_participant_id == &"player"
-						else "Player 2"
-					)
-					if GameFlow.local_battle_mode
-					else (
-						"Player"
-						if state.current_participant_id == &"player"
-						else "AI"
-					)
+					"Player 1" if state.current_participant_id == &"player"
+					else "Player 2"
+				)
+				if GameFlow.local_battle_mode
+				else (
+					"Player" if state.current_participant_id == &"player"
+					else "Opponent" if GameFlow.online_battle_mode
+					else "AI"
 				)
 			)
 		},

@@ -53,7 +53,11 @@ var matchup_reveal_started: bool = false
 func _ready() -> void:
 	THEME.apply_to(self)
 	database.load_all()
-	GameFlow.local_battle_mode = true
+	if not GameFlow.online_battle_mode:
+		GameFlow.local_battle_mode = true
+	if GameFlow.online_battle_mode and GameFlow.local_battle_setup_phase == &"online_submit":
+		call_deferred("_submit_online_loadout")
+		return
 	if GameFlow.local_battle_setup_phase == &"":
 		GameFlow.local_battle_setup_phase = &"player1_pokemon"
 	continue_button.pressed.connect(_continue_setup)
@@ -117,13 +121,19 @@ func _apply_responsive_layout() -> void:
 
 func _apply_text() -> void:
 	title_label.text = LocalizationService.tr_key(
-		"main_menu.local_battle", "LOCAL VS"
+		"main_menu.online_battle" if GameFlow.online_battle_mode else "main_menu.local_battle",
+		"ONLINE VS" if GameFlow.online_battle_mode else "LOCAL VS"
 	)
-	var player_number: int = 2 if GameFlow.local_battle_setup_phase == &"player2_pokemon" else 1
-	player_label.text = LocalizationService.tr_format(
-		"preparation.local.choose_pokemon", {"player": player_number},
-		"PLAYER {player}: CHOOSE POKÉMON"
-	)
+	if GameFlow.online_battle_mode:
+		player_label.text = LocalizationService.tr_key(
+			"online.choose_loadout", "CHOOSE YOUR POKÉMON"
+		)
+	else:
+		var player_number: int = 2 if GameFlow.local_battle_setup_phase == &"player2_pokemon" else 1
+		player_label.text = LocalizationService.tr_format(
+			"preparation.local.choose_pokemon", {"player": player_number},
+			"PLAYER {player}: CHOOSE POKÉMON"
+		)
 	continue_button.text = LocalizationService.tr_key(
 		"preparation.local.continue_energy"
 		if choosing_moves
@@ -291,7 +301,10 @@ func _finish_player_setup() -> void:
 			"preparation.local.need_four_moves", "Choose exactly four Moves."
 		)
 		return
-	var player_two: bool = GameFlow.local_battle_setup_phase == &"player2_pokemon"
+	var player_two: bool = (
+		not GameFlow.online_battle_mode
+		and GameFlow.local_battle_setup_phase == &"player2_pokemon"
+	)
 	var result: Dictionary = (
 		CONTENT_PLAYTEST.create_playtest_opponent_loadout(pokemon_id, &"normal", move_ids)
 		if player_two
@@ -302,7 +315,11 @@ func _finish_player_setup() -> void:
 		return
 	var target_path: String = CONTENT_PLAYTEST.get_pokemon_default_dice_path(pokemon)
 	var species_id: String = String(pokemon.get("species_id", "")).to_lower()
-	GameFlow.local_battle_setup_phase = &"ready" if player_two else &"player2_pokemon"
+	GameFlow.local_battle_setup_phase = (
+		&"online_submit"
+		if GameFlow.online_battle_mode
+		else (&"ready" if player_two else &"player2_pokemon")
+	)
 	if not DICE_CONTEXT.set_context(
 		"pokemon_default", target_path,
 		GameFlow.LOCAL_BATTLE_SETUP_SCENE, pokemon_id, species_id
@@ -328,10 +345,26 @@ func _go_back() -> void:
 		_apply_text()
 		_refresh_pokemon_summary()
 		return
+	if GameFlow.online_battle_mode:
+		GameFlow.return_to_online_lobby()
+		return
 	if GameFlow.phone_mode:
 		GameFlow.open_phone_mode_menu()
 	else:
 		GameFlow.exit_phone_mode()
+
+
+func _submit_online_loadout() -> void:
+	var loadout: Variant = PLAYER_LOADOUT_PROVIDER.load_player_loadout()
+	if loadout == null or not loadout.is_complete():
+		GameFlow.local_battle_setup_phase = &"online_player_pokemon"
+		status_label.text = LocalizationService.tr_key(
+			"online.loadout_failed", "Could not load the completed Online loadout."
+		)
+		return
+	OnlineBattleService.submit_loadout(loadout.to_dictionary())
+	GameFlow.local_battle_setup_phase = &""
+	GameFlow.return_to_online_lobby()
 
 
 func _present_player_two_handoff() -> void:

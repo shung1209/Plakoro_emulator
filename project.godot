@@ -29,6 +29,11 @@ PlayerProgress="*res://scripts/game/PlayerProgress.gd"
 UIInteractionMotion="*res://scripts/ui/UIInteractionMotion.gd"
 WebUIUsability="*res://scripts/ui/WebUIUsability.gd"
 PhoneOrientationGuard="*res://scripts/ui/phone/PhoneOrientationGuard.gd"
+OnlineBattleService="*res://scripts/online/OnlineBattleService.gd"
+
+[online]
+
+server_url="ws://127.0.0.1:10000/ws"
 
 [display]
 

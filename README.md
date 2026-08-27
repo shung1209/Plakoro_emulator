@@ -20,6 +20,12 @@ advance through the arena.
   levels up to LV5.
 - Free Mode with all playable content available for unrestricted battles and
   expanded Enerkoro rules.
+- Local VS with private pass-and-play setup for two players: each player
+  chooses a Pokémon, four Moves, and three Enerkoro before both Loadouts are
+  revealed and the battle begins.
+- Experimental Online VS foundation with private room codes, synchronized
+  Loadouts, server-selected first turn, authoritative Enerkoro and Charakoro
+  rolls, damage/effect resolution, and disconnect/forfeit results.
 - Phone Mode with dedicated portrait menus, simplified preparation and
   Loadout scenes, a vertical Enerkoro Builder, and a focused touch-first
   battle flow.
@@ -171,6 +177,15 @@ The included export presets provide:
 Web export helpers are available in `tools/export_web.sh` and
 `tools/export_web.ps1`.
 
+### Online VS server
+
+The authoritative WebSocket service lives in `online-server/`. For local
+testing, install its dependencies and run `pnpm start`; the game defaults to
+`ws://127.0.0.1:10000/ws`. A Render Blueprint is included as `render.yaml`.
+After deployment, set the Godot project setting `online/server_url` to
+`wss://<your-render-service>.onrender.com/ws` before exporting the client.
+See `online-server/README.md` for deployment and verification details.
+
 ## User Data and Custom Content
 
 On first launch, the game copies the editable starter database into Godot's
@@ -236,6 +251,10 @@ V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險�
   故事路線、戰鬥獎勵、收藏解鎖，以及最高 LV5 的 Plakoro 等級。
 - Free Mode 開放所有可玩內容，讓玩家自由對戰，並提供較寬鬆的 Enerkoro
   規則。
+- 本機對戰提供兩位玩家依序且保密的設定流程；雙方各自選擇 Pokémon、四張
+  招式與三顆 Enerkoro，完成後才同時揭曉配置並開始對戰。
+- 實驗性的線上對戰基礎：私人房號、Loadout 同步、伺服器決定先攻、
+  Enerkoro／Charakoro 權威擲骰、傷害與常用效果結算，以及斷線／投降判定。
 - Phone Mode 提供專用直立主選單、簡化版對戰準備與 Loadout 場景、垂直排列
   的 Enerkoro Builder，以及適合觸控操作的精簡戰鬥流程。
 - 收錄 21 隻 Pokémon、126 張招式卡及 9 組自訂 Kyokoro 權重設定。
@@ -371,6 +390,15 @@ Charakoro，可在獨立視窗
 
 Web 匯出輔助工具位於 `tools/export_web.sh` 與
 `tools/export_web.ps1`。
+
+### 線上對戰伺服器
+
+權威 WebSocket 服務位於 `online-server/`。本機測試時先安裝相依套件，再執行
+`pnpm start`；遊戲預設連線至 `ws://127.0.0.1:10000/ws`。Repository 根目錄
+已提供 Render Blueprint：`render.yaml`。部署後，請在匯出遊戲前將 Godot
+專案設定 `online/server_url` 改成
+`wss://<你的-render-service>.onrender.com/ws`。部署與驗測細節請參考
+`online-server/README.md`。
 
 ## 使用者資料與自訂內容
 

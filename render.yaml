@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: plakoro-online
+    runtime: node
+    rootDir: online-server
+    buildCommand: pnpm install --frozen-lockfile
+    startCommand: pnpm start
+    healthCheckPath: /health
+    autoDeployTrigger: commit
