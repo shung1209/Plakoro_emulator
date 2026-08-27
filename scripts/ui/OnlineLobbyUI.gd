@@ -12,6 +12,8 @@ const ENERGY_CODES: Dictionary = {
 	"G": &"dark", "H": &"steel", "I": &"flying",
 }
 
+var _join_code_entry_visible: bool = false
+
 @onready var panel: PanelContainer = %Panel
 @onready var title_label: Label = %TitleLabel
 @onready var subtitle_label: Label = %SubtitleLabel
@@ -21,8 +23,12 @@ const ENERGY_CODES: Dictionary = {
 @onready var connect_button: Button = %ConnectButton
 @onready var create_room_button: Button = %CreateRoomButton
 @onready var join_label: Label = %JoinLabel
+@onready var open_join_button: Button = %OpenJoinButton
+@onready var join_row: VBoxContainer = %JoinRow
 @onready var room_code_edit: LineEdit = %RoomCodeEdit
+@onready var code_selection_label: Label = %CodeSelectionLabel
 @onready var code_display: HBoxContainer = %CodeDisplay
+@onready var energy_choice_label: Label = %EnergyChoiceLabel
 @onready var energy_palette: GridContainer = %EnergyPalette
 @onready var code_back_button: Button = %CodeBackButton
 @onready var code_clear_button: Button = %CodeClearButton
@@ -40,6 +46,7 @@ const ENERGY_CODES: Dictionary = {
 @onready var submit_move_button: Button = %SubmitMoveButton
 @onready var turn_result_label: Label = %TurnResultLabel
 @onready var foundation_label: Label = %FoundationLabel
+@onready var bottom_row: HBoxContainer = %BottomRow
 @onready var back_button: Button = %BackButton
 @onready var leave_room_button: Button = %LeaveRoomButton
 
@@ -49,6 +56,7 @@ func _ready() -> void:
 	server_url_edit.text = OnlineBattleService.get_default_server_url()
 	connect_button.pressed.connect(_toggle_connection)
 	create_room_button.pressed.connect(_create_room)
+	open_join_button.pressed.connect(_open_join_code_entry)
 	join_room_button.pressed.connect(_join_room)
 	code_back_button.pressed.connect(_remove_code_energy)
 	code_clear_button.pressed.connect(_clear_code)
@@ -114,7 +122,15 @@ func _apply_localized_text() -> void:
 		"online.create_room", "CREATE PRIVATE ROOM"
 	)
 	join_label.text = LocalizationService.tr_key("online.join_room", "Join Room")
+	open_join_button.text = LocalizationService.tr_key("online.join_room", "JOIN ROOM")
+	code_selection_label.text = LocalizationService.tr_key(
+		"online.selected_energy_code", "SELECTED ROOM CODE"
+	)
+	energy_choice_label.text = LocalizationService.tr_key(
+		"online.choose_code_energy", "CHOOSE AN ENERGY"
+	)
 	join_room_button.text = LocalizationService.tr_key("online.join", "JOIN")
+	code_back_button.text = LocalizationService.tr_key("common.delete_short", "DEL")
 	code_clear_button.text = LocalizationService.tr_key("common.clear", "CLEAR")
 	leave_room_button.text = LocalizationService.tr_key("online.leave", "LEAVE ROOM")
 	configure_button.text = LocalizationService.tr_key(
@@ -141,6 +157,16 @@ func _toggle_connection() -> void:
 
 func _create_room() -> void:
 	OnlineBattleService.create_room(DEFAULT_ONLINE_PLAYER_NAME)
+
+
+func _open_join_code_entry() -> void:
+	_join_code_entry_visible = true
+	_apply_lobby_page_visibility(OnlineBattleService.current_room)
+
+
+func _close_join_code_entry() -> void:
+	_join_code_entry_visible = false
+	_apply_lobby_page_visibility(OnlineBattleService.current_room)
 
 
 func _join_room() -> void:
@@ -179,14 +205,17 @@ func _append_code_energy(code: String) -> void:
 	if room_code_edit.text.length() >= 6:
 		return
 	room_code_edit.text += code
+	_refresh_energy_code_display()
 
 
 func _remove_code_energy() -> void:
 	room_code_edit.text = room_code_edit.text.left(maxi(0, room_code_edit.text.length() - 1))
+	_refresh_energy_code_display()
 
 
 func _clear_code() -> void:
 	room_code_edit.text = ""
+	_refresh_energy_code_display()
 
 
 func _refresh_energy_code_display() -> void:
@@ -199,16 +228,24 @@ func _refresh_energy_code_display() -> void:
 
 func _render_energy_code(container: HBoxContainer, code: String, show_empty: bool) -> void:
 	for child: Node in container.get_children():
+		container.remove_child(child)
 		child.queue_free()
 	for index: int in 6:
-		var slot := TextureRect.new()
-		slot.custom_minimum_size = Vector2(48, 48)
-		slot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		slot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		if index < code.length() and ENERGY_CODES.has(code[index]):
-			slot.texture = ICONS.load_energy_icon(ENERGY_CODES[code[index]])
+		var slot := Button.new()
+		slot.custom_minimum_size = Vector2(54, 54)
+		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.focus_mode = Control.FOCUS_NONE
+		slot.expand_icon = true
+		var code_character: String = code.substr(index, 1) if index < code.length() else ""
+		if ENERGY_CODES.has(code_character):
+			var energy: StringName = ENERGY_CODES[code_character]
+			slot.icon = ICONS.load_energy_icon(energy)
+			slot.tooltip_text = String(energy).capitalize()
 		elif show_empty:
-			slot.tooltip_text = "—"
+			slot.text = str(index + 1)
+			slot.modulate = Color(1.0, 1.0, 1.0, 0.58)
+		else:
+			slot.visible = false
 		container.add_child(slot)
 
 
@@ -218,6 +255,7 @@ func _on_connection_state_changed(_state: StringName) -> void:
 	server_url_edit.editable = not connected and not connecting
 	connect_button.disabled = connecting
 	create_room_button.disabled = not connected
+	open_join_button.disabled = not connected
 	join_room_button.disabled = not connected or room_code_edit.text.length() != 6
 	_refresh_connection_text()
 
@@ -239,11 +277,11 @@ func _refresh_connection_text() -> void:
 
 
 func _on_room_changed(room: Dictionary) -> void:
+	if not room.is_empty():
+		_join_code_entry_visible = false
 	room_panel.visible = not room.is_empty()
 	leave_room_button.visible = not room.is_empty()
-	create_room_button.visible = room.is_empty()
-	join_label.visible = room.is_empty()
-	room_code_edit.get_parent().visible = room.is_empty()
+	_apply_lobby_page_visibility(room)
 	_refresh_configure_button(room)
 	var rules: Dictionary = Dictionary(room.get("rules", {}))
 	var allow_repeated: bool = bool(rules.get("allow_repeated_fixed_energy", false))
@@ -256,6 +294,23 @@ func _on_room_changed(room: Dictionary) -> void:
 		or bool(room.get("match_started", false))
 	)
 	_refresh_room_text()
+
+
+func _apply_lobby_page_visibility(room: Dictionary) -> void:
+	var room_empty: bool = room.is_empty()
+	var show_actions: bool = room_empty and not _join_code_entry_visible
+	var back_parent: Container = join_row if room_empty and _join_code_entry_visible else bottom_row
+	if back_button.get_parent() != back_parent:
+		back_button.reparent(back_parent)
+		if back_parent == bottom_row:
+			bottom_row.move_child(back_button, 0)
+	status_label.get_parent().visible = show_actions
+	server_label.visible = show_actions
+	server_url_edit.get_parent().visible = show_actions
+	create_room_button.visible = show_actions
+	open_join_button.visible = show_actions
+	join_label.visible = room_empty
+	join_row.visible = room_empty and _join_code_entry_visible
 
 
 func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
@@ -420,6 +475,9 @@ func _on_server_error(_code: String, message: String) -> void:
 
 
 func _go_back() -> void:
+	if _join_code_entry_visible and OnlineBattleService.current_room.is_empty():
+		_close_join_code_entry()
+		return
 	OnlineBattleService.disconnect_from_server()
 	if GameFlow.phone_mode:
 		GameFlow.open_phone_mode_menu()

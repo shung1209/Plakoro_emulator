@@ -123,7 +123,16 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Join Room"
 
+[node name="OpenJoinButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+disabled = true
+text = "JOIN ROOM"
+
 [node name="JoinRow" type="VBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 10
 
@@ -137,15 +146,35 @@ max_length = 6
 placeholder_text = "ABC123"
 alignment = 1
 
+[node name="CodeSelectionLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.75, 0.82, 1)
+text = "Selected room code"
+horizontal_alignment = 1
+
 [node name="CodeDisplay" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
+[node name="CodeDivider" type="ColorRect" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.25, 0.36, 0.5, 0.72)
+
+[node name="EnergyChoiceLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.75, 0.82, 1)
+text = "Choose an Energy"
+horizontal_alignment = 1
+
 [node name="EnergyPalette" type="GridContainer" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 9
@@ -159,7 +188,7 @@ alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 52)
 layout_mode = 2
-text = "⌫"
+text = "DEL"
 
 [node name="CodeClearButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow/JoinControls"]
 unique_name_in_owner = true
@@ -291,6 +320,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="BottomRow" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
