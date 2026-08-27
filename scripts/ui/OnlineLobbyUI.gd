@@ -5,6 +5,10 @@ const PLAKORO_THEME: Script = preload(
 )
 const MOVE_AUTHORING: Script = preload("res://scripts/content/MoveCardAuthoringService.gd")
 const DEFAULT_ONLINE_PLAYER_NAME: String = "Player"
+const IOS_WEB_PROMPT_COOLDOWN_MS: int = 750
+
+var _ios_web_input: bool = false
+var _last_ios_prompt_ms: int = -IOS_WEB_PROMPT_COOLDOWN_MS
 
 @onready var panel: PanelContainer = %Panel
 @onready var title_label: Label = %TitleLabel
@@ -35,6 +39,7 @@ const DEFAULT_ONLINE_PLAYER_NAME: String = "Player"
 
 func _ready() -> void:
 	PLAKORO_THEME.apply_to(self)
+	_ios_web_input = _is_ios_web_browser()
 	server_url_edit.text = OnlineBattleService.get_default_server_url()
 	connect_button.pressed.connect(_toggle_connection)
 	create_room_button.pressed.connect(_create_room)
@@ -47,6 +52,7 @@ func _ready() -> void:
 	room_code_edit.text_changed.connect(_normalize_room_code)
 	room_code_edit.gui_input.connect(_on_room_code_gui_input)
 	room_code_edit.virtual_keyboard_enabled = true
+	room_code_edit.virtual_keyboard_show_on_focus = true
 	room_code_edit.focus_mode = Control.FOCUS_ALL
 	OnlineBattleService.connection_state_changed.connect(_on_connection_state_changed)
 	OnlineBattleService.room_changed.connect(_on_room_changed)
@@ -160,8 +166,58 @@ func _on_room_code_gui_input(event: InputEvent) -> void:
 			and event.pressed
 		)
 	)
+	if pressed and _ios_web_input:
+		_open_ios_room_code_prompt()
+		accept_event()
+		return
 	if pressed and not room_code_edit.has_focus():
 		room_code_edit.grab_focus()
+	if pressed and DisplayServer.has_feature(DisplayServer.FEATURE_VIRTUAL_KEYBOARD):
+		DisplayServer.virtual_keyboard_show(
+			room_code_edit.text,
+			room_code_edit.get_global_rect(),
+			DisplayServer.KEYBOARD_TYPE_DEFAULT,
+			room_code_edit.max_length,
+			room_code_edit.caret_column,
+			room_code_edit.caret_column
+		)
+
+
+func _is_ios_web_browser() -> bool:
+	if not OS.has_feature("web"):
+		return false
+	var detected: Variant = JavaScriptBridge.eval(
+		"/iPhone|iPad|iPod/.test(navigator.userAgent) || "
+		+ "(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)",
+		true
+	)
+	return bool(detected)
+
+
+func _open_ios_room_code_prompt() -> void:
+	# All iOS browsers use WebKit. Some versions do not expose Godot's hidden
+	# canvas input to the keyboard, so use a native prompt from the tap event.
+	var now_ms: int = Time.get_ticks_msec()
+	if now_ms - _last_ios_prompt_ms < IOS_WEB_PROMPT_COOLDOWN_MS:
+		return
+	_last_ios_prompt_ms = now_ms
+	var prompt_text: String = LocalizationService.tr_key(
+		"online.enter_room_code", "Enter the six-character room code."
+	)
+	var script: String = "window.prompt(%s, %s)" % [
+		JSON.stringify(prompt_text),
+		JSON.stringify(room_code_edit.text),
+	]
+	var entered_value: Variant = JavaScriptBridge.eval(script, true)
+	if entered_value == null:
+		return
+	var entered: String = String(entered_value).strip_edges().to_upper()
+	var cleaned: String = ""
+	for character: String in entered:
+		if character.is_valid_identifier() or character.is_valid_int():
+			cleaned += character
+	room_code_edit.text = cleaned.left(6)
+	room_code_edit.caret_column = room_code_edit.text.length()
 
 
 func _on_connection_state_changed(_state: StringName) -> void:

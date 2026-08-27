@@ -12,7 +12,10 @@ const VALID_ENERGIES: Array[StringName] = [
 	&"grass", &"fire", &"water", &"electric", &"psychic",
 	&"fighting", &"dark", &"steel", &"flying"
 ]
-const MAIN_FACE_TARGETS: Dictionary = {&"easy": 3, &"normal": 4, &"hard": 5}
+# Each Enerkoro contains eight Energy symbols across its six physical faces:
+# two Fixed, two Double, and two Single. Difficulty controls how many of
+# those eight symbols use the AI's main Energy type.
+const MAIN_FACE_TARGETS: Dictionary = {&"easy": 3, &"normal": 5, &"hard": 7}
 const MOVE_COUNT: int = 4
 const GREEN_THRESHOLD: float = 0.60
 
@@ -172,7 +175,7 @@ static func _build_dice(
 ) -> Variant:
 	var setup: Variant = SETUP_DATA.new()
 	var support: Array[StringName] = _support_priority(moves, main_energy)
-	var dynamic_main_count: int = int(MAIN_FACE_TARGETS[difficulty]) - 1
+	var target_main_symbols: int = int(MAIN_FACE_TARGETS[difficulty])
 	var species: String = String(pokemon.get("species_id", "ai")).to_lower()
 	for die_index: int in 3:
 		var die: Variant = DIE_DATA.new()
@@ -191,8 +194,13 @@ static func _build_dice(
 			[support_a, support_b], [support_b, support_a],
 			[support_a], [support_b]
 		]
+		var remaining_main_symbols: int = target_main_symbols - 1
+		var face_symbol_counts: Array[int] = [2, 2, 1, 1]
 		for face_index: int in 4:
-			if face_index >= dynamic_main_count:
+			var symbol_count: int = face_symbol_counts[face_index]
+			if remaining_main_symbols >= symbol_count:
+				remaining_main_symbols -= symbol_count
+			else:
 				main_faces[face_index] = other_faces[face_index]
 		die.double_a_first = main_faces[0][0]
 		die.double_a_second = main_faces[0][1]
