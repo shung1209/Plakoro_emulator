@@ -258,6 +258,7 @@ func _on_connection_state_changed(_state: StringName) -> void:
 	open_join_button.disabled = not connected
 	join_room_button.disabled = not connected or room_code_edit.text.length() != 6
 	_refresh_connection_text()
+	_apply_lobby_page_visibility(OnlineBattleService.current_room)
 
 
 func _refresh_connection_text() -> void:
@@ -299,18 +300,23 @@ func _on_room_changed(room: Dictionary) -> void:
 func _apply_lobby_page_visibility(room: Dictionary) -> void:
 	var room_empty: bool = room.is_empty()
 	var show_actions: bool = room_empty and not _join_code_entry_visible
+	var show_server_controls: bool = (
+		show_actions
+		and OnlineBattleService.connection_state != &"connected"
+	)
 	var back_parent: Container = join_row if room_empty and _join_code_entry_visible else bottom_row
 	if back_button.get_parent() != back_parent:
 		back_button.reparent(back_parent)
 		if back_parent == bottom_row:
 			bottom_row.move_child(back_button, 0)
 	status_label.get_parent().visible = show_actions
-	server_label.visible = show_actions
-	server_url_edit.get_parent().visible = show_actions
+	server_label.visible = show_server_controls
+	server_url_edit.get_parent().visible = show_server_controls
 	create_room_button.visible = show_actions
 	open_join_button.visible = show_actions
-	join_label.visible = room_empty
+	join_label.visible = room_empty and _join_code_entry_visible
 	join_row.visible = room_empty and _join_code_entry_visible
+	foundation_label.visible = false
 
 
 func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
