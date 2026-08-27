@@ -45,6 +45,9 @@ func _ready() -> void:
 	submit_move_button.pressed.connect(_submit_selected_move)
 	back_button.pressed.connect(_go_back)
 	room_code_edit.text_changed.connect(_normalize_room_code)
+	room_code_edit.gui_input.connect(_on_room_code_gui_input)
+	room_code_edit.virtual_keyboard_enabled = true
+	room_code_edit.focus_mode = Control.FOCUS_ALL
 	OnlineBattleService.connection_state_changed.connect(_on_connection_state_changed)
 	OnlineBattleService.room_changed.connect(_on_room_changed)
 	OnlineBattleService.server_error.connect(_on_server_error)
@@ -143,6 +146,22 @@ func _normalize_room_code(value: String) -> void:
 	if normalized != value:
 		room_code_edit.text = normalized
 		room_code_edit.caret_column = normalized.length()
+
+
+func _on_room_code_gui_input(event: InputEvent) -> void:
+	# Web exports receive an iPhone tap through the canvas before LineEdit can
+	# reliably acquire focus. Grabbing it during that same user gesture lets
+	# Godot's hidden Web input open the iOS virtual keyboard.
+	var pressed: bool = (
+		(event is InputEventScreenTouch and event.pressed)
+		or (
+			event is InputEventMouseButton
+			and event.button_index == MOUSE_BUTTON_LEFT
+			and event.pressed
+		)
+	)
+	if pressed and not room_code_edit.has_focus():
+		room_code_edit.grab_focus()
 
 
 func _on_connection_state_changed(_state: StringName) -> void:

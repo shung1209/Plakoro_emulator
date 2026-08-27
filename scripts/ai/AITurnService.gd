@@ -123,6 +123,10 @@ func execute_ai_turn(
             0
         )
     )
+    # Official opening-turn restriction applies equally when the AI or local
+    # Player 2 wins the coin toss and acts first.
+    if battle_controller.state.turn_number == 1:
+        dice_modifier -= 1
     result["status_lifecycle"] = (
         dice_modifier_report
     )

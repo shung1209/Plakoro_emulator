@@ -310,6 +310,7 @@ var online_turn_transition_label: Label = null
 var online_turn_transition_tween: Tween = null
 var last_online_turn_transition_key: String = ""
 var online_connection_lost: bool = false
+var coin_toss_in_progress: bool = false
 
 
 func _ready() -> void:
@@ -348,6 +349,7 @@ func _ready() -> void:
 	)
 	enemy_charakoro_button.pressed.connect(_open_enemy_move_window)
 	enemy_move_window_close_button.pressed.connect(enemy_move_window.hide)
+	coin_toss_window.popup_hide.connect(_on_coin_toss_popup_hide)
 	if not OnlineBattleService.turn_resolved.is_connected(_on_online_turn_resolved):
 		OnlineBattleService.turn_resolved.connect(_on_online_turn_resolved)
 	if not OnlineBattleService.match_ended.is_connected(_on_online_match_ended):
@@ -2175,6 +2177,7 @@ func _on_online_match_ended(result: Dictionary) -> void:
 
 
 func _present_coin_toss(coin_heads: bool, result_override: String = "") -> void:
+	coin_toss_in_progress = true
 	coin_toss_title.text = LocalizationService.tr_key(
 		"battle.coin_toss.title",
 		"COIN TOSS"
@@ -2214,7 +2217,21 @@ func _present_coin_toss(coin_heads: bool, result_override: String = "") -> void:
 	# Keep the resolved face and first-player message readable on desktop as
 	# well as phone layouts before the battle view takes focus again.
 	await get_tree().create_timer(2.5).timeout
+	coin_toss_in_progress = false
 	coin_toss_window.hide()
+
+
+func _on_coin_toss_popup_hide() -> void:
+	# PopupPanel normally closes when the user taps outside it or presses the
+	# platform back action. The toss is part of battle setup, so restore it
+	# until the animation and resolved-result hold have both completed.
+	if coin_toss_in_progress:
+		call_deferred("_restore_coin_toss_window")
+
+
+func _restore_coin_toss_window() -> void:
+	if coin_toss_in_progress and not coin_toss_window.visible:
+		coin_toss_window.popup_centered(Vector2i(500, 380))
 
 
 
@@ -2559,6 +2576,10 @@ func _on_move_pressed(
 			0
 		)
 	)
+	# Official rule: the participant who won the opening coin toss rolls only
+	# two Enerkoro on the first turn. Later status modifiers stack normally.
+	if battle.state.turn_number == 1:
+		dice_modifier -= 1
 
 	var kyokoro_disable_report: Dictionary = (
 		STATUS_RESOLVER

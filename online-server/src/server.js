@@ -321,7 +321,10 @@ function resolveTurn(client, moveId) {
   match.phase = "resolving";
   const actorEffects = match.effects[client.id];
   const defenderEffects = match.effects[defender.id];
-  const energyDiceModifier = Number(actorEffects.energyDiceModifier ?? 0);
+  // Official rule: the coin-toss winner rolls two Enerkoro on turn 1.
+  // The server remains authoritative so both online clients see one result.
+  const openingTurnModifier = match.turn === 1 ? -1 : 0;
+  const energyDiceModifier = Number(actorEffects.energyDiceModifier ?? 0) + openingTurnModifier;
   actorEffects.energyDiceModifier = 0;
   const energyRoll = rollEnergyDice(client.loadout.energy_dice_setup, energyDiceModifier);
   const energyCounts = countEnergy(energyRoll);
