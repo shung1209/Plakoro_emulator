@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/MainMenuUI.gd" id="1_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/LanguageSelector.tscn" id="2_language"]
 [ext_resource type="Script" path="res://scripts/ui/GlobalQuitConfirmation.gd" id="3_quit_guard"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/garbage_bin.svg" id="4_delete"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_menu_panel"]
 bg_color = Color(0.035, 0.055, 0.078, 0.96)
@@ -135,12 +136,28 @@ autowrap_mode = 2
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 
-[node name="PlayButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
+[node name="StoryRow" type="HBoxContainer" parent="Center/MenuPanel/Margin/Menu"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PlayButton" type="Button" parent="Center/MenuPanel/Margin/Menu/StoryRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 text = "PLAY"
+
+[node name="DeleteSaveButton" type="Button" parent="Center/MenuPanel/Margin/Menu/StoryRow"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+tooltip_text = "Delete Save File"
+icon = ExtResource("4_delete")
+expand_icon = true
+icon_alignment = 1
+theme_override_constants/icon_max_width = 30
 
 [node name="ContentStudioButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
 unique_name_in_owner = true
@@ -171,15 +188,6 @@ custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "PHONE MODE  |  PORTRAIT"
-
-[node name="DeleteSaveButton" type="Button" parent="Center/MenuPanel/Margin/Menu"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.52, 0.48, 1)
-theme_override_font_sizes/font_size = 16
-text = "Delete Save File"
 
 [node name="DeleteStatusLabel" type="Label" parent="Center/MenuPanel/Margin/Menu"]
 unique_name_in_owner = true

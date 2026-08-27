@@ -239,14 +239,10 @@ func _apply_main_menu_layout(
 		phone_mode_button.add_theme_font_size_override("font_size", 20)
 		quit_button.custom_minimum_size.y = 54.0
 		quit_button.add_theme_font_size_override("font_size", 18)
-	delete_save_button.custom_minimum_size.y = (
-		40.0
-		if compact_landscape
-		else (48.0 if short_web_portrait else (58.0 if web_touch_style else 48.0))
-	)
-	delete_save_button.add_theme_font_size_override(
-		"font_size",
-		16 if compact_landscape else (18 if web_touch_style else 16)
+	delete_save_button.custom_minimum_size = Vector2(primary_height, primary_height)
+	delete_save_button.add_theme_constant_override(
+		"icon_max_width",
+		int(clampf(primary_height * 0.44, 24.0, 34.0))
 	)
 	if compact_landscape:
 		theme_option.custom_minimum_size = Vector2(148, 40)
@@ -312,7 +308,8 @@ func _apply_localized_text() -> void:
 		"main_menu.quit",
 		"Quit"
 	)
-	delete_save_button.text = LocalizationService.tr_key(
+	delete_save_button.text = ""
+	delete_save_button.tooltip_text = LocalizationService.tr_key(
 		"main_menu.delete_save",
 		"Delete Save File"
 	)

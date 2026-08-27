@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/phone/PhoneModeMenuUI.gd" id="1_menu"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/garbage_bin.svg" id="2_delete"]
 
 [node name="PhoneModeMenuUI" type="Control"]
 layout_mode = 3
@@ -77,12 +78,28 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="StoryButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
+[node name="StoryRow" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Menu"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StoryButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu/StoryRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 74)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 21
 text = "STORY MODE"
+
+[node name="DeleteSaveButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu/StoryRow"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(74, 74)
+layout_mode = 2
+tooltip_text = "Delete Save File"
+icon = ExtResource("2_delete")
+expand_icon = true
+icon_alignment = 1
+theme_override_constants/icon_max_width = 32
 
 [node name="FreeButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
 unique_name_in_owner = true
@@ -110,3 +127,14 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "PLAKORO • PORTRAIT"
 horizontal_alignment = 1
+
+[node name="DeleteSaveConfirmation" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Delete Save File?"
+dialog_text = "All battle progress, unlocked Plakoro, levels, Moves, Energy, and the player loadout will be permanently deleted. Content Studio data will be kept."
+exclusive = true
+
+[node name="DeleteSaveError" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+title = "Delete Save File"
+exclusive = true
