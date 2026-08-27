@@ -102,6 +102,7 @@
     "online.session_missing": "La sesión de batalla en línea no está disponible.",
     "online.runtime_failed": "No se pudo preparar el equipo de batalla en línea.",
     "online.match_finished": "BATALLA EN LÍNEA FINALIZADA",
+    "online.return_lobby": "VOLVER A LA SALA EN LÍNEA",
     "online.opponent": "Oponente",
     "online.coin_first": "¡{player} empieza!",
     "online.charakoro_ready": "Charakoro listo",

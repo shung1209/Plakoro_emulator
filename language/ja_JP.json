@@ -102,6 +102,7 @@
     "online.session_missing": "オンラインバトルを利用できません。",
     "online.runtime_failed": "オンラインバトルの構成を準備できませんでした。",
     "online.match_finished": "オンラインバトル終了",
+    "online.return_lobby": "オンラインロビーに戻る",
     "online.opponent": "相手",
     "online.coin_first": "{player}が先攻！",
     "online.charakoro_ready": "Charakoro 準備完了",

@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "check": "node --check src/server.js"
+    "check": "node --check src/server.js",
+    "test:end-state": "node test/end-state.test.mjs"
   },
   "dependencies": {
     "ws": "^8.18.0"

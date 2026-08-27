@@ -102,6 +102,7 @@
     "online.session_missing": "Online battle session is unavailable.",
     "online.runtime_failed": "Online battle loadout could not be prepared.",
     "online.match_finished": "ONLINE MATCH FINISHED",
+    "online.return_lobby": "RETURN TO ONLINE LOBBY",
     "online.opponent": "Opponent",
     "online.coin_first": "{player} goes first!",
     "online.charakoro_ready": "Charakoro ready",

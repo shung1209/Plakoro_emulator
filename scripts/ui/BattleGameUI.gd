@@ -1786,7 +1786,12 @@ func _refresh_online_turn_prompt() -> void:
 		_set_battle_navigation_locked(false)
 		_set_battle_action_state(&"battle_finished")
 		result_panel.visible = true
-		result_actions.visible = false
+		result_actions.visible = true
+		result_restart_button.visible = false
+		result_preparation_button.visible = true
+		result_preparation_button.text = LocalizationService.tr_key(
+			"online.return_lobby", "RETURN TO ONLINE LOBBY"
+		)
 		var won: bool = battle.state.winner_participant_id == &"player"
 		result_title_label.text = LocalizationService.tr_key(
 			"online.you_win" if won else "online.you_lose", "YOU WIN" if won else "YOU LOSE"
@@ -4188,6 +4193,10 @@ func _on_result_primary_pressed() -> void:
 
 func _open_battle_report(advance_to_next_opponent: bool = false) -> void:
 	if battle == null or battle.state == null or not battle.state.is_finished:
+		return
+	if GameFlow.online_battle_mode:
+		OnlineBattleService.leave_room()
+		GameFlow.return_to_online_lobby()
 		return
 
 	var outcome: Variant = BATTLE_OUTCOME_DATA.new()
