@@ -239,16 +239,6 @@ text = "Waiting for players..."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="FirstTurnLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.78, 0.24, 1)
-theme_override_font_sizes/font_size = 20
-text = "PLAYER GOES FIRST"
-horizontal_alignment = 1
-autowrap_mode = 2
-
 [node name="RepeatFixedEnergyToggle" type="CheckButton" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -261,63 +251,9 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "CONFIGURE MY LOADOUT"
 
-[node name="TurnPanel" type="PanelContainer" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-
-[node name="TurnMargin" type="MarginContainer" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo/TurnPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
-
-[node name="TurnContent" type="VBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo/TurnPanel/TurnMargin"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="TurnLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo/TurnPanel/TurnMargin/TurnContent"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "TURN"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="MoveRow" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo/TurnPanel/TurnMargin/TurnContent"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="MoveOption" type="OptionButton" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo/TurnPanel/TurnMargin/TurnContent/MoveRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="SubmitMoveButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo/TurnPanel/TurnMargin/TurnContent/MoveRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 48)
-layout_mode = 2
-text = "USE MOVE"
-
-[node name="TurnResultLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Content/RoomPanel/RoomMargin/RoomInfo/TurnPanel/TurnMargin/TurnContent"]
-unique_name_in_owner = true
-layout_mode = 2
-text = ""
-autowrap_mode = 2
-
 [node name="Spacer" type="Control" parent="Margin/Center/Panel/PanelMargin/Content"]
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="FoundationLabel" type="Label" parent="Margin/Center/Panel/PanelMargin/Content"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.48, 0.62, 0.72, 1)
-text = "ROOM CONNECTION TEST • BATTLE SYNC COMING NEXT"
-horizontal_alignment = 1
-autowrap_mode = 2
 
 [node name="BottomRow" type="HBoxContainer" parent="Margin/Center/Panel/PanelMargin/Content"]
 unique_name_in_owner = true

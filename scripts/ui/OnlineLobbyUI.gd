@@ -3,7 +3,6 @@ extends Control
 const PLAKORO_THEME: Script = preload(
 	"res://scripts/ui/theme/PlakoroThemeFactory.gd"
 )
-const MOVE_AUTHORING: Script = preload("res://scripts/content/MoveCardAuthoringService.gd")
 const ICONS: Script = preload("res://scripts/presentation/PlakoroIconService.gd")
 const DEFAULT_ONLINE_PLAYER_NAME: String = "Player"
 const ENERGY_CODES: Dictionary = {
@@ -37,15 +36,8 @@ var _join_code_entry_visible: bool = false
 @onready var room_code_label: Label = %RoomCodeLabel
 @onready var room_energy_code: HBoxContainer = %RoomEnergyCode
 @onready var players_label: Label = %PlayersLabel
-@onready var first_turn_label: Label = %FirstTurnLabel
 @onready var repeat_fixed_energy_toggle: CheckButton = %RepeatFixedEnergyToggle
 @onready var configure_button: Button = %ConfigureButton
-@onready var turn_panel: PanelContainer = %TurnPanel
-@onready var turn_label: Label = %TurnLabel
-@onready var move_option: OptionButton = %MoveOption
-@onready var submit_move_button: Button = %SubmitMoveButton
-@onready var turn_result_label: Label = %TurnResultLabel
-@onready var foundation_label: Label = %FoundationLabel
 @onready var bottom_row: HBoxContainer = %BottomRow
 @onready var back_button: Button = %BackButton
 @onready var leave_room_button: Button = %LeaveRoomButton
@@ -63,7 +55,6 @@ func _ready() -> void:
 	leave_room_button.pressed.connect(OnlineBattleService.leave_room)
 	repeat_fixed_energy_toggle.toggled.connect(_on_repeat_fixed_energy_toggled)
 	configure_button.pressed.connect(GameFlow.open_online_loadout_setup)
-	submit_move_button.pressed.connect(_submit_selected_move)
 	back_button.pressed.connect(_go_back)
 	room_code_edit.text_changed.connect(_normalize_room_code)
 	_build_energy_palette()
@@ -73,7 +64,6 @@ func _ready() -> void:
 	OnlineBattleService.server_error.connect(_on_server_error)
 	OnlineBattleService.match_ready.connect(_on_match_ready)
 	OnlineBattleService.battle_session_started.connect(_on_battle_session_started)
-	OnlineBattleService.turn_resolved.connect(_on_turn_resolved)
 	LocalizationService.locale_changed.connect(_on_locale_changed)
 	_apply_responsive_layout()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
@@ -97,8 +87,6 @@ func _exit_tree() -> void:
 		OnlineBattleService.match_ready.disconnect(_on_match_ready)
 	if OnlineBattleService.battle_session_started.is_connected(_on_battle_session_started):
 		OnlineBattleService.battle_session_started.disconnect(_on_battle_session_started)
-	if OnlineBattleService.turn_resolved.is_connected(_on_turn_resolved):
-		OnlineBattleService.turn_resolved.disconnect(_on_turn_resolved)
 
 
 func _apply_responsive_layout() -> void:
@@ -139,11 +127,7 @@ func _apply_localized_text() -> void:
 	repeat_fixed_energy_toggle.text = LocalizationService.tr_key(
 		"online.allow_repeated_fixed_energy", "ALLOW REPEATED FIXED ENERGY"
 	)
-	submit_move_button.text = LocalizationService.tr_key("online.submit_move", "USE MOVE")
 	back_button.text = LocalizationService.tr_key("common.back", "BACK")
-	foundation_label.text = LocalizationService.tr_key(
-		"online.foundation_notice", "LOADOUT SYNC READY • ONLINE BATTLE START COMING NEXT"
-	)
 	_refresh_connection_text()
 	_refresh_room_text()
 
@@ -316,7 +300,6 @@ func _apply_lobby_page_visibility(room: Dictionary) -> void:
 	open_join_button.visible = show_actions
 	join_label.visible = room_empty and _join_code_entry_visible
 	join_row.visible = room_empty and _join_code_entry_visible
-	foundation_label.visible = false
 
 
 func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
@@ -375,105 +358,9 @@ func _on_match_ready(players: Array) -> void:
 
 
 func _on_battle_session_started(session: Dictionary) -> void:
-	var first_player_id: String = String(session.get("current_player_id", ""))
-	var first_player_name: String = "Player"
-	for player_value: Variant in Array(session.get("players", [])):
-		var player: Dictionary = Dictionary(player_value)
-		if String(player.get("id", "")) == first_player_id:
-			first_player_name = String(player.get("name", "Player"))
-			break
-	first_turn_label.visible = true
-	first_turn_label.text = LocalizationService.tr_format(
-		"online.first_turn",
-		{"player": first_player_name},
-		"{player} GOES FIRST"
-	)
-	foundation_label.text = LocalizationService.tr_format(
-		"online.session_ready",
-		{"match": String(session.get("id", "")).left(8).to_upper()},
-		"ONLINE BATTLE SESSION {match} READY"
-	)
-	turn_panel.visible = false
-	GameFlow.open_battle.call_deferred()
-
-
-func _populate_move_options() -> void:
-	move_option.clear()
-	var loadout: Dictionary = _local_loadout()
-	for move_id_value: Variant in Array(loadout.get("move_card_ids", [])):
-		var move_id: String = String(move_id_value)
-		var move: Dictionary = MOVE_AUTHORING.load_by_id(move_id)
-		var name_id: String = String(move.get("move_name_id", move_id))
-		var fallback: String = String(move.get("display_name", move_id))
-		move_option.add_item(GameContentLocalizationService.text("move", name_id, "name", fallback))
-		move_option.set_item_metadata(move_option.item_count - 1, move_id)
-
-
-func _local_loadout() -> Dictionary:
-	for player_value: Variant in OnlineBattleService.revealed_players:
-		var player: Dictionary = Dictionary(player_value)
-		if String(player.get("id", "")) == OnlineBattleService.player_id:
-			return Dictionary(player.get("loadout", {}))
-	return {}
-
-
-func _refresh_turn_controls() -> void:
-	var session: Dictionary = OnlineBattleService.battle_session
 	if session.is_empty():
-		turn_panel.visible = false
 		return
-	var finished: bool = String(session.get("phase", "")) == "finished"
-	var my_turn: bool = String(session.get("current_player_id", "")) == OnlineBattleService.player_id
-	move_option.disabled = finished or not my_turn
-	submit_move_button.disabled = finished or not my_turn or move_option.item_count == 0
-	if finished:
-		var won: bool = String(session.get("winner_id", "")) == OnlineBattleService.player_id
-		turn_label.text = LocalizationService.tr_key(
-			"online.you_win" if won else "online.you_lose", "YOU WIN" if won else "YOU LOSE"
-		)
-	elif my_turn:
-		turn_label.text = LocalizationService.tr_key("online.your_turn", "YOUR TURN • CHOOSE A MOVE")
-	else:
-		turn_label.text = LocalizationService.tr_key("online.opponent_turn", "OPPONENT'S TURN • WAITING")
-
-
-func _submit_selected_move() -> void:
-	if move_option.selected < 0:
-		return
-	submit_move_button.disabled = true
-	OnlineBattleService.choose_move(String(move_option.get_item_metadata(move_option.selected)))
-
-
-func _on_turn_resolved(result: Dictionary) -> void:
-	var lines: PackedStringArray = []
-	var move_id: String = String(result.get("move_id", ""))
-	var move: Dictionary = MOVE_AUTHORING.load_by_id(move_id)
-	var name_id: String = String(move.get("move_name_id", result.get("move_name_id", move_id)))
-	var move_name: String = GameContentLocalizationService.text(
-		"move", name_id, "name", String(move.get("display_name", move_id))
-	)
-	lines.append(LocalizationService.tr_format(
-		"online.used_move", {"move": move_name}, "USED {move}"
-	))
-	if not bool(result.get("energy_met", false)):
-		lines.append(LocalizationService.tr_key("online.energy_failed", "ENERKORO ENERGY FAILED • ATTACK FAILED"))
-	else:
-		lines.append(LocalizationService.tr_key("online.energy_ok", "ENERKORO ENERGY CONFIRMED"))
-		lines.append(LocalizationService.tr_format(
-			"online.charakoro_result",
-			{"result": String(result.get("charakoro_orientation", "")), "bonus": int(result.get("charakoro_bonus", 0))},
-			"CHARAKORO {result} • +{bonus}"
-		))
-		var weakness_bonus: int = int(result.get("weakness_bonus", 0))
-		if weakness_bonus > 0:
-			lines.append(LocalizationService.tr_format(
-				"online.weakness_bonus", {"bonus": weakness_bonus}, "WEAKNESS • +{bonus}"
-			))
-		lines.append(LocalizationService.tr_format(
-			"online.damage_result", {"damage": int(result.get("damage", 0))}, "ATTACK DEALT {damage} DAMAGE"
-		))
-	turn_result_label.text = "\n".join(lines)
-	_refresh_turn_controls()
+	GameFlow.open_battle.call_deferred()
 
 
 func _on_server_error(_code: String, message: String) -> void:
