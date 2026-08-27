@@ -92,6 +92,13 @@ text = "Both players are configured."
 horizontal_alignment = 1
 autowrap_mode = 2
 
+[node name="RevealCards" type="BoxContainer" parent="Center/Panel/Margin/Content/ReadyPanel/ReadyBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 18
+
 [node name="ReadyActions" type="BoxContainer" parent="Center/Panel/Margin/Content/ReadyPanel/ReadyBox"]
 unique_name_in_owner = true
 layout_mode = 2

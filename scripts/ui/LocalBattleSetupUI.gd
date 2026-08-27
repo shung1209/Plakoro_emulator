@@ -24,6 +24,7 @@ const PLAYER_TWO_LOADOUT_PROVIDER: Script = preload(
 @onready var ready_panel: PanelContainer = %ReadyPanel
 @onready var ready_title: Label = %ReadyTitle
 @onready var ready_message: Label = %ReadyMessage
+@onready var reveal_cards: BoxContainer = %RevealCards
 @onready var ready_actions: BoxContainer = %ReadyActions
 @onready var ready_back_button: Button = %ReadyBackButton
 @onready var start_battle_button: Button = %StartBattleButton
@@ -46,6 +47,7 @@ const PLAYER_TWO_LOADOUT_PROVIDER: Script = preload(
 var choosing_moves: bool = false
 var selected_pokemon_id: String = ""
 var move_cards: Array[Button] = []
+var matchup_reveal_started: bool = false
 
 
 func _ready() -> void:
@@ -57,7 +59,7 @@ func _ready() -> void:
 	continue_button.pressed.connect(_continue_setup)
 	back_button.pressed.connect(_go_back)
 	ready_back_button.pressed.connect(_return_to_player_two_setup)
-	start_battle_button.pressed.connect(GameFlow.open_battle)
+	start_battle_button.pressed.connect(_reveal_matchup_and_start)
 	pokemon_option.item_selected.connect(func(_index: int) -> void: _refresh_pokemon_summary())
 	LocalizationService.locale_changed.connect(_on_locale_changed)
 	get_viewport().size_changed.connect(_apply_responsive_layout)
@@ -82,6 +84,7 @@ func _apply_responsive_layout() -> void:
 	var portrait_layout: bool = GameFlow.phone_mode or viewport_size.x < 760.0
 	if portrait_layout:
 		ready_actions.vertical = true
+		reveal_cards.vertical = true
 		setup_panel.custom_minimum_size = Vector2(
 			minf(440.0, maxf(320.0, viewport_size.x - 24.0)),
 			minf(820.0, maxf(620.0, viewport_size.y - 24.0))
@@ -94,6 +97,7 @@ func _apply_responsive_layout() -> void:
 		move_scroll.custom_minimum_size.y = 480
 	else:
 		ready_actions.vertical = false
+		reveal_cards.vertical = false
 		setup_panel.custom_minimum_size = Vector2(880, 820)
 		setup_margin.add_theme_constant_override("margin_left", 28)
 		setup_margin.add_theme_constant_override("margin_right", 28)
@@ -401,7 +405,12 @@ func _show_ready_confirmation() -> void:
 	ready_title.text = LocalizationService.tr_key(
 		"preparation.local.ready_title", "LOCAL VS READY"
 	)
-	ready_message.text = _build_ready_summary()
+	ready_message.visible = true
+	ready_message.text = LocalizationService.tr_key(
+		"preparation.local.ready_message",
+		"Both players are configured. Start the battle?"
+	)
+	reveal_cards.visible = false
 	ready_back_button.text = LocalizationService.tr_key(
 		"common.back", "Back"
 	)
@@ -411,25 +420,99 @@ func _show_ready_confirmation() -> void:
 	start_battle_button.grab_focus()
 
 
-func _build_ready_summary() -> String:
+func _reveal_matchup_and_start() -> void:
+	if matchup_reveal_started:
+		return
+	matchup_reveal_started = true
+	ready_back_button.disabled = true
+	start_battle_button.disabled = true
+	ready_actions.visible = false
+	ready_message.visible = false
+	ready_title.text = LocalizationService.tr_key(
+		"preparation.local.matchup_reveal",
+		"MATCHUP REVEAL"
+	)
+	_build_reveal_cards()
+	reveal_cards.visible = true
+	await get_tree().create_timer(3.5).timeout
+	GameFlow.open_battle()
+
+
+func _build_reveal_cards() -> void:
+	for child: Node in reveal_cards.get_children():
+		child.queue_free()
 	var player_one: Variant = PLAYER_LOADOUT_PROVIDER.load_player_loadout()
 	var player_two: Variant = PLAYER_TWO_LOADOUT_PROVIDER.load_ai_loadout()
 	if player_one == null or player_two == null:
-		return LocalizationService.tr_key(
-			"preparation.local.ready_message",
-			"Both players are configured. Start the battle?"
-		)
-	return LocalizationService.tr_format(
-		"preparation.local.ready_summary",
-		{
-			"player_one_pokemon": _loadout_pokemon_name(player_one),
-			"player_one_moves": _loadout_move_names(player_one),
-			"player_two_pokemon": _loadout_pokemon_name(player_two),
-			"player_two_moves": _loadout_move_names(player_two)
-		},
-		"Player 1: {player_one_pokemon}\n{player_one_moves}\n\n"
-		+ "Player 2: {player_two_pokemon}\n{player_two_moves}"
+		GameFlow.open_battle()
+		return
+	reveal_cards.add_child(_create_reveal_card(player_one, 1))
+	reveal_cards.add_child(_create_reveal_card(player_two, 2))
+
+
+func _create_reveal_card(loadout: Variant, player_number: int) -> PanelContainer:
+	var pokemon: Dictionary = POKEMON_AUTHORING.load_by_id(String(loadout.pokemon_id))
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(300, 250)
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.055, 0.082, 0.13, 0.98)
+	style.border_color = Color("4baeff") if player_number == 1 else Color("ff557f")
+	style.set_border_width_all(3)
+	style.set_corner_radius_all(16)
+	style.content_margin_left = 18
+	style.content_margin_right = 18
+	style.content_margin_top = 16
+	style.content_margin_bottom = 16
+	panel.add_theme_stylebox_override("panel", style)
+
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 9)
+	panel.add_child(content)
+	var heading := Label.new()
+	heading.text = LocalizationService.tr_format(
+		"preparation.local.player_card",
+		{"player": player_number},
+		"PLAYER {player}"
 	)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	heading.add_theme_font_size_override("font_size", 22)
+	content.add_child(heading)
+
+	var identity := HBoxContainer.new()
+	identity.alignment = BoxContainer.ALIGNMENT_CENTER
+	identity.add_theme_constant_override("separation", 14)
+	content.add_child(identity)
+	var portrait: Control = PORTRAIT.instantiate()
+	portrait.custom_minimum_size = Vector2(130, 130)
+	identity.add_child(portrait)
+	portrait.setup(pokemon, true)
+	var details := VBoxContainer.new()
+	details.alignment = BoxContainer.ALIGNMENT_CENTER
+	details.add_theme_constant_override("separation", 7)
+	identity.add_child(details)
+	var name_label := Label.new()
+	name_label.text = _loadout_pokemon_name(loadout)
+	name_label.add_theme_font_size_override("font_size", 24)
+	details.add_child(name_label)
+	var type_icons := HBoxContainer.new()
+	details.add_child(type_icons)
+	ATTRIBUTE_ICONS.show_type(
+		type_icons,
+		StringName(String(pokemon.get("pokemon_type", ""))),
+		30
+	)
+	var weakness_icons := HBoxContainer.new()
+	details.add_child(weakness_icons)
+	ATTRIBUTE_ICONS.show_weaknesses(weakness_icons, pokemon, 30)
+
+	var moves := Label.new()
+	moves.text = _loadout_move_names(loadout)
+	moves.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	moves.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	moves.add_theme_font_size_override("font_size", 17)
+	content.add_child(moves)
+	return panel
 
 
 func _loadout_pokemon_name(loadout: Variant) -> String:

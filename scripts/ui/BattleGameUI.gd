@@ -395,13 +395,19 @@ func _apply_localized_text() -> void:
 	back_to_preparation_button.text = (
 		"<- "
 		+ LocalizationService.tr_key(
-			"battle.back_preparation",
-			"Back to Preparation"
+			"battle.local.reconfigure"
+			if GameFlow.local_battle_mode
+			else "battle.back_preparation",
+			"Reconfigure Players"
+			if GameFlow.local_battle_mode
+			else "Back to Preparation"
 		)
 	)
 	restart_button.text = LocalizationService.tr_key(
-		"battle.restart",
-		"Restart"
+		"battle.local.restart_match"
+		if GameFlow.local_battle_mode
+		else "battle.restart",
+		"Restart Match" if GameFlow.local_battle_mode else "Restart"
 	)
 	_refresh_result_primary_button()
 	result_preparation_button.text = LocalizationService.tr_key(
@@ -1168,7 +1174,8 @@ func _set_battle_action_state(
 
 	match phase:
 		&"choose_move":
-			actor_key = "battle.your_turn"
+			if not GameFlow.local_battle_mode:
+				actor_key = "battle.your_turn"
 			phase_key = "battle.phase.choose_move"
 		&"rolling":
 			actor_key = "battle.your_turn"
@@ -1258,6 +1265,21 @@ func _set_battle_action_state(
 		},
 		"Turn {turn} - {actor}  |  {phase}"
 	)
+	_refresh_local_active_player(actor_key)
+
+
+func _refresh_local_active_player(actor_key: String) -> void:
+	if not GameFlow.local_battle_mode:
+		player_panel.modulate = Color.WHITE
+		enemy_panel.modulate = Color.WHITE
+		return
+	if actor_key == "battle.finished":
+		player_panel.modulate = Color.WHITE
+		enemy_panel.modulate = Color.WHITE
+		return
+	var player_one_active: bool = actor_key == "battle.player_one"
+	player_panel.modulate = Color.WHITE if player_one_active else Color(0.58, 0.62, 0.70, 0.72)
+	enemy_panel.modulate = Color(0.58, 0.62, 0.70, 0.72) if player_one_active else Color.WHITE
 
 
 
