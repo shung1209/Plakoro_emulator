@@ -110,6 +110,35 @@ async function run() {
     });
   });
 
+  const cancelledSearch = connectClient();
+  await cancelledSearch.next("connected");
+  cancelledSearch.send({ type: "join_random_queue", player_name: "Queued Player" });
+  assert.equal((await cancelledSearch.next("matchmaking_status")).state, "searching");
+  cancelledSearch.send({ type: "leave_random_queue" });
+  assert.equal((await cancelledSearch.next("matchmaking_status")).state, "idle");
+  cancelledSearch.socket.close();
+
+  const randomOne = connectClient();
+  const randomTwo = connectClient();
+  await Promise.all([randomOne.next("connected"), randomTwo.next("connected")]);
+  randomOne.send({ type: "join_random_queue", player_name: "Random One" });
+  assert.equal((await randomOne.next("matchmaking_status")).state, "searching");
+  randomTwo.send({ type: "join_random_queue", player_name: "Random Two" });
+  const [randomJoinedOne, randomJoinedTwo] = await Promise.all([
+    randomOne.next("room_joined"),
+    randomTwo.next("room_joined")
+  ]);
+  assert.equal(randomJoinedOne.room.code, randomJoinedTwo.room.code);
+  assert.equal(randomJoinedOne.room.matchmaking, "random");
+  assert.equal(randomJoinedOne.room.players.length, 2);
+  assert.equal(randomJoinedOne.room.rules.allow_repeated_fixed_energy, false);
+  randomOne.send({ type: "leave_room" });
+  await randomOne.next("room_left");
+  randomTwo.send({ type: "leave_room" });
+  await randomTwo.next("room_left");
+  randomOne.socket.close();
+  randomTwo.socket.close();
+
   const forfeited = await createStartedMatch();
   forfeited.playerOne.send({ type: "forfeit" });
   const [loserResult, winnerResult] = await Promise.all([
@@ -207,7 +236,7 @@ async function run() {
   idle.socket.close();
 
   await delay(50);
-  console.log("Online lifecycle tests passed: reconnect, disconnect, cleanup, forfeit, and HP-zero sync.");
+  console.log("Online lifecycle tests passed: random matchmaking, reconnect, disconnect, cleanup, forfeit, and HP-zero sync.");
 }
 
 try {

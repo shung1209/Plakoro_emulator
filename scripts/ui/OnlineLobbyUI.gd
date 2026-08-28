@@ -21,6 +21,7 @@ var _join_code_entry_visible: bool = false
 @onready var server_url_edit: LineEdit = %ServerUrlEdit
 @onready var connect_button: Button = %ConnectButton
 @onready var create_room_button: Button = %CreateRoomButton
+@onready var random_match_button: Button = %RandomMatchButton
 @onready var join_label: Label = %JoinLabel
 @onready var open_join_button: Button = %OpenJoinButton
 @onready var join_row: VBoxContainer = %JoinRow
@@ -48,6 +49,7 @@ func _ready() -> void:
 	server_url_edit.text = OnlineBattleService.get_default_server_url()
 	connect_button.pressed.connect(_toggle_connection)
 	create_room_button.pressed.connect(_create_room)
+	random_match_button.pressed.connect(_toggle_random_matchmaking)
 	open_join_button.pressed.connect(_open_join_code_entry)
 	join_room_button.pressed.connect(_join_room)
 	code_back_button.pressed.connect(_remove_code_energy)
@@ -61,6 +63,7 @@ func _ready() -> void:
 	_refresh_energy_code_display()
 	OnlineBattleService.connection_state_changed.connect(_on_connection_state_changed)
 	OnlineBattleService.room_changed.connect(_on_room_changed)
+	OnlineBattleService.matchmaking_state_changed.connect(_on_matchmaking_state_changed)
 	OnlineBattleService.server_error.connect(_on_server_error)
 	OnlineBattleService.match_ready.connect(_on_match_ready)
 	OnlineBattleService.battle_session_started.connect(_on_battle_session_started)
@@ -81,6 +84,8 @@ func _exit_tree() -> void:
 		OnlineBattleService.connection_state_changed.disconnect(_on_connection_state_changed)
 	if OnlineBattleService.room_changed.is_connected(_on_room_changed):
 		OnlineBattleService.room_changed.disconnect(_on_room_changed)
+	if OnlineBattleService.matchmaking_state_changed.is_connected(_on_matchmaking_state_changed):
+		OnlineBattleService.matchmaking_state_changed.disconnect(_on_matchmaking_state_changed)
 	if OnlineBattleService.server_error.is_connected(_on_server_error):
 		OnlineBattleService.server_error.disconnect(_on_server_error)
 	if OnlineBattleService.match_ready.is_connected(_on_match_ready):
@@ -108,6 +113,10 @@ func _apply_localized_text() -> void:
 	server_label.text = LocalizationService.tr_key("online.server", "Server")
 	create_room_button.text = LocalizationService.tr_key(
 		"online.create_room", "CREATE PRIVATE ROOM"
+	)
+	random_match_button.text = LocalizationService.tr_key(
+		"online.random_cancel" if OnlineBattleService.matchmaking_searching else "online.random_vs",
+		"CANCEL SEARCH" if OnlineBattleService.matchmaking_searching else "RANDOM VS"
 	)
 	join_label.text = LocalizationService.tr_key("online.join_room", "Join Room")
 	open_join_button.text = LocalizationService.tr_key("online.join_room", "JOIN ROOM")
@@ -141,6 +150,13 @@ func _toggle_connection() -> void:
 
 func _create_room() -> void:
 	OnlineBattleService.create_room(DEFAULT_ONLINE_PLAYER_NAME)
+
+
+func _toggle_random_matchmaking() -> void:
+	if OnlineBattleService.matchmaking_searching:
+		OnlineBattleService.leave_random_queue()
+	else:
+		OnlineBattleService.join_random_queue(DEFAULT_ONLINE_PLAYER_NAME)
 
 
 func _open_join_code_entry() -> void:
@@ -236,16 +252,23 @@ func _render_energy_code(container: HBoxContainer, code: String, show_empty: boo
 func _on_connection_state_changed(_state: StringName) -> void:
 	var connected: bool = OnlineBattleService.connection_state == &"connected"
 	var connecting: bool = OnlineBattleService.connection_state == &"connecting"
+	var searching: bool = OnlineBattleService.matchmaking_searching
 	server_url_edit.editable = not connected and not connecting
 	connect_button.disabled = connecting
-	create_room_button.disabled = not connected
-	open_join_button.disabled = not connected
+	create_room_button.disabled = not connected or searching
+	open_join_button.disabled = not connected or searching
+	random_match_button.disabled = not connected
 	join_room_button.disabled = not connected or room_code_edit.text.length() != 6
 	_refresh_connection_text()
 	_apply_lobby_page_visibility(OnlineBattleService.current_room)
 
 
 func _refresh_connection_text() -> void:
+	if OnlineBattleService.matchmaking_searching:
+		status_label.text = LocalizationService.tr_key(
+			"online.random_searching", "SEARCHING FOR AN OPPONENT..."
+		)
+		return
 	match OnlineBattleService.connection_state:
 		&"connected":
 			status_label.text = LocalizationService.tr_key("online.connected", "CONNECTED")
@@ -272,13 +295,19 @@ func _on_room_changed(room: Dictionary) -> void:
 	var allow_repeated: bool = bool(rules.get("allow_repeated_fixed_energy", false))
 	GameFlow.free_mode_allow_repeated_fixed_energy = allow_repeated
 	repeat_fixed_energy_toggle.set_pressed_no_signal(allow_repeated)
-	repeat_fixed_energy_toggle.visible = not room.is_empty()
+	var random_match: bool = String(room.get("matchmaking", "private")) == "random"
+	repeat_fixed_energy_toggle.visible = not room.is_empty() and not random_match
 	repeat_fixed_energy_toggle.disabled = (
 		room.is_empty()
 		or String(room.get("host_id", "")) != OnlineBattleService.player_id
 		or bool(room.get("match_started", false))
 	)
 	_refresh_room_text()
+
+
+func _on_matchmaking_state_changed(_searching: bool) -> void:
+	_apply_localized_text()
+	_on_connection_state_changed(OnlineBattleService.connection_state)
 
 
 func _apply_lobby_page_visibility(room: Dictionary) -> void:
@@ -297,6 +326,7 @@ func _apply_lobby_page_visibility(room: Dictionary) -> void:
 	server_label.visible = show_server_controls
 	server_url_edit.get_parent().visible = show_server_controls
 	create_room_button.visible = show_actions
+	random_match_button.visible = show_actions
 	open_join_button.visible = show_actions
 	join_label.visible = room_empty and _join_code_entry_visible
 	join_row.visible = room_empty and _join_code_entry_visible

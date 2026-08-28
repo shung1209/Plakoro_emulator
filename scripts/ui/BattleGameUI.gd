@@ -3717,6 +3717,13 @@ func _present_turn_damage(
 	# played only after the Move has passed its Energy gate. This keeps the
 	# animation synchronized with real battle execution for both Player and AI.
 	if attack_executed and move_card != null:
+		# Phone Story, Free, and Local VS finish their staged result text on the
+		# ROLL tab. Move back to ARENA and let that layout render before the
+		# attack starts, matching the Online battle presentation order.
+		if GameFlow.phone_mode:
+			phone_attack_animation_requested.emit()
+			await get_tree().process_frame
+			await get_tree().create_timer(0.25).timeout
 		await _play_attack_vfx(
 			move_card,
 			actor_side

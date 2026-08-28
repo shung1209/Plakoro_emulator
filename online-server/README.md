@@ -16,6 +16,11 @@ pnpm start
 Health check: `http://localhost:10000/health`  
 WebSocket endpoint: `ws://localhost:10000/ws`
 
+Random matchmaking uses a single in-memory waiting queue. A room is created
+only when two connected clients are available, then the normal room, loadout,
+reconnect, and authoritative battle flow is reused. Clients enter with
+`join_random_queue` and may cancel with `leave_random_queue`.
+
 ## Render
 
 Create a Render Web Service with:

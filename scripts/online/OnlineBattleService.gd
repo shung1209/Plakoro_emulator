@@ -2,6 +2,7 @@ extends Node
 
 signal connection_state_changed(state: StringName)
 signal room_changed(room: Dictionary)
+signal matchmaking_state_changed(searching: bool)
 signal match_ready(players: Array)
 signal battle_session_started(session: Dictionary)
 signal turn_resolved(result: Dictionary)
@@ -26,6 +27,7 @@ var resume_token: String = ""
 var reconnect_attempt: int = 0
 var reconnect_at_msec: int = 0
 var intentional_disconnect: bool = false
+var matchmaking_searching: bool = false
 
 
 func _ready() -> void:
@@ -78,6 +80,7 @@ func disconnect_from_server() -> void:
 	reconnect_token = ""
 	resume_token = ""
 	reconnect_attempt = 0
+	_set_matchmaking_searching(false)
 	set_process(false)
 	_set_state(&"disconnected")
 
@@ -92,6 +95,15 @@ func join_room(room_code: String, player_name: String) -> void:
 		"room_code": room_code.strip_edges().to_upper(),
 		"player_name": player_name
 	})
+
+
+func join_random_queue(player_name: String) -> void:
+	_send({"type": "join_random_queue", "player_name": player_name})
+
+
+func leave_random_queue() -> void:
+	_send({"type": "leave_random_queue"})
+	_set_matchmaking_searching(false)
 
 
 func leave_room() -> void:
@@ -185,8 +197,11 @@ func _receive_packet(packet: PackedByteArray) -> void:
 			reconnect_attempt = 0
 			_set_state(&"connected")
 		"room_joined", "room_updated":
+			_set_matchmaking_searching(false)
 			current_room = Dictionary(message.get("room", {})).duplicate(true)
 			room_changed.emit(current_room)
+		"matchmaking_status":
+			_set_matchmaking_searching(String(message.get("state", "idle")) == "searching")
 		"room_left":
 			_clear_room_state()
 			room_changed.emit(current_room)
@@ -245,6 +260,13 @@ func _set_state(next_state: StringName) -> void:
 	connection_state_changed.emit(connection_state)
 
 
+func _set_matchmaking_searching(searching: bool) -> void:
+	if matchmaking_searching == searching:
+		return
+	matchmaking_searching = searching
+	matchmaking_state_changed.emit(matchmaking_searching)
+
+
 func _clear_room_state() -> void:
 	current_room.clear()
 	revealed_players.clear()
@@ -253,6 +275,7 @@ func _clear_room_state() -> void:
 
 func _clear_online_session() -> void:
 	_clear_room_state()
+	_set_matchmaking_searching(false)
 	player_id = ""
 	reconnect_token = ""
 	resume_token = ""

@@ -16,17 +16,18 @@ const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../.."
 const ORIENTATIONS = ["FACE_DOWN", "FACE_UP", "HEAD_UP", "HEAD_DOWN", "HEAD_LEFT", "HEAD_RIGHT"];
 const rooms = new Map();
 const clients = new Map();
+const randomQueue = [];
 
 const server = createServer((request, response) => {
   if (request.url === "/health") {
     response.writeHead(200, { "content-type": "application/json" });
-    response.end(JSON.stringify({ ok: true, rooms: rooms.size }));
+    response.end(JSON.stringify({ ok: true, rooms: rooms.size, random_queue: randomQueue.length }));
     return;
   }
   response.writeHead(200, { "content-type": "application/json" });
   response.end(JSON.stringify({
     service: "plakoro-online",
-    protocol: 2,
+    protocol: 3,
     websocket: "/ws"
   }));
 });
@@ -88,6 +89,12 @@ function handleMessage(client, buffer) {
     case "join_room":
       joinRoom(client, cleanCode(message.room_code), cleanName(message.player_name));
       break;
+    case "join_random_queue":
+      joinRandomQueue(client, cleanName(message.player_name));
+      break;
+    case "leave_random_queue":
+      leaveRandomQueue(client);
+      break;
     case "leave_room":
       leaveRoom(client);
       break;
@@ -112,6 +119,7 @@ function handleMessage(client, buffer) {
 }
 
 function createRoom(client, playerName) {
+  removeFromRandomQueue(client);
   leaveRoom(client, false);
   let code = createRoomCode();
   while (rooms.has(code)) code = createRoomCode();
@@ -130,6 +138,7 @@ function createRoom(client, playerName) {
 }
 
 function joinRoom(client, code, playerName) {
+  removeFromRandomQueue(client);
   const room = rooms.get(code);
   if (!room) {
     sendError(client.socket, "room_not_found", "Room not found.");
@@ -142,6 +151,57 @@ function joinRoom(client, code, playerName) {
   leaveRoom(client, false);
   addPlayer(room, client, playerName);
   send(client.socket, { type: "room_joined", player_id: client.id, room: serializeRoom(room) });
+  broadcastRoom(room);
+}
+
+function joinRandomQueue(client, playerName) {
+  if (client.roomCode) {
+    sendError(client.socket, "already_in_room", "Leave the current room before matchmaking.");
+    return;
+  }
+  removeFromRandomQueue(client);
+  client.name = playerName;
+  while (randomQueue.length > 0) {
+    const opponent = randomQueue.shift();
+    if (!opponent || opponent === client || !opponent.connected || opponent.roomCode) continue;
+    createRandomRoom(opponent, client);
+    return;
+  }
+  randomQueue.push(client);
+  send(client.socket, { type: "matchmaking_status", state: "searching" });
+}
+
+function leaveRandomQueue(client, notify = true) {
+  const removed = removeFromRandomQueue(client);
+  if (notify && removed) send(client.socket, { type: "matchmaking_status", state: "idle" });
+}
+
+function removeFromRandomQueue(client) {
+  const index = randomQueue.indexOf(client);
+  if (index < 0) return false;
+  randomQueue.splice(index, 1);
+  return true;
+}
+
+function createRandomRoom(firstClient, secondClient) {
+  let code = createRoomCode();
+  while (rooms.has(code)) code = createRoomCode();
+  const room = {
+    code,
+    hostId: firstClient.id,
+    players: new Map(),
+    match: null,
+    rules: { allow_repeated_fixed_energy: false },
+    matchmaking: "random",
+    updatedAt: Date.now()
+  };
+  rooms.set(code, room);
+  addPlayer(room, firstClient, firstClient.name);
+  addPlayer(room, secondClient, secondClient.name);
+  for (const player of room.players.values()) {
+    send(player.socket, { type: "matchmaking_status", state: "matched" });
+    send(player.socket, { type: "room_joined", player_id: player.id, room: serializeRoom(room) });
+  }
   broadcastRoom(room);
 }
 
@@ -159,7 +219,7 @@ function sendConnected(client, resumed) {
     type: resumed ? "session_resumed" : "connected",
     player_id: client.id,
     reconnect_token: client.reconnectToken,
-    protocol: 2
+    protocol: 3
   });
 }
 
@@ -223,6 +283,10 @@ function setRoomRules(client, rawRules) {
   const room = rooms.get(client.roomCode);
   if (!room || room.hostId !== client.id || room.match) {
     sendError(client.socket, "room_rules_locked", "Only the host can change rules before the match.");
+    return;
+  }
+  if (room.matchmaking === "random") {
+    sendError(client.socket, "random_rules_locked", "Random matches use standardized rules.");
     return;
   }
   room.rules.allow_repeated_fixed_energy = Boolean(rawRules?.allow_repeated_fixed_energy);
@@ -303,6 +367,7 @@ function startMatch(room) {
 }
 
 function leaveRoom(client, notify = true) {
+  removeFromRandomQueue(client);
   if (!client.roomCode) return;
   const room = rooms.get(client.roomCode);
   client.roomCode = null;
@@ -350,6 +415,7 @@ function forfeitMatch(client, reason = "forfeit", knownRoom = null) {
 function removeClient(client, closeCode = 1006) {
   if (!clients.has(client.socket)) return;
   clients.delete(client.socket);
+  removeFromRandomQueue(client);
   if (closeCode === 1000) {
     leaveRoom(client, false);
     return;
@@ -411,6 +477,7 @@ function serializeRoom(room) {
     host_id: room.hostId,
     match_started: room.match !== null,
     rules: { ...room.rules },
+    matchmaking: room.matchmaking ?? "private",
     max_players: MAX_PLAYERS,
     players: [...room.players.values()].map((player) => ({
       id: player.id,
