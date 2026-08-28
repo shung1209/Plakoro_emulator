@@ -411,10 +411,16 @@ func play_opponent_kyokoro_sequence(
     var total: int = orientations.size()
     for index: int in total:
         var orientation: StringName = StringName(orientations[index])
-        await get_tree().create_timer(0.18).timeout
         for slot_index: int in range(3):
             _slot_panels[slot_index].visible = false
         _slot_panels[3].visible = true
+        _reset_slot_transform(3)
+        _show_unrolled_charakoro(true)
+        _labels[3].text = (
+            "Opponent Charakoro %d/%d"
+            % [index + 1, total]
+        )
+        await get_tree().create_timer(0.32).timeout
         await _animate_batch(
             [],
             orientation,
@@ -430,6 +436,7 @@ func play_opponent_kyokoro_sequence(
                 String(orientation).replace("_", " ").capitalize()
             ]
         )
+        await get_tree().create_timer(0.42).timeout
 
 
 func play_kyokoro_sequence(

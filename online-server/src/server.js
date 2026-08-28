@@ -719,7 +719,31 @@ function countEnergy(rolls) {
 }
 
 function meetsEnergyCost(counts, costs) {
-  return costs.every((cost) => Number(counts[cost.energy_type] ?? 0) >= Number(cost.count ?? 0));
+  const remaining = Object.fromEntries(
+    Object.entries(counts ?? {}).map(([energyType, count]) => [
+      energyType,
+      Math.max(0, Number(count ?? 0))
+    ])
+  );
+  let wildcardRequired = 0;
+
+  // Match the game client: typed costs are paid first, then each remaining
+  // Energy symbol may pay a Normal (wildcard) requirement.
+  for (const cost of costs ?? []) {
+    const energyType = String(cost?.energy_type ?? "");
+    const required = Math.max(0, Number(cost?.count ?? 0));
+    if (energyType === "normal") {
+      wildcardRequired += required;
+      continue;
+    }
+    const available = Math.max(0, Number(remaining[energyType] ?? 0));
+    if (available < required) return false;
+    remaining[energyType] = available - required;
+  }
+
+  const remainingTotal = Object.values(remaining)
+    .reduce((sum, count) => sum + Math.max(0, Number(count ?? 0)), 0);
+  return remainingTotal >= wildcardRequired;
 }
 
 function rollCharakoro(pokemonId) {
