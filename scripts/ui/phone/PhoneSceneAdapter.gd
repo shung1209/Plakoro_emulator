@@ -537,7 +537,6 @@ func _adapt_battle() -> void:
 					0,
 					phone_card_height
 				)
-				(button as Button).pressed.connect(_on_phone_move_pressed)
 	if source.has_signal("battle_phase_changed"):
 		source.connect("battle_phase_changed", _on_battle_phase_changed)
 	if source.has_signal("phone_roll_confirmation_changed"):
@@ -549,6 +548,11 @@ func _adapt_battle() -> void:
 		source.connect(
 			"phone_attack_animation_requested",
 			_on_phone_attack_animation_requested
+		)
+	if source.has_signal("phone_move_popup_closed"):
+		source.connect(
+			"phone_move_popup_closed",
+			_on_phone_move_popup_closed
 		)
 	_fit_phone_popup("%CoinTossWindow", Vector2i(430, 410))
 	_fit_phone_popup("%EnemyMoveWindow", Vector2i(440, 790))
@@ -668,8 +672,8 @@ func _fit_phone_portrait_content(root: Control, content_size: float) -> void:
 		_fit_phone_portrait_content(control, content_size)
 
 
-func _on_phone_move_pressed() -> void:
-	_show_battle_view(&"roll")
+func _on_phone_move_popup_closed() -> void:
+	_show_battle_view(&"moves")
 
 
 func _on_phone_attack_animation_requested() -> void:

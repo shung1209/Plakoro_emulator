@@ -48,24 +48,36 @@ var advance_to_next_opponent: bool = false
 
 func _ready() -> void:
 	PLAKORO_THEME.apply_to(self)
-	rematch_button.pressed.connect(GameFlow.open_battle)
-	preparation_button.pressed.connect(GameFlow.open_preparation)
-	encounters_button.pressed.connect(GameFlow.open_encounter_select)
-	main_menu_button.pressed.connect(GameFlow.open_main_menu)
+	rematch_button.pressed.connect(_on_rematch_pressed)
+	preparation_button.pressed.connect(_on_preparation_pressed)
+	encounters_button.pressed.connect(_on_encounters_pressed)
+	main_menu_button.pressed.connect(_on_main_menu_pressed)
 	LocalizationService.locale_changed.connect(_on_locale_changed)
 	outcome = GameFlow.get_battle_outcome()
 	advance_to_next_opponent = GameFlow.should_advance_after_battle_result()
 	_apply_localized_text()
 	_refresh_energy_choice()
-	rematch_button.grab_focus()
+	if GameFlow.online_battle_mode:
+		main_menu_button.grab_focus()
+	else:
+		rematch_button.grab_focus()
 	_continue_to_next_opponent_if_ready.call_deferred()
 
 
 func _apply_localized_text() -> void:
 	var local_battle: bool = GameFlow.local_battle_mode
+	var online_battle: bool = GameFlow.online_battle_mode
 	report_brand.text = LocalizationService.tr_key(
-		"battle_result.local.report" if local_battle else "battle_result.report",
-		"PLAKORO  |  LOCAL VS RESULT" if local_battle else "PLAKORO  |  BATTLE REPORT"
+		"battle_result.local.report"
+		if local_battle
+		else "battle_result.online.report"
+		if online_battle
+		else "battle_result.report",
+		"PLAKORO  |  LOCAL VS RESULT"
+		if local_battle
+		else "PLAKORO  |  ONLINE VS RESULT"
+		if online_battle
+		else "PLAKORO  |  BATTLE REPORT"
 	)
 	turns_label.text = LocalizationService.tr_key(
 		"battle_result.turns",
@@ -96,9 +108,12 @@ func _apply_localized_text() -> void:
 		"Choose Encounter"
 	)
 	main_menu_button.text = LocalizationService.tr_key(
-		"common.main_menu",
-		"Main Menu"
+		"online.return_lobby" if online_battle else "common.main_menu",
+		"Return to Online Lobby" if online_battle else "Main Menu"
 	)
+	rematch_button.visible = not online_battle
+	preparation_button.visible = not online_battle
+	encounters_button.visible = not online_battle
 
 	if outcome == null or not outcome.has_method("is_valid") or not outcome.is_valid():
 		_show_missing_outcome()
@@ -373,3 +388,22 @@ func _show_missing_outcome() -> void:
 
 func _on_locale_changed(_locale: String) -> void:
 	_apply_localized_text()
+
+
+func _on_rematch_pressed() -> void:
+	GameFlow.open_battle()
+
+
+func _on_preparation_pressed() -> void:
+	GameFlow.open_preparation()
+
+
+func _on_encounters_pressed() -> void:
+	GameFlow.open_encounter_select()
+
+
+func _on_main_menu_pressed() -> void:
+	if GameFlow.online_battle_mode:
+		GameFlow.return_to_online_lobby()
+	else:
+		GameFlow.open_main_menu()

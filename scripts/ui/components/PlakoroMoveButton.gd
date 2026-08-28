@@ -34,11 +34,16 @@ var _battle_coverage_text: String = "-"
 var _is_large_preview: bool = false
 var _web_info_popup: PopupPanel = null
 var _web_popup_allow_use: bool = false
+var _web_popup_modal: bool = false
+var _web_popup_close_requested: bool = false
+var _web_popup_use_requested: bool = false
+var _web_popup_size: Vector2i = Vector2i.ZERO
 var _battle_usable: bool = true
 var _battle_unavailable_reason: String = ""
 var _hover_preview_enabled: bool = true
 
 signal web_move_use_requested(move_card_id: StringName)
+signal web_move_popup_closed
 
 const BATTLE_HOVER_DELAY_SECONDS: float = 0.35
 const BATTLE_HOVER_LAYOUT_DEBUG: bool = false
@@ -381,6 +386,10 @@ func set_web_popup_allow_use(enabled: bool) -> void:
     _web_popup_allow_use = enabled
 
 
+func set_web_popup_modal(enabled: bool) -> void:
+    _web_popup_modal = enabled
+
+
 func _open_web_move_info_popup() -> void:
     # Defensive cleanup: Web must have exactly one move popup.
     _hover_request_serial += 1
@@ -403,6 +412,8 @@ func _open_web_move_info_popup() -> void:
     popup.transparent_bg = false
     add_child(popup)
     _web_info_popup = popup
+    _web_popup_close_requested = false
+    _web_popup_use_requested = false
     popup.popup_hide.connect(_on_web_info_popup_hidden)
 
     var margin := MarginContainer.new()
@@ -441,7 +452,7 @@ func _open_web_move_info_popup() -> void:
         "Close"
     )
     close_button.custom_minimum_size = Vector2(160.0, 50.0)
-    close_button.pressed.connect(popup.hide)
+    close_button.pressed.connect(_close_web_move_info_popup)
     action_row.add_child(close_button)
 
     if _web_popup_allow_use:
@@ -457,26 +468,49 @@ func _open_web_move_info_popup() -> void:
         use_button.pressed.connect(_on_web_popup_use_pressed)
         action_row.add_child(use_button)
 
-    popup.popup_centered(
-        Vector2i(
-            int(card_width + 20.0),
-            int(card_height + 88.0)
-        )
+    _web_popup_size = Vector2i(
+        int(card_width + 20.0),
+        int(card_height + 88.0)
     )
+    popup.popup_centered(_web_popup_size)
+
+
+func _close_web_move_info_popup() -> void:
+    _web_popup_close_requested = true
+    if _web_info_popup != null and is_instance_valid(_web_info_popup):
+        _web_info_popup.hide()
 
 
 func _on_web_popup_use_pressed() -> void:
     if not _battle_usable or move_card == null:
         return
+    _web_popup_use_requested = true
     if _web_info_popup != null and is_instance_valid(_web_info_popup):
         _web_info_popup.hide()
     web_move_use_requested.emit(StringName(move_card.id))
 
 
 func _on_web_info_popup_hidden() -> void:
+    if (
+        _web_popup_modal
+        and not _web_popup_close_requested
+        and not _web_popup_use_requested
+    ):
+        call_deferred("_restore_web_move_info_popup")
+        return
     if _web_info_popup != null and is_instance_valid(_web_info_popup):
         _web_info_popup.queue_free()
     _web_info_popup = null
+    if _web_popup_close_requested:
+        web_move_popup_closed.emit()
+    _web_popup_close_requested = false
+    _web_popup_use_requested = false
+
+
+func _restore_web_move_info_popup() -> void:
+    if _web_info_popup == null or not is_instance_valid(_web_info_popup):
+        return
+    _web_info_popup.popup_centered(_web_popup_size)
 
 
 func _add_card_label(

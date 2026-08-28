@@ -12,6 +12,7 @@ signal phone_roll_confirmation_changed(
 	amount: int
 )
 signal phone_attack_animation_requested
+signal phone_move_popup_closed
 
 
 const CHARAKORO_FEEDBACK: Script = preload(
@@ -1985,24 +1986,8 @@ func _refresh_online_turn_prompt() -> void:
 		_set_player_input_enabled(false)
 		_set_battle_navigation_locked(false)
 		_set_battle_action_state(&"battle_finished")
-		result_panel.visible = true
-		result_actions.visible = true
-		result_restart_button.visible = false
-		result_preparation_button.visible = true
-		result_preparation_button.text = LocalizationService.tr_key(
-			"online.return_lobby", "RETURN TO ONLINE LOBBY"
-		)
-		var won: bool = battle.state.winner_participant_id == &"player"
-		result_title_label.text = LocalizationService.tr_key(
-			"online.you_win" if won else "online.you_lose", "YOU WIN" if won else "YOU LOSE"
-		)
-		result_summary_label.text = LocalizationService.tr_key(
-			"online.match_finished", "ONLINE MATCH FINISHED"
-		)
-		result_hp_label.text = "%d / %d  •  %d / %d" % [
-			int(battle.state.player.current_hp), int(battle.state.player.max_hp),
-			int(battle.state.enemy.current_hp), int(battle.state.enemy.max_hp)
-		]
+		result_panel.visible = false
+		_show_battle_result()
 		return
 	var my_turn: bool = battle.state.current_participant_id == &"player"
 	_present_online_turn_transition_if_needed(my_turn)
@@ -2283,6 +2268,11 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 	var player_hp_before: int = int(battle.state.player.current_hp)
 	var enemy_hp_before: int = int(battle.state.enemy.current_hp)
 	if bool(result.get("energy_met", false)) and move_card != null:
+		var resolved_damage: int = maxi(0, int(result.get("damage", 0)))
+		if actor_is_local:
+			player_damage_dealt += resolved_damage
+		else:
+			enemy_damage_dealt += resolved_damage
 		if GameFlow.phone_mode:
 			phone_attack_animation_requested.emit()
 			await get_tree().process_frame
@@ -2682,6 +2672,12 @@ func _create_move_buttons() -> void:
 		)
 		if OS.has_feature("web"):
 			button.call("set_web_popup_allow_use", true)
+			if GameFlow.phone_mode:
+				button.call("set_web_popup_modal", true)
+				button.connect(
+					"web_move_popup_closed",
+					Callable(self, "_on_web_move_popup_closed")
+				)
 			button.pressed.connect(
 				func() -> void:
 					button.call("_open_web_move_info_popup")
@@ -2702,6 +2698,10 @@ func _create_move_buttons() -> void:
 
 	if layout_prototype != null and layout_prototype.visible:
 		_apply_prototype_move_button_size()
+
+
+func _on_web_move_popup_closed() -> void:
+	phone_move_popup_closed.emit()
 
 
 func _format_move_button_text(
@@ -4652,10 +4652,6 @@ func _open_battle_report(advance_to_next_opponent: bool = false) -> void:
 		return
 	if battle == null or battle.state == null or not battle.state.is_finished:
 		return
-	if GameFlow.online_battle_mode:
-		OnlineBattleService.leave_room()
-		GameFlow.return_to_online_lobby()
-		return
 
 	var outcome: Variant = BATTLE_OUTCOME_DATA.new()
 	outcome.winner_participant_id = battle.state.winner_participant_id
@@ -4677,6 +4673,8 @@ func _open_battle_report(advance_to_next_opponent: bool = false) -> void:
 	outcome.player_max_hp = int(battle.state.player.max_hp)
 	outcome.enemy_hp = int(battle.state.enemy.current_hp)
 	outcome.enemy_max_hp = int(battle.state.enemy.max_hp)
+	if GameFlow.online_battle_mode:
+		OnlineBattleService.leave_room()
 	GameFlow.finish_battle(outcome, advance_to_next_opponent)
 
 
