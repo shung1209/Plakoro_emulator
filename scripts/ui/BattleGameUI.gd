@@ -1935,6 +1935,19 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 		dice_result.energy_counts[StringName(key)] = int(result["energy_counts"][key])
 	if bool(result.get("energy_met", false)):
 		dice_result.kyokoro_orientation = StringName(result.get("charakoro_orientation", ""))
+		dice_result.set_additional_kyokoro_orientations(
+			Array(result.get("additional_kyokoro_orientations", []))
+		)
+		dice_result.opponent_kyokoro_orientations = Array(
+			result.get("opponent_kyokoro_orientations", [])
+		).duplicate()
+		dice_result.opponent_kyokoro_roll_triggered = (
+			not dice_result.opponent_kyokoro_orientations.is_empty()
+		)
+		if dice_result.opponent_kyokoro_roll_triggered:
+			dice_result.opponent_kyokoro_orientation = StringName(
+				dice_result.opponent_kyokoro_orientations[0]
+			)
 	var actor_loadout: Variant = player_loadout if actor_is_local else enemy_loadout
 	var energy_profiles: Array = _create_profiles(actor_loadout)
 	var roll_record: Variant = DICE_ROLL_RECORD_DATA.new()
@@ -1953,6 +1966,44 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 	roll_record.kyokoro_orientation = dice_result.kyokoro_orientation
 	roll_result_panel.visible = true
 	await battle_dice_roll_presenter.play_result(dice_result, energy_profiles, roll_record)
+	if not dice_result.additional_kyokoro_orientations.is_empty():
+		await battle_dice_roll_presenter.play_kyokoro_sequence(
+			dice_result.additional_kyokoro_orientations
+		)
+	if dice_result.opponent_kyokoro_roll_triggered:
+		await battle_dice_roll_presenter.play_opponent_kyokoro_sequence(
+			dice_result.opponent_kyokoro_orientations
+		)
+	var opponent_energy_values: Array = Array(result.get("opponent_energy_roll", []))
+	if not opponent_energy_values.is_empty():
+		var opponent_loadout: Variant = enemy_loadout if actor_is_local else player_loadout
+		var opponent_profiles: Array = _create_profiles(opponent_loadout)
+		var opponent_result: Variant = DICE_RESULT_DATA.new()
+		var opponent_record: Variant = DICE_ROLL_RECORD_DATA.new()
+		for roll_value: Variant in opponent_energy_values:
+			var opponent_roll: Dictionary = Dictionary(roll_value)
+			var opponent_orientations: Array = Array(
+				face_orientations.get(String(opponent_roll.get("face_type", "")), [])
+			)
+			var opponent_face_index: int = int(opponent_roll.get("face_index", -1))
+			if (
+				opponent_face_index >= 0
+				and opponent_face_index < opponent_orientations.size()
+			):
+				opponent_record.energy_die_face_ids.append(
+					opponent_orientations[opponent_face_index]
+				)
+			for raw_energy: Variant in Array(opponent_roll.get("energies", [])):
+				var energy: StringName = StringName(raw_energy)
+				opponent_result.energy_counts[energy] = int(
+					opponent_result.energy_counts.get(energy, 0)
+				) + 1
+		opponent_record.energy_counts = opponent_result.energy_counts.duplicate(true)
+		await battle_dice_roll_presenter.play_opponent_enerkoro_result(
+			opponent_result,
+			opponent_profiles,
+			opponent_record
+		)
 
 	var move_id: StringName = StringName(result.get("move_id", ""))
 	var move_card: Variant = RESOURCE_RECOVERY.safe_get_move(database, move_id, "Online turn")
@@ -2752,10 +2803,8 @@ func _on_move_pressed(
 	if bool(
 		dice_result.opponent_kyokoro_roll_triggered
 	):
-		await battle_dice_roll_presenter.play_opponent_kyokoro_roll(
-			StringName(
-				dice_result.opponent_kyokoro_orientation
-			)
+		await battle_dice_roll_presenter.play_opponent_kyokoro_sequence(
+			dice_result.opponent_kyokoro_orientations
 		)
 
 	if not dice_result.additional_kyokoro_orientations.is_empty():
@@ -3068,10 +3117,8 @@ func _execute_ai_turn(selected_move_card_id: StringName = &"") -> void:
 		dice_result.opponent_kyokoro_roll_triggered
 		)
 	):
-		await battle_dice_roll_presenter.play_opponent_kyokoro_roll(
-			StringName(
-				dice_result.opponent_kyokoro_orientation
-			)
+		await battle_dice_roll_presenter.play_opponent_kyokoro_sequence(
+			dice_result.opponent_kyokoro_orientations
 		)
 
 	if (

@@ -399,6 +399,39 @@ func play_opponent_kyokoro_roll(
     )
 
 
+func play_opponent_kyokoro_sequence(
+    orientations: Array
+) -> void:
+    if orientations.is_empty():
+        return
+
+    if _icon_rows.is_empty():
+        _build_slots()
+
+    var total: int = orientations.size()
+    for index: int in total:
+        var orientation: StringName = StringName(orientations[index])
+        await get_tree().create_timer(0.18).timeout
+        for slot_index: int in range(3):
+            _slot_panels[slot_index].visible = false
+        _slot_panels[3].visible = true
+        await _animate_batch(
+            [],
+            orientation,
+            [0.0, 0.0, 0.0, 0.90],
+            [false, false, false, true],
+            0
+        )
+        _labels[3].text = (
+            "Opponent Charakoro %d/%d  |  %s"
+            % [
+                index + 1,
+                total,
+                String(orientation).replace("_", " ").capitalize()
+            ]
+        )
+
+
 func play_kyokoro_sequence(
     orientations: Array
 ) -> void:

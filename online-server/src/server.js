@@ -338,12 +338,14 @@ function startMatch(room) {
       loadPokemon(player.loadout.pokemon_id).max_hp ?? 120
     ])),
     lastMoveByPlayer: {},
+    lastTurnByPlayer: {},
     effects: Object.fromEntries(players.map((player) => [player.id, {
       incomingDamageModifier: 0,
       incomingDamageImmunity: false,
       energyDiceModifier: 0,
       forcedOrientation: null,
-      kyokoroDisabled: false
+      kyokoroDisabled: false,
+      lockedMoveId: null
     }]))
   };
   const revealedPlayers = players.map((player) => ({
@@ -526,6 +528,10 @@ function resolveTurn(client, moveId) {
     sendError(client.socket, "move_repeated", "The same Move cannot be used twice in a row.");
     return;
   }
+  if (match.effects[client.id]?.lockedMoveId === moveId) {
+    sendError(client.socket, "move_locked", "That Move is locked for this turn.");
+    return;
+  }
   const defender = [...room.players.values()].find((player) => player.id !== client.id);
   if (!defender) return;
   let move;
@@ -554,6 +560,10 @@ function resolveTurn(client, moveId) {
   let damage = 0;
   let healing = 0;
   let recoil = 0;
+  let opponentKyokoroOrientations = [];
+  let additionalKyokoroOrientations = [];
+  let opponentEnergyRoll = [];
+  let repeatMoveCount = 0;
 
   if (energyMet) {
     if (!actorEffects.kyokoroDisabled) {
@@ -561,9 +571,40 @@ function resolveTurn(client, moveId) {
     }
     actorEffects.forcedOrientation = null;
     actorEffects.kyokoroDisabled = false;
-    const matchedActions = getMatchedActions(move, orientation);
-    const allActions = [...(move.base_actions ?? []), ...matchedActions];
+    const actionContext = { match, actorId: client.id, defenderId: defender.id };
+    const matchedActions = expandConditionalActions(
+      getMatchedActions(move, orientation),
+      actionContext
+    );
+    const baseActions = expandConditionalActions(move.base_actions ?? [], actionContext);
+    const allActions = [...baseActions, ...matchedActions];
+    const copiedDamage = getCopiedPrintedDamage(baseActions, match, defender.id);
+    if (copiedDamage !== null) printedDamage = copiedDamage;
     charakoroBonus = getActionDamageBonus(matchedActions, energyCounts);
+    const actorKyokoro = resolveActorKyokoroEffect(
+      move,
+      orientation,
+      client.loadout.pokemon_id,
+      actionContext,
+      energyCounts
+    );
+    additionalKyokoroOrientations = actorKyokoro.orientations;
+    charakoroBonus += actorKyokoro.damageBonus;
+    repeatMoveCount = actorKyokoro.repeatMoveCount;
+    const opponentKyokoro = resolveOpponentKyokoroEffect(
+      move,
+      orientation,
+      defender.loadout.pokemon_id
+    );
+    opponentKyokoroOrientations = opponentKyokoro.orientations;
+    charakoroBonus += opponentKyokoro.damageBonus;
+    const opponentEnergy = resolveOpponentEnergyEffect(
+      move,
+      orientation,
+      defender.loadout.energy_dice_setup
+    );
+    opponentEnergyRoll = opponentEnergy.rolls;
+    charakoroBonus += opponentEnergy.damageBonus;
     const defenderPokemon = loadPokemon(defender.loadout.pokemon_id);
     const ignoreWeakness = allActions.some((action) => action.opcode === "weakness.ignore_current");
     weaknessBonus = ignoreWeakness ? 0 : getWeaknessBonus(defenderPokemon, move.attack_type);
@@ -573,6 +614,9 @@ function resolveTurn(client, moveId) {
       if (action.opcode === "damage.multiply") damage = Math.max(0, Math.round(damage * Number(action.args?.factor ?? 1)));
     }
     damage += weaknessBonus;
+    if (repeatMoveCount > 0) {
+      damage += repeatMoveCount * Math.max(0, printedDamage + weaknessBonus);
+    }
     if (defenderEffects.incomingDamageImmunity) damage = 0;
     else damage = Math.max(0, damage + Number(defenderEffects.incomingDamageModifier ?? 0));
     defenderEffects.incomingDamageImmunity = false;
@@ -587,6 +631,25 @@ function resolveTurn(client, moveId) {
     const actorMaxHp = Number(loadPokemon(client.loadout.pokemon_id).max_hp ?? 120);
     match.hp[client.id] = Math.min(actorMaxHp, Math.max(0, Number(match.hp[client.id]) + healing - recoil));
     match.lastMoveByPlayer[client.id] = moveId;
+    match.lastTurnByPlayer[client.id] = {
+      moveId,
+      moveNameId: move.move_name_id ?? moveId,
+      printedDamage,
+      energyMet: true,
+      outcomeSuccess: matchedActions.length > 0
+    };
+    actorEffects.lockedMoveId = null;
+    applyMoveLockEffect(move, orientation, defender, defenderEffects);
+  }
+  if (!energyMet) {
+    match.lastTurnByPlayer[client.id] = {
+      moveId,
+      moveNameId: move.move_name_id ?? moveId,
+      printedDamage,
+      energyMet: false,
+      outcomeSuccess: false
+    };
+    actorEffects.lockedMoveId = null;
   }
 
   if (match.hp[defender.id] <= 0 || match.hp[client.id] <= 0) {
@@ -609,6 +672,10 @@ function resolveTurn(client, moveId) {
     energy_counts: energyCounts,
     energy_met: energyMet,
     charakoro_orientation: orientation,
+    additional_kyokoro_orientations: additionalKyokoroOrientations,
+    opponent_kyokoro_orientations: opponentKyokoroOrientations,
+    opponent_energy_roll: opponentEnergyRoll,
+    repeat_move_count: repeatMoveCount,
     printed_damage: printedDamage,
     charakoro_bonus: charakoroBonus,
     weakness_bonus: weaknessBonus,
@@ -666,6 +733,166 @@ function getMatchedActions(move, orientation) {
     }
   }
   return actions;
+}
+
+function expandConditionalActions(actions, context) {
+  const result = [];
+  for (const action of actions ?? []) {
+    if (action?.opcode !== "condition.if") {
+      result.push(action);
+      continue;
+    }
+    const branch = evaluateCondition(action.args?.condition ?? {}, context)
+      ? action.then ?? []
+      : action.else ?? [];
+    result.push(...expandConditionalActions(branch, context));
+  }
+  return result;
+}
+
+function evaluateCondition(condition, context) {
+  const { match, actorId, defenderId } = context;
+  const type = condition.type;
+  if (type === "hp") {
+    const targetId = (condition.target ?? "self") === "opponent" ? defenderId : actorId;
+    const actual = Number(match.hp[targetId] ?? 0);
+    const expected = Number(condition.value ?? 0);
+    const operator = condition.operator ?? "<=";
+    if (operator === "<=") return actual <= expected;
+    if (operator === "<") return actual < expected;
+    if (operator === ">=") return actual >= expected;
+    if (operator === ">") return actual > expected;
+    if (operator === "==") return actual === expected;
+    return false;
+  }
+  if (type === "previous_self_energy_failed") {
+    return match.lastTurnByPlayer[actorId]?.energyMet === false;
+  }
+  if (type === "previous_opponent_energy_failed") {
+    return match.lastTurnByPlayer[defenderId]?.energyMet === false;
+  }
+  if (type === "previous_self_move_outcome_success") {
+    const previous = match.lastTurnByPlayer[actorId];
+    return Boolean(previous?.outcomeSuccess)
+      && (!condition.move_name_id || previous.moveNameId === condition.move_name_id);
+  }
+  return false;
+}
+
+function getCopiedPrintedDamage(actions, match, defenderId) {
+  if (!(actions ?? []).some((action) => action.opcode === "damage.copy_previous_opponent_move")) {
+    return null;
+  }
+  const value = match.lastTurnByPlayer[defenderId]?.printedDamage;
+  return Number.isFinite(Number(value)) ? Number(value) : 0;
+}
+
+function resolveActorKyokoroEffect(move, initialOrientation, pokemonId, context, energyCounts) {
+  const result = { orientations: [], damageBonus: 0, repeatMoveCount: 0 };
+  if (!initialOrientation) return result;
+  const effect = (move.special_effects ?? []).find((candidate) => [
+    "kyokoro.multi_roll",
+    "kyokoro.repeat_until_fail",
+    "kyokoro.repeat_same_move_until_fail"
+  ].includes(candidate?.effect_type));
+  if (!effect) return result;
+
+  const successOrientations = effect.confirmed_orientations
+    ?? getOutcomeSuccessOrientations(move);
+  if (effect.effect_type !== "kyokoro.multi_roll" && !successOrientations.includes(initialOrientation)) {
+    return result;
+  }
+  if (effect.effect_type === "kyokoro.multi_roll") {
+    const extraCount = Math.max(0, Number(effect.roll_count ?? 1) - 1);
+    for (let index = 0; index < extraCount; index += 1) {
+      const orientation = rollCharakoro(pokemonId);
+      result.orientations.push(orientation);
+      const actions = expandConditionalActions(getMatchedActions(move, orientation), context);
+      result.damageBonus += getActionDamageBonus(actions, energyCounts);
+    }
+    return result;
+  }
+  for (let index = 0; index < 64; index += 1) {
+    const orientation = rollCharakoro(pokemonId);
+    result.orientations.push(orientation);
+    if (!successOrientations.includes(orientation)) break;
+    if (effect.effect_type === "kyokoro.repeat_same_move_until_fail") {
+      result.repeatMoveCount += 1;
+    } else {
+      const actions = expandConditionalActions(getMatchedActions(move, orientation), context);
+      result.damageBonus += getActionDamageBonus(actions, energyCounts);
+    }
+  }
+  return result;
+}
+
+function getOutcomeSuccessOrientations(move) {
+  const result = [];
+  for (const rule of move.outcome_rules ?? []) {
+    if (rule.condition?.type === "kyokoro_orientation_any") {
+      result.push(...(rule.condition.orientations ?? []));
+    }
+  }
+  return [...new Set(result)];
+}
+
+function resolveOpponentKyokoroEffect(move, initialOrientation, defenderPokemonId) {
+  const result = { orientations: [], damageBonus: 0 };
+  if (!initialOrientation) return result;
+  const effect = (move.special_effects ?? []).find((candidate) =>
+    candidate?.effect_type === "kyokoro.opponent_roll"
+    && (candidate.confirmed_orientations ?? []).includes(initialOrientation)
+  );
+  if (!effect) return result;
+  const rollCount = Math.max(1, Number(effect.roll_count ?? 1));
+  const successOrientations = effect.opponent_success_orientations ?? [];
+  const successActions = effect.opponent_success_actions ?? [];
+  for (let index = 0; index < rollCount; index += 1) {
+    const rolledOrientation = rollCharakoro(defenderPokemonId);
+    result.orientations.push(rolledOrientation);
+    if (successOrientations.includes(rolledOrientation)) {
+      result.damageBonus += getActionDamageBonus(successActions, {});
+    }
+  }
+  return result;
+}
+
+function resolveOpponentEnergyEffect(move, initialOrientation, defenderSetup) {
+  const result = { rolls: [], damageBonus: 0 };
+  const effect = (move.special_effects ?? []).find((candidate) =>
+    candidate?.effect_type === "energy_dice.opponent_roll"
+    && (candidate.confirmed_orientations ?? []).includes(initialOrientation)
+  );
+  if (!effect) return result;
+  const modifier = Math.max(0, Number(effect.roll_count ?? 3) - 3);
+  result.rolls = rollEnergyDice(defenderSetup, modifier);
+  const counts = countEnergy(result.rolls);
+  const highest = Math.max(0, ...Object.values(counts).map(Number));
+  const tiedTotal = Object.values(counts)
+    .map(Number)
+    .filter((count) => count === highest)
+    .reduce((sum, count) => sum + count, 0);
+  result.damageBonus = tiedTotal * Number(effect.damage_per_most_common_energy ?? 0);
+  return result;
+}
+
+function applyMoveLockEffect(move, orientation, defender, defenderEffects) {
+  const effect = (move.special_effects ?? []).find((candidate) =>
+    candidate?.effect_type === "move.select_and_lock"
+    && (candidate.confirmed_orientations ?? []).includes(orientation)
+  );
+  if (!effect) return;
+  let selected = null;
+  let selectedDamage = -1;
+  for (const moveId of defender.loadout.move_card_ids ?? []) {
+    const candidate = loadMove(moveId);
+    const damage = Number(candidate.printed_damage ?? 0);
+    if (damage > selectedDamage) {
+      selected = moveId;
+      selectedDamage = damage;
+    }
+  }
+  defenderEffects.lockedMoveId = selected;
 }
 
 function getActionDamageBonus(actions, energyCounts) {
