@@ -63,6 +63,7 @@
     "phone_mode.local_battle": "LOCAL VS",
     "phone_mode.online_battle": "ONLINE VS",
     "online.title": "ONLINE VS",
+    "online.game_start": "GAME START",
     "online.subtitle": "Create a private room or join with a room code.",
     "online.server": "Server",
     "online.player_name": "Player Name",

@@ -63,6 +63,7 @@
     "phone_mode.local_battle": "VS LOCAL",
     "phone_mode.online_battle": "VS EN LÍNEA",
     "online.title": "VS EN LÍNEA",
+    "online.game_start": "COMIENZA EL COMBATE",
     "online.subtitle": "Crea una sala privada o únete con un código.",
     "online.server": "Servidor",
     "online.player_name": "Nombre del jugador",

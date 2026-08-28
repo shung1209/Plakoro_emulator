@@ -63,6 +63,7 @@
     "phone_mode.local_battle": "ローカル対戦",
     "phone_mode.online_battle": "オンライン対戦",
     "online.title": "オンライン対戦",
+    "online.game_start": "バトルスタート",
     "online.subtitle": "プライベートルームを作成するか、ルームコードで参加します。",
     "online.server": "サーバー",
     "online.player_name": "プレイヤー名",

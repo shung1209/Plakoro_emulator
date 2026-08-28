@@ -1750,6 +1750,9 @@ func _start_online_battle() -> void:
 	_refresh_enemy_move_reveal()
 	_create_move_buttons()
 	_refresh_ui()
+	_set_player_input_enabled(false)
+	_set_battle_navigation_locked(true)
+	await _present_online_game_start()
 	var first_player_name: String = LocalizationService.tr_key("online.opponent", "Opponent")
 	if local_starts:
 		first_player_name = LocalizationService.tr_key("battle.you", "You")
@@ -1762,6 +1765,39 @@ func _start_online_battle() -> void:
 		)
 	)
 	_refresh_online_turn_prompt()
+
+
+func _present_online_game_start() -> void:
+	if online_turn_transition_layer == null or online_turn_transition_label == null:
+		return
+	if online_turn_transition_tween != null and online_turn_transition_tween.is_valid():
+		online_turn_transition_tween.kill()
+	var viewport_width: float = maxf(get_viewport_rect().size.x, 480.0)
+	online_turn_transition_label.text = LocalizationService.tr_key(
+		"online.game_start", "GAME START"
+	)
+	online_turn_transition_label.add_theme_color_override(
+		"font_color", Color("ffd04a")
+	)
+	# Consume pointer input while keyboard/gamepad actions remain battle-locked.
+	online_turn_transition_layer.mouse_filter = Control.MOUSE_FILTER_STOP
+	online_turn_transition_layer.visible = true
+	online_turn_transition_layer.position = Vector2(-viewport_width, 0.0)
+	online_turn_transition_tween = create_tween()
+	online_turn_transition_tween.set_trans(Tween.TRANS_QUART)
+	online_turn_transition_tween.set_ease(Tween.EASE_OUT)
+	online_turn_transition_tween.tween_property(
+		online_turn_transition_layer, "position:x", 0.0, 0.38
+	)
+	online_turn_transition_tween.tween_interval(1.0)
+	online_turn_transition_tween.set_ease(Tween.EASE_IN)
+	online_turn_transition_tween.tween_property(
+		online_turn_transition_layer, "position:x", viewport_width, 0.38
+	)
+	await online_turn_transition_tween.finished
+	online_turn_transition_layer.visible = false
+	online_turn_transition_layer.position = Vector2.ZERO
+	online_turn_transition_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _sync_online_battle_state(

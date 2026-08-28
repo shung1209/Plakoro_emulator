@@ -497,6 +497,7 @@ func _create_reveal_card(loadout: Variant, player_number: int) -> PanelContainer
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(280, 205 if compact else 250)
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.clip_contents = true
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.055, 0.082, 0.13, 0.98)
 	style.border_color = Color("4baeff") if player_number == 1 else Color("ff557f")
@@ -556,6 +557,11 @@ func _create_reveal_card(loadout: Variant, player_number: int) -> PanelContainer
 	moves.text = _loadout_move_names(loadout)
 	moves.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	moves.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	moves.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	moves.max_lines_visible = 2
+	moves.custom_minimum_size.x = 0
+	moves.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	moves.tooltip_text = moves.text
 	moves.add_theme_font_size_override("font_size", 15 if compact else 17)
 	content.add_child(moves)
 	return panel

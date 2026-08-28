@@ -224,11 +224,21 @@ static func _configure_default_font_colors(theme: Theme) -> void:
 	var muted_color: Color = get_color("text_muted")
 	for type_name in ["Label", "RichTextLabel", "Button", "OptionButton", "CheckBox"]:
 		theme.set_color("font_color", type_name, text_color)
-		theme.set_color("font_disabled_color", type_name, Color(muted_color, 0.58))
+		theme.set_color(
+			"font_disabled_color", type_name,
+			Color(muted_color, 0.82 if is_warm_theme() else 0.64)
+		)
 	for type_name in ["Button", "OptionButton", "CheckBox"]:
 		theme.set_color("font_hover_color", type_name, text_color)
 		theme.set_color("font_pressed_color", type_name, text_color)
 		theme.set_color("font_focus_color", type_name, text_color)
+	# RichTextLabel and editable controls use different theme property names;
+	# setting these centrally prevents old white text from leaking into Warm.
+	theme.set_color("default_color", "RichTextLabel", text_color)
+	for type_name in ["LineEdit", "TextEdit"]:
+		theme.set_color("font_color", type_name, text_color)
+		theme.set_color("font_readonly_color", type_name, muted_color)
+		theme.set_color("font_placeholder_color", type_name, Color(muted_color, 0.82))
 
 
 static func _configure_panels(theme: Theme) -> void:
@@ -355,7 +365,11 @@ static func _configure_button_variant(
 		theme.set_color(color_name, variation, text_color)
 	theme.set_color(
 		"font_disabled_color", variation,
-		Color(text_color, 0.48)
+		(
+			Color(WARM_TEXT_MUTED, 0.86)
+			if is_warm_theme()
+			else Color(text_color, 0.58)
+		)
 	)
 
 
@@ -529,10 +543,21 @@ static func _apply_warm_scene_overrides(node: Node) -> void:
 		_apply_warm_panel(node as PanelContainer)
 	if node is Label:
 		_apply_warm_label(node as Label)
-	if node is Button and not node is OptionButton:
-		_apply_warm_button_role(node as Button)
+	if node is Button:
+		_normalize_warm_button_text(node as Button)
+		if not node is OptionButton:
+			_apply_warm_button_role(node as Button)
 	for child in node.get_children():
 		_apply_warm_scene_overrides(child)
+
+
+static func _normalize_warm_button_text(button: Button) -> void:
+	# Old scene-local white overrides are unreadable on Warm's pale surfaces.
+	for color_name: StringName in [
+		&"font_color", &"font_hover_color", &"font_pressed_color",
+		&"font_focus_color", &"font_disabled_color"
+	]:
+		button.remove_theme_color_override(color_name)
 
 
 static func _apply_warm_color_rect(rect: ColorRect) -> void:
