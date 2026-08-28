@@ -1,7 +1,7 @@
 extends Control
 
 
-const DISPLAY_VERSION: String = "V2.3"
+const DISPLAY_VERSION: String = "V3"
 
 const QUIT_DIALOG_LAYOUT: Script = preload(
 	"res://scripts/ui/QuitConfirmationLayout.gd"
@@ -323,7 +323,7 @@ func _apply_localized_text() -> void:
 	)
 	# Product version metadata must not be replaced by an older user language
 	# override copied from a previous release.
-	version_label.text = DISPLAY_VERSION + " HOTFIX"
+	version_label.text = DISPLAY_VERSION
 	quit_confirmation.title = LocalizationService.tr_key(
 		"global_quit.title",
 		"Exit PLAKORO?"
