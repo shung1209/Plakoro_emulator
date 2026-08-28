@@ -121,6 +121,7 @@ const MOVE_DRAFT_PROVIDER: Script = preload(
 @onready var pokemon_title: Label = $Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/PokemonPanel/PokemonBox/PokemonTitle
 @onready var battle_ready_title: Label = $Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/BattleReadyTitle
 @onready var opponent_title: Label = $Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/OpponentBox/OpponentInfoBox/OpponentTitle
+@onready var resolution_mode_box: HBoxContainer = $Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/ResolutionModeBox
 @onready var resolution_mode_label: Label = $Margin/Main/ContentScroll/Content/Body/LeftColumn/TopSummaryRow/BattleReadyPanel/BattleReadyBox/ResolutionModeBox/ResolutionModeLabel
 @onready var moves_title: Label = $Margin/Main/ContentScroll/Content/Body/LeftColumn/MovesPanel/MovesBox/MovesTitle
 @onready var dice_title: Label = $Margin/Main/ContentScroll/Content/Body/RightColumn/DicePanel/DiceBox/DiceTitle
@@ -255,6 +256,7 @@ func _ready() -> void:
 		_on_resolution_mode_selected
 	)
 	_populate_resolution_modes()
+	resolution_mode_box.visible = not _is_story_preparation()
 	battle_setup_dialog.confirmed.connect(_on_battle_setup_confirmed)
 	setup_player_pokemon_option.item_selected.connect(
 		func(_index: int) -> void:
@@ -3171,6 +3173,10 @@ func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
 
 
 func _refresh_validation() -> void:
+	# Story Mode has a fixed step-by-step resolution flow. Keep blocking errors
+	# visible, but do not spend preparation space repeating the successful
+	# readiness state that is already represented by the enabled battle button.
+	validation_label.visible = true
 	var player_resources: Dictionary = (
 		RESOURCE_RECOVERY.inspect_loadout(
 			player_loadout_data,
@@ -3239,6 +3245,7 @@ func _refresh_validation() -> void:
 		validation_label.text = (
 			LocalizationService.tr_key("preparation.validation_ready", "[OK] READY - Player and AI loadouts are valid.")
 		)
+		validation_label.visible = not _is_story_preparation()
 		start_battle_button.disabled = false
 		return
 
@@ -3272,6 +3279,15 @@ func _refresh_validation() -> void:
         "NOT READY\n{errors}"
 	)
 	start_battle_button.disabled = true
+
+
+func _is_story_preparation() -> bool:
+	return (
+		EncounterSession.has_active_encounter()
+		and not GameFlow.free_mode
+		and not GameFlow.local_battle_mode
+		and not GameFlow.online_battle_mode
+	)
 
 
 func _start_battle() -> void:

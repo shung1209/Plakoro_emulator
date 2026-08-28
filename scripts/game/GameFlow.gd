@@ -8,6 +8,7 @@ const ENCOUNTER_SELECT_SCENE: String = "res://scenes/game/EncounterSelectUI.tscn
 const BATTLE_SCENE: String = "res://scenes/ui/BattleGameUI.tscn"
 const BATTLE_RESULT_SCENE: String = "res://scenes/game/BattleResultUI.tscn"
 const LOCAL_BATTLE_SETUP_SCENE: String = "res://scenes/game/LocalBattleSetupUI.tscn"
+const ONLINE_LOBBY_SCENE: String = "res://scenes/game/OnlineLobbyUI.tscn"
 const PHONE_SAVE_CREATION_SCENE: String = (
 	"res://scenes/phone/PhoneSaveCreationUI.tscn"
 )
@@ -40,6 +41,7 @@ var battle_outcome: Variant = null
 var collection_mode: bool = false
 var free_mode: bool = false
 var local_battle_mode: bool = false
+var online_battle_mode: bool = false
 var local_battle_setup_phase: StringName = &""
 var free_mode_allow_repeated_fixed_energy: bool = false
 var advance_after_battle_result: bool = false
@@ -62,6 +64,7 @@ func exit_phone_mode() -> void:
 	collection_mode = false
 	free_mode = false
 	local_battle_mode = false
+	online_battle_mode = false
 	local_battle_setup_phase = &""
 	free_mode_allow_repeated_fixed_energy = false
 	EncounterSession.clear()
@@ -75,6 +78,7 @@ func start_game() -> void:
 	collection_mode = false
 	free_mode = false
 	local_battle_mode = false
+	online_battle_mode = false
 	local_battle_setup_phase = &""
 	free_mode_allow_repeated_fixed_energy = false
 	_change_scene(
@@ -94,6 +98,7 @@ func open_phone_mode_menu() -> void:
 	collection_mode = false
 	free_mode = false
 	local_battle_mode = false
+	online_battle_mode = false
 	local_battle_setup_phase = &""
 	free_mode_allow_repeated_fixed_energy = false
 	EncounterSession.clear()
@@ -106,6 +111,7 @@ func start_phone_story_mode() -> void:
 	collection_mode = false
 	free_mode = false
 	local_battle_mode = false
+	online_battle_mode = false
 	free_mode_allow_repeated_fixed_energy = false
 	_set_phone_mode(true)
 	_change_scene(
@@ -121,6 +127,7 @@ func open_phone_free_mode() -> void:
 	collection_mode = false
 	free_mode = true
 	local_battle_mode = false
+	online_battle_mode = false
 	free_mode_allow_repeated_fixed_energy = (
 		PLAKORO_THEME.get_free_mode_allow_repeated_fixed_energy()
 	)
@@ -135,6 +142,7 @@ func open_phone_local_battle() -> void:
 	collection_mode = false
 	free_mode = true
 	local_battle_mode = true
+	online_battle_mode = false
 	local_battle_setup_phase = &"player1_pokemon"
 	free_mode_allow_repeated_fixed_energy = (
 		PLAKORO_THEME.get_free_mode_allow_repeated_fixed_energy()
@@ -142,6 +150,17 @@ func open_phone_local_battle() -> void:
 	EncounterSession.clear()
 	_set_phone_mode(true)
 	_change_scene(LOCAL_BATTLE_SETUP_SCENE)
+
+
+func open_phone_online_battle() -> void:
+	battle_outcome = null
+	collection_mode = false
+	free_mode = true
+	local_battle_mode = false
+	online_battle_mode = true
+	EncounterSession.clear()
+	_set_phone_mode(true)
+	_change_scene(ONLINE_LOBBY_SCENE)
 
 
 func open_phone_battle_loadout() -> void:
@@ -190,6 +209,7 @@ func open_collection() -> void:
 	collection_mode = true
 	free_mode = false
 	local_battle_mode = false
+	online_battle_mode = false
 	free_mode_allow_repeated_fixed_energy = false
 	EncounterSession.clear()
 	_change_scene(PREPARATION_SCENE)
@@ -203,6 +223,7 @@ func open_free_mode() -> void:
 	collection_mode = false
 	free_mode = true
 	local_battle_mode = false
+	online_battle_mode = false
 	free_mode_allow_repeated_fixed_energy = PLAKORO_THEME.get_free_mode_allow_repeated_fixed_energy()
 	EncounterSession.clear()
 	_change_scene(PREPARATION_SCENE)
@@ -218,12 +239,41 @@ func open_local_battle() -> void:
 	# explicit controller mode for pass-and-play and future network transport.
 	free_mode = true
 	local_battle_mode = true
+	online_battle_mode = false
 	local_battle_setup_phase = &"player1_pokemon"
 	free_mode_allow_repeated_fixed_energy = (
 		PLAKORO_THEME.get_free_mode_allow_repeated_fixed_energy()
 	)
 	EncounterSession.clear()
 	_change_scene(LOCAL_BATTLE_SETUP_SCENE)
+
+
+func open_online_battle() -> void:
+	_set_phone_mode(false)
+	_set_landscape_mode(true)
+	battle_outcome = null
+	collection_mode = false
+	free_mode = true
+	local_battle_mode = false
+	online_battle_mode = true
+	EncounterSession.clear()
+	_change_scene(ONLINE_LOBBY_SCENE)
+
+
+func open_online_loadout_setup() -> void:
+	if OnlineBattleService.current_room.is_empty():
+		return
+	free_mode = true
+	local_battle_mode = false
+	online_battle_mode = true
+	local_battle_setup_phase = &"online_player_pokemon"
+	_change_scene(LOCAL_BATTLE_SETUP_SCENE)
+
+
+func return_to_online_lobby() -> void:
+	if not online_battle_mode:
+		return
+	_change_scene(ONLINE_LOBBY_SCENE)
 
 
 func open_battle() -> void:

@@ -1,7 +1,7 @@
 extends Control
 
 
-const DISPLAY_VERSION: String = "V2.3"
+const DISPLAY_VERSION: String = "V3"
 
 const QUIT_DIALOG_LAYOUT: Script = preload(
 	"res://scripts/ui/QuitConfirmationLayout.gd"
@@ -26,6 +26,7 @@ const TITLE_DARK: Texture2D = preload(
 @onready var content_studio_button: Button = %ContentStudioButton
 @onready var free_mode_button: Button = %FreeModeButton
 @onready var local_battle_button: Button = %LocalBattleButton
+@onready var online_battle_button: Button = %OnlineBattleButton
 @onready var phone_mode_button: Button = %PhoneModeButton
 @onready var unsealed_label: Label = %UnsealedLabel
 @onready var quit_button: Button = %QuitButton
@@ -58,6 +59,7 @@ func _ready() -> void:
 	content_studio_button.pressed.connect(_open_content_studio)
 	free_mode_button.pressed.connect(_start_free_mode)
 	local_battle_button.pressed.connect(_start_local_battle)
+	online_battle_button.pressed.connect(_start_online_battle)
 	phone_mode_button.pressed.connect(_start_phone_mode)
 	quit_button.pressed.connect(_request_quit)
 	delete_save_button.pressed.connect(_request_delete_save)
@@ -220,6 +222,7 @@ func _apply_main_menu_layout(
 			content_studio_button,
 			free_mode_button,
 			local_battle_button,
+			online_battle_button,
 			phone_mode_button,
 			quit_button
 		]:
@@ -235,6 +238,8 @@ func _apply_main_menu_layout(
 		free_mode_button.add_theme_font_size_override("font_size", 20)
 		local_battle_button.custom_minimum_size.y = 58.0
 		local_battle_button.add_theme_font_size_override("font_size", 20)
+		online_battle_button.custom_minimum_size.y = 58.0
+		online_battle_button.add_theme_font_size_override("font_size", 20)
 		phone_mode_button.custom_minimum_size.y = 58.0
 		phone_mode_button.add_theme_font_size_override("font_size", 20)
 		quit_button.custom_minimum_size.y = 54.0
@@ -296,6 +301,9 @@ func _apply_localized_text() -> void:
 		"main_menu.local_battle",
 		"LOCAL VS"
 	)
+	online_battle_button.text = LocalizationService.tr_key(
+		"main_menu.online_battle", "ONLINE VS"
+	)
 	phone_mode_button.text = LocalizationService.tr_key(
 		"main_menu.phone_mode",
 		"PHONE MODE  |  PORTRAIT"
@@ -315,7 +323,7 @@ func _apply_localized_text() -> void:
 	)
 	# Product version metadata must not be replaced by an older user language
 	# override copied from a previous release.
-	version_label.text = DISPLAY_VERSION + " HOTFIX"
+	version_label.text = DISPLAY_VERSION
 	quit_confirmation.title = LocalizationService.tr_key(
 		"global_quit.title",
 		"Exit PLAKORO?"
@@ -386,6 +394,11 @@ func _start_free_mode() -> void:
 func _start_local_battle() -> void:
 	_begin_navigation()
 	GameFlow.open_local_battle()
+
+
+func _start_online_battle() -> void:
+	_begin_navigation()
+	GameFlow.open_online_battle()
 
 
 func _start_phone_mode() -> void:

@@ -1,0 +1,437 @@
+extends Control
+
+const PLAKORO_THEME: Script = preload(
+	"res://scripts/ui/theme/PlakoroThemeFactory.gd"
+)
+const ICONS: Script = preload("res://scripts/presentation/PlakoroIconService.gd")
+const DEFAULT_ONLINE_PLAYER_NAME: String = "Player"
+const ENERGY_CODES: Dictionary = {
+	"A": &"grass", "B": &"fire", "C": &"water",
+	"D": &"electric", "E": &"psychic", "F": &"fighting",
+	"G": &"dark", "H": &"steel", "I": &"flying",
+}
+
+var _join_code_entry_visible: bool = false
+
+@onready var panel: PanelContainer = %Panel
+@onready var title_label: Label = %TitleLabel
+@onready var subtitle_label: Label = %SubtitleLabel
+@onready var status_label: Label = %StatusLabel
+@onready var server_label: Label = %ServerLabel
+@onready var server_url_edit: LineEdit = %ServerUrlEdit
+@onready var connect_button: Button = %ConnectButton
+@onready var create_room_button: Button = %CreateRoomButton
+@onready var random_match_button: Button = %RandomMatchButton
+@onready var join_label: Label = %JoinLabel
+@onready var open_join_button: Button = %OpenJoinButton
+@onready var join_row: VBoxContainer = %JoinRow
+@onready var room_code_edit: LineEdit = %RoomCodeEdit
+@onready var code_selection_label: Label = %CodeSelectionLabel
+@onready var code_display: HBoxContainer = %CodeDisplay
+@onready var energy_choice_label: Label = %EnergyChoiceLabel
+@onready var energy_palette: GridContainer = %EnergyPalette
+@onready var code_back_button: Button = %CodeBackButton
+@onready var code_clear_button: Button = %CodeClearButton
+@onready var join_room_button: Button = %JoinRoomButton
+@onready var room_panel: PanelContainer = %RoomPanel
+@onready var room_code_label: Label = %RoomCodeLabel
+@onready var room_energy_code: HBoxContainer = %RoomEnergyCode
+@onready var players_label: Label = %PlayersLabel
+@onready var repeat_fixed_energy_toggle: CheckButton = %RepeatFixedEnergyToggle
+@onready var configure_button: Button = %ConfigureButton
+@onready var bottom_row: HBoxContainer = %BottomRow
+@onready var back_button: Button = %BackButton
+@onready var leave_room_button: Button = %LeaveRoomButton
+
+
+func _ready() -> void:
+	PLAKORO_THEME.apply_to(self)
+	server_url_edit.text = OnlineBattleService.get_default_server_url()
+	connect_button.pressed.connect(_toggle_connection)
+	create_room_button.pressed.connect(_create_room)
+	random_match_button.pressed.connect(_toggle_random_matchmaking)
+	open_join_button.pressed.connect(_open_join_code_entry)
+	join_room_button.pressed.connect(_join_room)
+	code_back_button.pressed.connect(_remove_code_energy)
+	code_clear_button.pressed.connect(_clear_code)
+	leave_room_button.pressed.connect(OnlineBattleService.leave_room)
+	repeat_fixed_energy_toggle.toggled.connect(_on_repeat_fixed_energy_toggled)
+	configure_button.pressed.connect(GameFlow.open_online_loadout_setup)
+	back_button.pressed.connect(_go_back)
+	room_code_edit.text_changed.connect(_normalize_room_code)
+	_build_energy_palette()
+	_refresh_energy_code_display()
+	OnlineBattleService.connection_state_changed.connect(_on_connection_state_changed)
+	OnlineBattleService.room_changed.connect(_on_room_changed)
+	OnlineBattleService.matchmaking_state_changed.connect(_on_matchmaking_state_changed)
+	OnlineBattleService.server_capabilities_changed.connect(_on_server_capabilities_changed)
+	OnlineBattleService.server_error.connect(_on_server_error)
+	OnlineBattleService.match_ready.connect(_on_match_ready)
+	OnlineBattleService.battle_session_started.connect(_on_battle_session_started)
+	LocalizationService.locale_changed.connect(_on_locale_changed)
+	_apply_responsive_layout()
+	get_viewport().size_changed.connect(_apply_responsive_layout)
+	_apply_localized_text()
+	_on_connection_state_changed(OnlineBattleService.connection_state)
+	_on_room_changed(OnlineBattleService.current_room)
+	if not OnlineBattleService.revealed_players.is_empty():
+		_on_match_ready(OnlineBattleService.revealed_players)
+	if not OnlineBattleService.battle_session.is_empty():
+		_on_battle_session_started(OnlineBattleService.battle_session)
+
+
+func _exit_tree() -> void:
+	if OnlineBattleService.connection_state_changed.is_connected(_on_connection_state_changed):
+		OnlineBattleService.connection_state_changed.disconnect(_on_connection_state_changed)
+	if OnlineBattleService.room_changed.is_connected(_on_room_changed):
+		OnlineBattleService.room_changed.disconnect(_on_room_changed)
+	if OnlineBattleService.matchmaking_state_changed.is_connected(_on_matchmaking_state_changed):
+		OnlineBattleService.matchmaking_state_changed.disconnect(_on_matchmaking_state_changed)
+	if OnlineBattleService.server_capabilities_changed.is_connected(_on_server_capabilities_changed):
+		OnlineBattleService.server_capabilities_changed.disconnect(_on_server_capabilities_changed)
+	if OnlineBattleService.server_error.is_connected(_on_server_error):
+		OnlineBattleService.server_error.disconnect(_on_server_error)
+	if OnlineBattleService.match_ready.is_connected(_on_match_ready):
+		OnlineBattleService.match_ready.disconnect(_on_match_ready)
+	if OnlineBattleService.battle_session_started.is_connected(_on_battle_session_started):
+		OnlineBattleService.battle_session_started.disconnect(_on_battle_session_started)
+
+
+func _apply_responsive_layout() -> void:
+	var viewport_size: Vector2 = get_viewport_rect().size
+	var portrait: bool = GameFlow.phone_mode or viewport_size.x < 700.0
+	panel.custom_minimum_size = Vector2(
+		minf(700.0, viewport_size.x - 32.0),
+		minf(720.0, viewport_size.y - 32.0)
+	)
+	energy_palette.columns = 3 if portrait else 9
+	server_url_edit.custom_minimum_size.y = 58.0 if portrait else 52.0
+
+
+func _apply_localized_text() -> void:
+	title_label.text = LocalizationService.tr_key("online.title", "ONLINE VS")
+	subtitle_label.text = LocalizationService.tr_key(
+		"online.subtitle", "Create a private room or join with a room code."
+	)
+	server_label.text = LocalizationService.tr_key("online.server", "Server")
+	create_room_button.text = LocalizationService.tr_key(
+		"online.create_room", "CREATE PRIVATE ROOM"
+	)
+	random_match_button.text = LocalizationService.tr_key(
+		"online.random_cancel" if OnlineBattleService.matchmaking_searching else "online.random_vs",
+		"CANCEL SEARCH" if OnlineBattleService.matchmaking_searching else "RANDOM VS"
+	)
+	join_label.text = LocalizationService.tr_key("online.join_room", "Join Room")
+	open_join_button.text = LocalizationService.tr_key("online.join_room", "JOIN ROOM")
+	code_selection_label.text = LocalizationService.tr_key(
+		"online.selected_energy_code", "SELECTED ROOM CODE"
+	)
+	energy_choice_label.text = LocalizationService.tr_key(
+		"online.choose_code_energy", "CHOOSE AN ENERGY"
+	)
+	join_room_button.text = LocalizationService.tr_key("online.join", "JOIN")
+	code_back_button.text = LocalizationService.tr_key("common.delete_short", "DEL")
+	code_clear_button.text = LocalizationService.tr_key("common.clear", "CLEAR")
+	leave_room_button.text = LocalizationService.tr_key("online.leave", "LEAVE ROOM")
+	configure_button.text = LocalizationService.tr_key(
+		"online.configure", "CONFIGURE MY LOADOUT"
+	)
+	repeat_fixed_energy_toggle.text = LocalizationService.tr_key(
+		"online.allow_repeated_fixed_energy", "ALLOW REPEATED FIXED ENERGY"
+	)
+	back_button.text = LocalizationService.tr_key("common.back", "BACK")
+	_refresh_connection_text()
+	_refresh_room_text()
+
+
+func _toggle_connection() -> void:
+	if OnlineBattleService.connection_state == &"disconnected":
+		OnlineBattleService.connect_to_server(server_url_edit.text)
+	else:
+		OnlineBattleService.disconnect_from_server()
+
+
+func _create_room() -> void:
+	OnlineBattleService.create_room(DEFAULT_ONLINE_PLAYER_NAME)
+
+
+func _toggle_random_matchmaking() -> void:
+	if OnlineBattleService.matchmaking_searching:
+		OnlineBattleService.leave_random_queue()
+	else:
+		OnlineBattleService.join_random_queue(DEFAULT_ONLINE_PLAYER_NAME)
+
+
+func _open_join_code_entry() -> void:
+	_join_code_entry_visible = true
+	_apply_lobby_page_visibility(OnlineBattleService.current_room)
+
+
+func _close_join_code_entry() -> void:
+	_join_code_entry_visible = false
+	_apply_lobby_page_visibility(OnlineBattleService.current_room)
+
+
+func _join_room() -> void:
+	if room_code_edit.text.length() != 6:
+		_on_server_error("invalid_room_code", LocalizationService.tr_key(
+			"online.invalid_code", "Enter a six-character room code."
+		))
+		return
+	OnlineBattleService.join_room(
+		room_code_edit.text,
+		DEFAULT_ONLINE_PLAYER_NAME
+	)
+
+
+func _normalize_room_code(value: String) -> void:
+	var normalized: String = value.to_upper()
+	if normalized != value:
+		room_code_edit.text = normalized
+		room_code_edit.caret_column = normalized.length()
+	_refresh_energy_code_display()
+
+
+func _build_energy_palette() -> void:
+	for code: String in ENERGY_CODES:
+		var energy: StringName = ENERGY_CODES[code]
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(54, 54)
+		button.icon = ICONS.load_energy_icon(energy)
+		button.expand_icon = true
+		button.tooltip_text = String(energy).capitalize()
+		button.pressed.connect(_append_code_energy.bind(code))
+		energy_palette.add_child(button)
+
+
+func _append_code_energy(code: String) -> void:
+	if room_code_edit.text.length() >= 6:
+		return
+	room_code_edit.text += code
+	_refresh_energy_code_display()
+
+
+func _remove_code_energy() -> void:
+	room_code_edit.text = room_code_edit.text.left(maxi(0, room_code_edit.text.length() - 1))
+	_refresh_energy_code_display()
+
+
+func _clear_code() -> void:
+	room_code_edit.text = ""
+	_refresh_energy_code_display()
+
+
+func _refresh_energy_code_display() -> void:
+	_render_energy_code(code_display, room_code_edit.text, true)
+	join_room_button.disabled = (
+		OnlineBattleService.connection_state != &"connected"
+		or room_code_edit.text.length() != 6
+	)
+
+
+func _render_energy_code(container: HBoxContainer, code: String, show_empty: bool) -> void:
+	for child: Node in container.get_children():
+		container.remove_child(child)
+		child.queue_free()
+	for index: int in 6:
+		var slot := Button.new()
+		slot.custom_minimum_size = Vector2(54, 54)
+		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.focus_mode = Control.FOCUS_NONE
+		slot.expand_icon = true
+		var code_character: String = code.substr(index, 1) if index < code.length() else ""
+		if ENERGY_CODES.has(code_character):
+			var energy: StringName = ENERGY_CODES[code_character]
+			slot.icon = ICONS.load_energy_icon(energy)
+			slot.tooltip_text = String(energy).capitalize()
+		elif show_empty:
+			slot.text = str(index + 1)
+			slot.modulate = Color(1.0, 1.0, 1.0, 0.58)
+		else:
+			slot.visible = false
+		container.add_child(slot)
+
+
+func _on_connection_state_changed(_state: StringName) -> void:
+	var connected: bool = OnlineBattleService.connection_state == &"connected"
+	var connecting: bool = OnlineBattleService.connection_state == &"connecting"
+	var searching: bool = OnlineBattleService.matchmaking_searching
+	server_url_edit.editable = not connected and not connecting
+	connect_button.disabled = connecting
+	create_room_button.disabled = not connected or searching
+	open_join_button.disabled = not connected or searching
+	random_match_button.disabled = (
+		not connected
+		or not OnlineBattleService.supports_capability("random_matchmaking")
+	)
+	random_match_button.tooltip_text = (
+		""
+		if not connected or OnlineBattleService.supports_capability("random_matchmaking")
+		else LocalizationService.tr_key(
+			"online.random_server_update_required",
+			"Random VS requires the latest Online server deployment."
+		)
+	)
+	join_room_button.disabled = not connected or room_code_edit.text.length() != 6
+	_refresh_connection_text()
+	_apply_lobby_page_visibility(OnlineBattleService.current_room)
+
+
+func _refresh_connection_text() -> void:
+	if OnlineBattleService.matchmaking_searching:
+		status_label.text = LocalizationService.tr_key(
+			"online.random_searching", "SEARCHING FOR AN OPPONENT..."
+		)
+		return
+	match OnlineBattleService.connection_state:
+		&"connected":
+			status_label.text = LocalizationService.tr_key("online.connected", "CONNECTED")
+			connect_button.text = LocalizationService.tr_key("online.disconnect", "DISCONNECT")
+		&"connecting":
+			status_label.text = LocalizationService.tr_key("online.connecting", "CONNECTING...")
+			connect_button.text = LocalizationService.tr_key("online.connect", "CONNECT")
+		&"reconnecting":
+			status_label.text = LocalizationService.tr_key("online.reconnecting", "RECONNECTING...")
+			connect_button.text = LocalizationService.tr_key("online.disconnect", "DISCONNECT")
+		_:
+			status_label.text = LocalizationService.tr_key("online.disconnected", "DISCONNECTED")
+			connect_button.text = LocalizationService.tr_key("online.connect", "CONNECT")
+
+
+func _on_room_changed(room: Dictionary) -> void:
+	if not room.is_empty():
+		_join_code_entry_visible = false
+	room_panel.visible = not room.is_empty()
+	leave_room_button.visible = not room.is_empty()
+	_apply_lobby_page_visibility(room)
+	_refresh_configure_button(room)
+	var rules: Dictionary = Dictionary(room.get("rules", {}))
+	var allow_repeated: bool = bool(rules.get("allow_repeated_fixed_energy", false))
+	GameFlow.free_mode_allow_repeated_fixed_energy = allow_repeated
+	repeat_fixed_energy_toggle.set_pressed_no_signal(allow_repeated)
+	var random_match: bool = String(room.get("matchmaking", "private")) == "random"
+	repeat_fixed_energy_toggle.visible = not room.is_empty() and not random_match
+	repeat_fixed_energy_toggle.disabled = (
+		room.is_empty()
+		or String(room.get("host_id", "")) != OnlineBattleService.player_id
+		or bool(room.get("match_started", false))
+	)
+	_refresh_room_text()
+
+
+func _on_matchmaking_state_changed(_searching: bool) -> void:
+	_apply_localized_text()
+	_on_connection_state_changed(OnlineBattleService.connection_state)
+
+
+func _on_server_capabilities_changed(_capabilities: Array[String]) -> void:
+	_on_connection_state_changed(OnlineBattleService.connection_state)
+
+
+func _apply_lobby_page_visibility(room: Dictionary) -> void:
+	var room_empty: bool = room.is_empty()
+	var show_actions: bool = room_empty and not _join_code_entry_visible
+	var show_server_controls: bool = (
+		show_actions
+		and OnlineBattleService.connection_state != &"connected"
+	)
+	var back_parent: Container = join_row if room_empty and _join_code_entry_visible else bottom_row
+	if back_button.get_parent() != back_parent:
+		back_button.reparent(back_parent)
+		if back_parent == bottom_row:
+			bottom_row.move_child(back_button, 0)
+	status_label.get_parent().visible = show_actions
+	server_label.visible = show_server_controls
+	server_url_edit.get_parent().visible = show_server_controls
+	create_room_button.visible = show_actions
+	random_match_button.visible = show_actions
+	open_join_button.visible = show_actions
+	join_label.visible = room_empty and _join_code_entry_visible
+	join_row.visible = room_empty and _join_code_entry_visible
+
+
+func _on_repeat_fixed_energy_toggled(enabled: bool) -> void:
+	OnlineBattleService.set_room_rules(enabled)
+
+
+func _refresh_configure_button(room: Dictionary) -> void:
+	configure_button.visible = false
+	if room.is_empty() or Array(room.get("players", [])).size() < 2:
+		return
+	for player_value: Variant in Array(room.get("players", [])):
+		var player: Dictionary = Dictionary(player_value)
+		if String(player.get("id", "")) != OnlineBattleService.player_id:
+			continue
+		configure_button.visible = true
+		configure_button.disabled = bool(player.get("ready", false))
+		if configure_button.disabled:
+			configure_button.text = LocalizationService.tr_key(
+				"online.ready_waiting", "READY • WAITING FOR OPPONENT"
+			)
+		return
+
+
+func _refresh_room_text() -> void:
+	var room: Dictionary = OnlineBattleService.current_room
+	if room.is_empty():
+		return
+	room_code_label.text = LocalizationService.tr_format(
+		"online.room_code", {"code": String(room.get("code", "------"))}, "ROOM: {code}"
+	)
+	room_code_label.visible = false
+	_render_energy_code(room_energy_code, String(room.get("code", "")), false)
+	var names: PackedStringArray = []
+	for player_value: Variant in Array(room.get("players", [])):
+		var player: Dictionary = Dictionary(player_value)
+		names.append(String(player.get("name", "Player")))
+	players_label.text = "  VS  ".join(names) if names.size() == 2 else LocalizationService.tr_key(
+		"online.waiting_player", "Waiting for Player 2..."
+	)
+
+
+func _on_match_ready(players: Array) -> void:
+	var pokemon_names: PackedStringArray = []
+	for player_value: Variant in players:
+		var player: Dictionary = Dictionary(player_value)
+		var loadout: Dictionary = Dictionary(player.get("loadout", {}))
+		pokemon_names.append("%s: %s" % [
+			String(player.get("name", "Player")),
+			String(loadout.get("pokemon_id", "?"))
+		])
+	status_label.text = LocalizationService.tr_key(
+		"online.both_ready", "BOTH PLAYERS READY • LOADOUTS SYNCHRONIZED"
+	)
+	players_label.text = "  VS  ".join(pokemon_names)
+	configure_button.visible = false
+
+
+func _on_battle_session_started(session: Dictionary) -> void:
+	if session.is_empty():
+		return
+	GameFlow.open_battle.call_deferred()
+
+
+func _on_server_error(code: String, message: String) -> void:
+	status_label.text = (
+		LocalizationService.tr_key(
+			"online.random_server_update_required",
+			"Random VS requires the latest Online server deployment."
+		)
+		if code == "random_matchmaking_unavailable"
+		else message
+	)
+
+
+func _go_back() -> void:
+	if _join_code_entry_visible and OnlineBattleService.current_room.is_empty():
+		_close_join_code_entry()
+		return
+	OnlineBattleService.disconnect_from_server()
+	if GameFlow.phone_mode:
+		GameFlow.open_phone_mode_menu()
+	else:
+		GameFlow.exit_phone_mode()
+
+
+func _on_locale_changed(_locale: String) -> void:
+	_apply_localized_text()

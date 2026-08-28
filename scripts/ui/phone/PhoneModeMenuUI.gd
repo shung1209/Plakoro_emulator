@@ -12,6 +12,7 @@ const PLAKORO_THEME: Script = preload(
 @onready var delete_save_button: Button = %DeleteSaveButton
 @onready var free_button: Button = %FreeButton
 @onready var local_battle_button: Button = %LocalBattleButton
+@onready var online_battle_button: Button = %OnlineBattleButton
 @onready var back_button: Button = %BackButton
 @onready var delete_save_confirmation: ConfirmationDialog = %DeleteSaveConfirmation
 @onready var delete_save_error: AcceptDialog = %DeleteSaveError
@@ -24,6 +25,7 @@ func _ready() -> void:
 	delete_save_confirmation.confirmed.connect(_confirm_delete_save)
 	free_button.pressed.connect(GameFlow.open_phone_free_mode)
 	local_battle_button.pressed.connect(GameFlow.open_phone_local_battle)
+	online_battle_button.pressed.connect(GameFlow.open_phone_online_battle)
 	back_button.pressed.connect(GameFlow.exit_phone_mode)
 	LocalizationService.locale_changed.connect(_on_locale_changed)
 	_apply_localized_text()
@@ -71,6 +73,9 @@ func _apply_localized_text() -> void:
 	)
 	local_battle_button.text = LocalizationService.tr_key(
 		"phone_mode.local_battle", "LOCAL VS"
+	)
+	online_battle_button.text = LocalizationService.tr_key(
+		"phone_mode.online_battle", "ONLINE VS"
 	)
 	back_button.text = LocalizationService.tr_key(
 		"phone_mode.back", "BACK"

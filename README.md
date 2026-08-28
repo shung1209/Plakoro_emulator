@@ -1,4 +1,4 @@
-# PLAKORO Adventures v2.3 Hotfix
+# PLAKORO Adventures V3
 
 [English](#english) | [繁體中文](#繁體中文)
 
@@ -8,21 +8,28 @@
 Pokémon PLAKORO dice game. It builds on the stable **12.12k release-clean
 Official V1 Base**, turning the original emulator and content tools into an
 adventure-driven game with progression, collection building, save files, and
-two ways to play.
+four game modes.
 
 Choose a Plakoro, build three Enerkoro, select four Moves, roll the dice, and
 advance through the arena.
 
-## What's in v2.3 Hotfix
+## What's in V3
 
 - Story Mode with New Game, Continue, save deletion, a randomized encounter
   route unique to each save, battle rewards, collection unlocks, and Plakoro
   levels up to LV5.
 - Free Mode with all playable content available for unrestricted battles and
   expanded Enerkoro rules.
-- Phone Mode with dedicated portrait menus, simplified preparation and
-  Loadout scenes, a vertical Enerkoro Builder, and a focused touch-first
-  battle flow.
+- Local VS with private pass-and-play setup for two players: each player
+  chooses a Pokémon, four Moves, and three Enerkoro before both Loadouts are
+  revealed and the battle begins.
+- Online VS with private Energy-sequence room codes and random matchmaking,
+  synchronized Loadouts, server-selected first turn, authoritative Enerkoro
+  and Charakoro rolls, damage/effect resolution, reconnection, room cleanup,
+  disconnect/forfeit handling, and a shared full-screen Battle Report.
+- Phone Mode with dedicated portrait menus and Story, Free, Local, and Online
+  entry points, simplified preparation and Loadout scenes, a vertical
+  Enerkoro Builder, and a focused touch-first battle flow.
 - 21 Pokémon, 126 Move cards, and 9 custom Kyokoro weight profiles.
 - New Gengar, Lucario, and Metagross data, Moves, images, and default dice
   setups.
@@ -39,7 +46,7 @@ advance through the arena.
 - Icon-driven battle information for Pokémon types, weaknesses, Energy,
   Enerkoro results, and Charakoro orientations.
 - Difficulty-aware AI Loadouts. Easy, Normal, and Hard AI use approximately
-  3/6, 4/6, and 5/6 main-Energy faces per die respectively. Automatic AI
+  3/8, 5/8, and 7/8 main-Energy outcomes respectively. Automatic AI
   Loadouts select four compatible Moves by success rate, damage, and effect
   synergy; Free Mode preserves manually selected AI Moves while generating
   difficulty-appropriate dice.
@@ -80,9 +87,27 @@ Plakoro, configure four Moves, edit Enerkoro directly, and battle without Story
 Mode progression restrictions. Free Mode also supports repeated Fixed Energy
 when enabled in the Enerkoro Builder.
 
+### Local VS
+
+Local VS is a private pass-and-play battle for two players on one device.
+Player 1 and Player 2 each choose a Plakoro, four Moves, and three Enerkoro in
+sequence. Their Loadouts remain hidden until both players finish, then a
+full-screen versus reveal and coin toss lead into battle. Local turns use the
+same staged dice, effect, attack, and Battle Report presentation as the other
+modes.
+
+### Online VS
+
+Online VS supports private rooms identified by a six-Energy sequence and
+automatic random matchmaking. Both clients synchronize hidden Loadouts before
+the match. The lightweight authoritative server owns the first turn, dice
+rolls, Energy and Charakoro validation, effects, HP, victory, forfeits, and
+disconnect recovery. The client sends player choices and presents the shared
+result, keeping server traffic and free-hosting load modest.
+
 ### Phone Mode
 
-Phone Mode provides separate Story and Free Mode entry points in a portrait
+Phone Mode provides Story, Free, Local, and Online entry points in a portrait
 layout. Its preparation flow focuses on choosing a Pokémon, selecting four
 Moves, editing three vertically arranged Enerkoro, validating the Loadout, and
 starting battle without desktop-only analysis panels.
@@ -108,9 +133,9 @@ in both Story and Free Mode workflows.
 
 ### Main Menu
 
-Start or continue Story Mode, enter Free Mode, switch between Warm and Dark
-themes, delete a Story save, or quit. Content Studio appears only after the
-unlock code is entered.
+Start or continue Story Mode, enter Free Mode, Local VS, Online VS, or Phone
+Mode, switch between Warm and Dark themes, delete a Story save, or quit.
+Content Studio appears only after the unlock code is entered.
 
 ### Encounter Select
 
@@ -164,12 +189,23 @@ renderer.
 
 The included export presets provide:
 
-- Windows Desktop: `Plakoro_Adventure_v2.3.exe`
-- Linux: `Plakoro_Adventure_v2.3.application`
+- Windows Desktop: `Plakoro_Adventure_V3.exe`
+- Linux: `Plakoro_Adventure_V3.application`
 - Web: `web/index.html`
 
 Web export helpers are available in `tools/export_web.sh` and
 `tools/export_web.ps1`.
+
+### Online VS server
+
+The authoritative WebSocket service lives in `online-server/`. For local
+testing, install its dependencies and run `pnpm start`, then temporarily set
+the client to `ws://127.0.0.1:10000/ws`. The V3 client is configured for
+`wss://plakoro-online.onrender.com/ws`, and sends one background health request
+at startup so the free Render service can begin waking before Online VS is
+opened. A Render Blueprint is included as `render.yaml`; another deployment
+can be selected through the Godot project setting `online/server_url`.
+See `online-server/README.md` for deployment and verification details.
 
 ## User Data and Custom Content
 
@@ -225,19 +261,25 @@ rights holders. No ownership of those properties is claimed by this project.
 **PLAKORO Adventures** 是一款非官方粉絲遊戲，靈感來自 Bandai 推出的
 Pokémon PLAKORO 骰子遊戲。本作以穩定的 **12.12k release-clean Official
 V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險進度、收藏、
-存檔及兩種遊玩方式的完整遊戲。
+存檔及四種遊戲模式的完整遊戲。
 
 選擇一隻 Plakoro、配置三顆 Enerkoro、挑選四個招式、擲出骰子，然後在
 競技場中一路前進。
 
-## v2.3 Hotfix 收錄內容
+## V3 收錄內容
 
 - Story Mode 提供 New Game、Continue、刪除存檔、每份存檔獨立的隨機
   故事路線、戰鬥獎勵、收藏解鎖，以及最高 LV5 的 Plakoro 等級。
 - Free Mode 開放所有可玩內容，讓玩家自由對戰，並提供較寬鬆的 Enerkoro
   規則。
-- Phone Mode 提供專用直立主選單、簡化版對戰準備與 Loadout 場景、垂直排列
-  的 Enerkoro Builder，以及適合觸控操作的精簡戰鬥流程。
+- 本機對戰提供兩位玩家依序且保密的設定流程；雙方各自選擇 Pokémon、四張
+  招式與三顆 Enerkoro，完成後才同時揭曉配置並開始對戰。
+- 線上對戰支援私人 Energy 序列房號與隨機配對，包含 Loadout 同步、
+  伺服器決定先攻、Enerkoro／Charakoro 權威擲骰、傷害與效果結算、
+  斷線重連、房間清理、投降判定及共用的全頁戰鬥報告。
+- Phone Mode 提供 Story、Free、Local 與 Online 入口、專用直立主選單、
+  簡化版對戰準備與 Loadout 場景、垂直排列的 Enerkoro Builder，
+  以及適合觸控操作的精簡戰鬥流程。
 - 收錄 21 隻 Pokémon、126 張招式卡及 9 組自訂 Kyokoro 權重設定。
 - 新增 Gengar、Lucario 及 Metagross 的資料、招式、圖片與預設骰子配置。
 - 可使用玩家目前擁有的 Energy 自由配置三顆 Enerkoro。
@@ -250,7 +292,7 @@ V1 Base** 為基礎，把原本的模擬器與內容工具發展成具有冒險�
 - Pokémon 屬性、弱點、Energy、Enerkoro 結果及 Charakoro 方位均以圖示為主，
   減少不同語言造成的版面擁擠。
 - AI Loadout 會依難度產生不同的 Enerkoro 與招式組合。簡單、普通、困難
-  AI 每顆骰子的主能量面約為 3/6、4/6、5/6，並依成功率、傷害及效果配合度
+  AI 的主能量結果約為 3/8、5/8、7/8，並依成功率、傷害及效果配合度
   自動挑選四個招式。Free Mode 手動指定 AI 招式時會保留選擇，只依難度
   重新配置骰子。
 - Web 介面支援響應式版面、Phone Mode 直立顯示、完整介面的橫向提示、
@@ -289,9 +331,23 @@ Free Mode 會立即開放完整角色陣容。玩家可以選擇自己與 AI 使
 進行對戰。啟用 Enerkoro Builder 中的選項後，Free Mode 也允許不同
 Enerkoro 使用重複的固定 Energy。
 
+### Local VS（本機對戰）
+
+Local VS 讓兩位玩家在同一台裝置上依序完成私密配置。玩家 1 與
+玩家 2 各自選擇 Plakoro、四個招式與三顆 Enerkoro；雙方完成後才會透過
+全畫面 VS 演出公開 Loadout，並在擲硬幣後開始對戰。擲骰、效果、攻擊及結算
+節奏與其他模式一致。
+
+### Online VS（線上對戰）
+
+Online VS 支援六個 Energy 組成的私人房號與隨機配對。雙方會先同步隱藏的
+Loadout，再由輕量化權威伺服器處理先攻、擲骰、Energy 與 Charakoro 驗證、
+效果、HP、勝負、投降與斷線恢復。用戶端僅傳送玩家選擇並擔任演出，降低
+free hosting 的伺服器負擔。
+
 ### Phone Mode（手機模式）
 
-Phone Mode 提供獨立的 Story Mode 與 Free Mode 入口，並以直立介面呈現。
+Phone Mode 提供 Story、Free、Local 與 Online 入口，並以直立介面呈現。
 對戰準備只保留選擇 Pokémon、挑選四個招式、編輯三顆垂直排列的 Enerkoro、
 Loadout 驗證及開始對戰等必要功能，不顯示桌面版的分析資訊。
 
@@ -315,8 +371,9 @@ Content Studio 在一般遊玩時會保持隱藏，讓主選單專注於遊戲�
 
 ### 主選單
 
-開始或繼續 Story Mode、進入 Free Mode、切換 Warm／Dark 主題、刪除故事
-存檔或離開遊戲。輸入解除密技後才會顯示 Content Studio。
+開始或繼續 Story Mode、進入 Free Mode、Local VS、Online VS 或 Phone Mode、
+切換 Warm／Dark 主題、刪除故事存檔或離開遊戲。輸入解除密技後才會
+顯示 Content Studio。
 
 ### 關卡選擇
 
@@ -365,12 +422,22 @@ Charakoro，可在獨立視窗
 
 專案內含以下匯出設定：
 
-- Windows Desktop：`Plakoro_Adventure_v2.3.exe`
-- Linux：`Plakoro_Adventure_v2.3.application`
+- Windows Desktop：`Plakoro_Adventure_V3.exe`
+- Linux：`Plakoro_Adventure_V3.application`
 - Web：`web/index.html`
 
 Web 匯出輔助工具位於 `tools/export_web.sh` 與
 `tools/export_web.ps1`。
+
+### 線上對戰伺服器
+
+權威 WebSocket 服務位於 `online-server/`。本機測試時先安裝相依套件，執行
+`pnpm start`，再暫時將用戶端改為 `ws://127.0.0.1:10000/ws`。V3 預設使用
+`wss://plakoro-online.onrender.com/ws`；遊戲啟動時會在背景發送一次 health request，
+讓免費 Render 服務可在玩家開啟 Online VS 前開始喚醒。Repository 根目錄
+已提供 Render Blueprint：`render.yaml`；其他部署可透過 Godot 專案設定
+`online/server_url` 切換。部署與驗測細節請參考
+`online-server/README.md`。
 
 ## 使用者資料與自訂內容
 

@@ -1,7 +1,7 @@
 extends RefCounted
 
 
-const SCHEMA_VERSION: String = "3.4"
+const SCHEMA_VERSION: String = "3.5"
 const FIRST_VICTORY_MILESTONE: String = "first_victory"
 const ENERGY_CATALOG: Script = preload(
 	"res://scripts/game/EnergyProgressionCatalog.gd"
@@ -171,7 +171,10 @@ static func from_dictionary(data: Dictionary) -> Variant:
 				if not String(choice.get("pokemon_id", "")).is_empty():
 					result.pending_energy_choices.append(choice)
 	result._migrate_energy_progression(source_schema)
-	result._migrate_pokemon_energy_rewards(has_energy_reward_tracking)
+	result._migrate_pokemon_energy_rewards(
+		has_energy_reward_tracking,
+		source_schema
+	)
 
 	result.last_winner_participant_id = StringName(
 		data.get("last_winner_participant_id", "")
@@ -280,6 +283,7 @@ func _migrate_energy_progression(source_schema: String) -> void:
 		starter_pokemon_id != &""
 		and starter_energy_type != &""
 		and source_schema != SCHEMA_VERSION
+		and source_schema != "3.4"
 		and source_schema != "3.3"
 	):
 		var old_start: Dictionary = (
@@ -313,7 +317,13 @@ func _migrate_energy_progression(source_schema: String) -> void:
 			pokemon_levels[pokemon_id] = 1
 
 
-func _migrate_pokemon_energy_rewards(has_tracking: bool) -> void:
+func _migrate_pokemon_energy_rewards(
+	has_tracking: bool,
+	source_schema: String
+) -> void:
+	if has_tracking and source_schema != SCHEMA_VERSION:
+		_migrate_legacy_split_energy_rewards()
+		return
 	if has_tracking:
 		return
 	for pokemon_id: String in unlocked_pokemon_ids:
@@ -335,6 +345,29 @@ func _migrate_pokemon_energy_rewards(has_tracking: bool) -> void:
 			_add_energy_pack(missing_pack)
 			energy_rewarded_pokemon_ids.append(pokemon_id)
 			needs_persistence_after_load = true
+
+
+func _migrate_legacy_split_energy_rewards() -> void:
+	for pokemon_id: String in energy_rewarded_pokemon_ids:
+		if pokemon_id == String(starter_pokemon_id):
+			continue
+		var old_pack: Dictionary = ENERGY_CATALOG.get_legacy_new_pokemon_pack(
+			StringName(pokemon_id)
+		)
+		var new_pack: Dictionary = ENERGY_CATALOG.get_new_pokemon_pack(
+			StringName(pokemon_id)
+		)
+		if old_pack == new_pack or new_pack.is_empty():
+			continue
+		for raw_energy: Variant in old_pack:
+			var energy: String = String(raw_energy)
+			energy_inventory[energy] = max(
+				0,
+				int(energy_inventory.get(energy, 0))
+				- int(old_pack[raw_energy])
+			)
+		_add_energy_pack(new_pack)
+		needs_persistence_after_load = true
 
 
 func _infer_starter_energy_if_missing() -> void:

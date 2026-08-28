@@ -66,7 +66,19 @@ func _bind_recursive(node: Node) -> void:
 
 
 func _on_node_added(node: Node) -> void:
-	call_deferred("_bind_node", node)
+	# A newly added transient popup can be freed before the deferred call is
+	# delivered. Passing that freed Object through a typed Node parameter makes
+	# Godot fail argument conversion before _bind_node can validate it. Defer
+	# only the stable instance id and resolve the live object at delivery time.
+	call_deferred("_bind_node_by_id", node.get_instance_id())
+
+
+func _bind_node_by_id(instance_id: int) -> void:
+	var candidate: Object = instance_from_id(instance_id)
+	if candidate == null or not is_instance_valid(candidate):
+		return
+	if candidate is Node:
+		_bind_node(candidate as Node)
 
 
 func _bind_node(node: Node) -> void:

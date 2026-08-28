@@ -147,6 +147,10 @@ func _build_slots() -> void:
         _slot_energy_colors.append(slot_color)
         _slot_states.append(&"idle")
 
+    # Responsive mode rebuilds all four slots. Restore the neutral Charakoro
+    # artwork here as well so switching compact mode never leaves a blank die.
+    _show_unrolled_charakoro(false)
+
 
 func set_compact_mode(enabled: bool) -> void:
     if _compact_mode == enabled:
@@ -199,16 +203,19 @@ func reset_display() -> void:
             "battle.dice.energy_index",
             {"index": index + 1},
             "Energy {index}"
-        )
+            )
             if index < 3
             else "Charakoro"
         )
+
+    _show_unrolled_charakoro(false)
 
 
 func play_result(
     dice_result: Variant,
     energy_profiles: Array = [],
-    roll_record: Variant = null
+    roll_record: Variant = null,
+    include_charakoro: bool = true
 ) -> void:
     if _icon_rows.is_empty():
         _build_slots()
@@ -228,7 +235,8 @@ func play_result(
     )
 
     var kyokoro_enabled: bool = (
-        final_orientation != &""
+        include_charakoro
+        and final_orientation != &""
     )
 
     var base_batch: Array[Array] = []
@@ -245,7 +253,8 @@ func play_result(
     await _play_base_batch(
         base_batch,
         final_orientation,
-        kyokoro_enabled
+        kyokoro_enabled,
+        include_charakoro
     )
 
     # Extra dice always animate after the base roll. A presentation batch
@@ -351,7 +360,7 @@ func play_opponent_enerkoro_result(
         )
 
 
-func play_opponent_kyokoro_roll(
+func play_charakoro_result(
     orientation: StringName
 ) -> void:
     if orientation == &"":
@@ -368,6 +377,8 @@ func play_opponent_kyokoro_roll(
         _slot_panels[index].visible = false
 
     _slot_panels[3].visible = true
+    _reset_slot_transform(3)
+    _show_unrolled_charakoro(true)
 
     await _animate_batch(
         [],
@@ -383,7 +394,7 @@ func play_opponent_kyokoro_roll(
     )
 
     _labels[3].text = (
-        "Opponent Charakoro  |  "
+        "Charakoro  |  "
         + String(
             orientation
         ).replace(
@@ -391,6 +402,56 @@ func play_opponent_kyokoro_roll(
             " "
         ).capitalize()
     )
+
+
+func play_opponent_kyokoro_roll(
+    orientation: StringName
+) -> void:
+    await play_charakoro_result(orientation)
+    _labels[3].text = (
+        "Opponent Charakoro  |  "
+        + String(orientation).replace("_", " ").capitalize()
+    )
+
+
+func play_opponent_kyokoro_sequence(
+    orientations: Array
+) -> void:
+    if orientations.is_empty():
+        return
+
+    if _icon_rows.is_empty():
+        _build_slots()
+
+    var total: int = orientations.size()
+    for index: int in total:
+        var orientation: StringName = StringName(orientations[index])
+        for slot_index: int in range(3):
+            _slot_panels[slot_index].visible = false
+        _slot_panels[3].visible = true
+        _reset_slot_transform(3)
+        _show_unrolled_charakoro(true)
+        _labels[3].text = (
+            "Opponent Charakoro %d/%d"
+            % [index + 1, total]
+        )
+        await get_tree().create_timer(0.32).timeout
+        await _animate_batch(
+            [],
+            orientation,
+            [0.0, 0.0, 0.0, 0.90],
+            [false, false, false, true],
+            0
+        )
+        _labels[3].text = (
+            "Opponent Charakoro %d/%d  |  %s"
+            % [
+                index + 1,
+                total,
+                String(orientation).replace("_", " ").capitalize()
+            ]
+        )
+        await get_tree().create_timer(0.42).timeout
 
 
 func play_kyokoro_sequence(
@@ -433,22 +494,19 @@ func play_kyokoro_sequence(
 func _play_base_batch(
     final_dice: Array[Array],
     final_orientation: StringName,
-    kyokoro_enabled: bool = true
+    kyokoro_enabled: bool = true,
+    show_charakoro_slot: bool = true
 ) -> void:
     for index: int in range(3):
         _slot_panels[index].visible = (
             index < final_dice.size()
         )
 
-    _slot_panels[3].visible = true
+    _slot_panels[3].visible = show_charakoro_slot
 
-    if not kyokoro_enabled:
-        _clear_icon_row(
-            _icon_rows[3]
-        )
-        _labels[3].text = (
-            "Charakoro Disabled"
-        )
+    if show_charakoro_slot and not kyokoro_enabled:
+        _show_unrolled_charakoro(true)
+        _labels[3].text = "Charakoro"
 
     await _animate_batch(
         final_dice,
@@ -938,6 +996,26 @@ func _set_orientation_slot(
         "orientation." + String(orientation),
         String(orientation).replace("_", " ").capitalize()
     )
+
+
+func _show_unrolled_charakoro(dimmed: bool) -> void:
+    if _icon_rows.size() <= 3:
+        return
+    _clear_icon_row(_icon_rows[3])
+    var ready_icon := TextureRect.new()
+    ready_icon.texture = ICONS.load_kyokoro_icon(&"FACE_DOWN")
+    ready_icon.custom_minimum_size = Vector2(
+        54 if _compact_mode else ICON_SIZE,
+        54 if _compact_mode else ICON_SIZE
+    )
+    ready_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    ready_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    ready_icon.modulate = Color(1.0, 1.0, 1.0, 0.42 if dimmed else 0.82)
+    ready_icon.tooltip_text = LocalizationService.tr_key(
+        "online.charakoro_not_rolled" if dimmed else "online.charakoro_ready",
+        "Charakoro not rolled" if dimmed else "Charakoro ready"
+    )
+    _icon_rows[3].add_child(ready_icon)
 
 
 func _pulse_slot(

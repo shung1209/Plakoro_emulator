@@ -115,6 +115,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "LOCAL VS"
 
+[node name="OnlineBattleButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "ONLINE VS"
+
 [node name="BackButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Menu"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 58)

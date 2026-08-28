@@ -2,22 +2,22 @@ extends VBoxContainer
 
 
 const PLAYER_COLOR: Color = Color(
-    0.34,
-    0.78,
-    1.0,
-    1.0
+	0.34,
+	0.78,
+	1.0,
+	1.0
 )
 const ENEMY_COLOR: Color = Color(
-    1.0,
-    0.61,
-    0.33,
-    1.0
+	1.0,
+	0.61,
+	0.33,
+	1.0
 )
 const SYSTEM_COLOR: Color = Color(
-    0.67,
-    0.70,
-    0.77,
-    1.0
+	0.67,
+	0.70,
+	0.77,
+	1.0
 )
 
 
@@ -26,272 +26,274 @@ var _turn_history: Array = []
 
 
 func set_technical_mode(
-    enabled: bool
+	enabled: bool
 ) -> void:
-    technical_mode = enabled
-    _rebuild()
+	technical_mode = enabled
+	_rebuild()
 
 
 func clear_timeline() -> void:
-    _turn_history.clear()
-    _clear_rendered_timeline()
+	_turn_history.clear()
+	_clear_rendered_timeline()
 
 
 func add_turn(
-    turn: Variant
+	turn: Variant
 ) -> void:
-    if turn == null:
-        return
+	if turn == null:
+		return
 
-    _turn_history.append(turn)
-    _render_turn(turn)
+	_turn_history.append(turn)
+	_render_turn(turn)
 
 
 func _rebuild() -> void:
-    _clear_rendered_timeline()
+	_clear_rendered_timeline()
 
-    for turn: Variant in _turn_history:
-        _render_turn(turn)
+	for turn: Variant in _turn_history:
+		_render_turn(turn)
 
 
 func _clear_rendered_timeline() -> void:
-    for child: Node in get_children():
-        remove_child(child)
-        child.queue_free()
+	for child: Node in get_children():
+		remove_child(child)
+		child.queue_free()
 
 
 func _render_turn(
-    turn: Variant
+	turn: Variant
 ) -> void:
-    var turn_panel: PanelContainer = (
-        PanelContainer.new()
-    )
-    turn_panel.size_flags_horizontal = (
-        Control.SIZE_EXPAND_FILL
-    )
+	var turn_panel: PanelContainer = (
+		PanelContainer.new()
+	)
+	turn_panel.size_flags_horizontal = (
+		Control.SIZE_EXPAND_FILL
+	)
 
-    var turn_box: VBoxContainer = (
-        VBoxContainer.new()
-    )
-    turn_box.add_theme_constant_override(
-        "separation",
-        8
-    )
-    turn_panel.add_child(turn_box)
+	var turn_box: VBoxContainer = (
+		VBoxContainer.new()
+	)
+	turn_box.add_theme_constant_override(
+		"separation",
+		8
+	)
+	turn_panel.add_child(turn_box)
 
-    var header: Label = Label.new()
-    header.text = _turn_header(turn)
-    header.add_theme_font_size_override(
-        "font_size",
-        18
-    )
-    header.modulate = (
-        PLAYER_COLOR
-        if turn.actor_id == &"player"
-        else ENEMY_COLOR
-    )
-    turn_box.add_child(header)
+	var header: Label = Label.new()
+	header.text = _turn_header(turn)
+	header.add_theme_font_size_override(
+		"font_size",
+		18
+	)
+	header.modulate = (
+		PLAYER_COLOR
+		if turn.actor_id == &"player"
+		else ENEMY_COLOR
+	)
+	turn_box.add_child(header)
 
-    for entry: Variant in turn.entries:
-        if (
-            not technical_mode
-            and not _is_player_facing_entry(entry)
-        ):
-            continue
+	for entry: Variant in turn.entries:
+		if (
+			not technical_mode
+			and not _is_player_facing_entry(entry)
+		):
+			continue
 
-        turn_box.add_child(
-            _create_entry_panel(
-                entry,
-                not technical_mode
-            )
-        )
+		turn_box.add_child(
+			_create_entry_panel(
+				entry,
+				not technical_mode
+			)
+		)
 
-    add_child(turn_panel)
+	add_child(turn_panel)
 
 
 func _is_player_facing_entry(
-    entry: Variant
+	entry: Variant
 ) -> bool:
-    var entry_type: StringName = StringName(
-        entry.entry_type
-    )
+	var entry_type: StringName = StringName(
+		entry.entry_type
+	)
 
-    return entry_type in [
-        &"move",
-        &"damage",
-        &"status",
-        &"effect_lifecycle",
-        &"result"
-    ]
+	return entry_type in [
+		&"move",
+		&"damage",
+		&"status",
+		&"effect_lifecycle",
+		&"result"
+	]
 
 
 func _create_entry_panel(
-    entry: Variant,
-    concise: bool = false
+	entry: Variant,
+	concise: bool = false
 ) -> Control:
-    var wrapper: PanelContainer = (
-        PanelContainer.new()
-    )
-    wrapper.size_flags_horizontal = (
-        Control.SIZE_EXPAND_FILL
-    )
+	var wrapper: PanelContainer = (
+		PanelContainer.new()
+	)
+	wrapper.size_flags_horizontal = (
+		Control.SIZE_EXPAND_FILL
+	)
 
-    var box: VBoxContainer = (
-        VBoxContainer.new()
-    )
-    box.add_theme_constant_override(
-        "separation",
-        4
-    )
-    wrapper.add_child(box)
+	var box: VBoxContainer = (
+		VBoxContainer.new()
+	)
+	box.add_theme_constant_override(
+		"separation",
+		4
+	)
+	wrapper.add_child(box)
 
-    var title_label: Label = Label.new()
-    title_label.text = String(entry.title)
-    title_label.add_theme_font_size_override(
-        "font_size",
-        15
-    )
-    title_label.modulate = _entry_color(
-        StringName(entry.emphasis),
-        StringName(entry.actor_id)
-    )
-    box.add_child(title_label)
+	var title_label: Label = Label.new()
+	title_label.text = String(entry.title)
+	title_label.add_theme_font_size_override(
+		"font_size",
+		15
+	)
+	title_label.modulate = _entry_color(
+		StringName(entry.emphasis),
+		StringName(entry.actor_id)
+	)
+	box.add_child(title_label)
 
-    var display_lines: Array[String] = (
-        _display_lines(
-            entry,
-            concise
-        )
-    )
+	var display_lines: Array[String] = (
+		_display_lines(
+			entry,
+			concise
+		)
+	)
 
-    for body_line: String in display_lines:
-        var line_label: Label = Label.new()
-        line_label.text = body_line
-        line_label.autowrap_mode = (
-            TextServer.AUTOWRAP_WORD_SMART
-        )
-        line_label.modulate = Color(
-            0.91,
-            0.92,
-            0.95,
-            1.0
-        )
-        box.add_child(line_label)
+	for body_line: String in display_lines:
+		var line_label: Label = Label.new()
+		line_label.text = body_line
+		line_label.autowrap_mode = (
+			TextServer.AUTOWRAP_WORD_SMART
+		)
+		line_label.modulate = Color(
+			0.91,
+			0.92,
+			0.95,
+			1.0
+		)
+		box.add_child(line_label)
 
-    return wrapper
+	return wrapper
 
 
 func _display_lines(
-    entry: Variant,
-    concise: bool
+	entry: Variant,
+	concise: bool
 ) -> Array[String]:
-    var lines: Array[String] = []
+	var lines: Array[String] = []
 
-    for raw_line: Variant in entry.body_lines:
-        lines.append(
-            String(raw_line)
-        )
+	for raw_line: Variant in entry.body_lines:
+		lines.append(
+			String(raw_line)
+		)
 
-    if not concise:
-        return lines
+	if not concise:
+		return lines
 
-    var entry_type: StringName = StringName(
-        entry.entry_type
-    )
+	var entry_type: StringName = StringName(
+		entry.entry_type
+	)
 
-    if entry_type == &"damage":
-        for line: String in lines:
-            if line.begins_with(
+	if entry_type == &"damage":
+		for line: String in lines:
+			if line.begins_with(
                 "Final applied damage:"
-            ):
-                return [
-                    line.replace(
-                        "Final applied damage:",
+			):
+				return [
+					line.replace(
+						"Final applied damage:",
                         "Damage:"
-                    )
-                ]
+					)
+				]
 
-    return lines
+	return lines
 
 
 func _entry_color(
-    emphasis: StringName,
-    actor_id: StringName
+	emphasis: StringName,
+	actor_id: StringName
 ) -> Color:
-    match emphasis:
-        &"damage":
-            return Color(
-                1.0,
-                0.42,
-                0.42,
-                1.0
-            )
+	match emphasis:
+		&"damage":
+			return Color(
+				1.0,
+				0.42,
+				0.42,
+				1.0
+			)
 
-        &"success":
-            return Color(
-                0.39,
-                0.85,
-                0.52,
-                1.0
-            )
+		&"success":
+			return Color(
+				0.39,
+				0.85,
+				0.52,
+				1.0
+			)
 
-        &"failure":
-            return Color(
-                1.0,
-                0.42,
-                0.42,
-                1.0
-            )
+		&"failure":
+			return Color(
+				1.0,
+				0.42,
+				0.42,
+				1.0
+			)
 
-        &"status":
-            return Color(
-                0.82,
-                0.61,
-                1.0,
-                1.0
-            )
+		&"status":
+			return Color(
+				0.82,
+				0.61,
+				1.0,
+				1.0
+			)
 
-        &"dice":
-            return Color(
-                1.0,
-                0.85,
-                0.35,
-                1.0
-            )
+		&"dice":
+			return Color(
+				1.0,
+				0.85,
+				0.35,
+				1.0
+			)
 
-        &"ai":
-            return ENEMY_COLOR
+		&"ai":
+			return ENEMY_COLOR
 
-        &"actor":
-            if actor_id == &"player":
-                return PLAYER_COLOR
+		&"actor":
+			if actor_id == &"player":
+				return PLAYER_COLOR
 
-            return ENEMY_COLOR
+			return ENEMY_COLOR
 
-        &"result":
-            return Color.WHITE
+		&"result":
+			return Color.WHITE
 
-        _:
-            return SYSTEM_COLOR
+		_:
+			return SYSTEM_COLOR
 
 
 func _turn_header(
-    turn: Variant
+	turn: Variant
 ) -> String:
-    var actor_name: String = LocalizationService.tr_key("battle.ai", "AI")
-    if GameFlow.local_battle_mode:
-        actor_name = LocalizationService.tr_key(
-            "battle.player_one" if turn.actor_id == &"player" else "battle.player_two",
-            "PLAYER 1" if turn.actor_id == &"player" else "PLAYER 2"
-        )
-    elif turn.actor_id == &"player":
-        actor_name = LocalizationService.tr_key("battle.you", "YOU")
+	var actor_name: String = LocalizationService.tr_key("battle.ai", "AI")
+	if GameFlow.local_battle_mode:
+		actor_name = LocalizationService.tr_key(
+			"battle.player_one" if turn.actor_id == &"player" else "battle.player_two",
+			"PLAYER 1" if turn.actor_id == &"player" else "PLAYER 2"
+		)
+	elif turn.actor_id == &"player":
+		actor_name = LocalizationService.tr_key("battle.you", "YOU")
+	elif GameFlow.online_battle_mode:
+		actor_name = LocalizationService.tr_key("online.opponent", "OPPONENT")
 
-    return (
+	return (
         "TURN "
-        + str(int(turn.turn_number))
-        + " - "
-        + actor_name
-        + " - "
-        + String(turn.move_name)
-    )
+		+ str(int(turn.turn_number))
+		+ " - "
+		+ actor_name
+		+ " - "
+		+ String(turn.move_name)
+	)

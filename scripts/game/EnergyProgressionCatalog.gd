@@ -68,6 +68,14 @@ static func get_new_pokemon_pack(pokemon_id: StringName) -> Dictionary:
 	if options.is_empty():
 		return {}
 	var primary: String = options[0]
+	return {primary: NEW_POKEMON_ENERGY_COUNT}
+
+
+static func get_legacy_new_pokemon_pack(pokemon_id: StringName) -> Dictionary:
+	var options: Array[String] = get_energy_options(pokemon_id)
+	if options.is_empty():
+		return {}
+	var primary: String = options[0]
 	if options.size() == 1:
 		return {primary: NEW_POKEMON_ENERGY_COUNT}
 	var secondary: String = options[1] if options.size() > 1 else primary

@@ -1,0 +1,19 @@
+{
+  "name": "plakoro-online-server",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "description": "Authoritative room and WebSocket foundation for PLAKORO online battles.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node --check src/server.js",
+    "test:end-state": "node test/end-state.test.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

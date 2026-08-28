@@ -470,6 +470,12 @@ func _adapt_battle() -> void:
 		var panel: Control = source.get(property) as Control
 		if panel != null:
 			panel.reparent(arena)
+	var arena_message_panel: Control = source.get("message_panel") as Control
+	if arena_message_panel != null:
+		# Phone battle details belong with the dice sequence in the ROLL tab.
+		# Keeping the legacy message panel in ARENA duplicates the result and
+		# pushes both combatant cards below the fold.
+		arena_message_panel.visible = false
 	var moves_panel: Control = source.get("moves_panel") as Control
 	var roll_panel: Control = source.get("roll_result_panel") as Control
 	if moves_panel != null:
@@ -531,13 +537,22 @@ func _adapt_battle() -> void:
 					0,
 					phone_card_height
 				)
-				(button as Button).pressed.connect(_on_phone_move_pressed)
 	if source.has_signal("battle_phase_changed"):
 		source.connect("battle_phase_changed", _on_battle_phase_changed)
 	if source.has_signal("phone_roll_confirmation_changed"):
 		source.connect(
 			"phone_roll_confirmation_changed",
 			_on_phone_roll_confirmation_changed
+		)
+	if source.has_signal("phone_attack_animation_requested"):
+		source.connect(
+			"phone_attack_animation_requested",
+			_on_phone_attack_animation_requested
+		)
+	if source.has_signal("phone_move_popup_closed"):
+		source.connect(
+			"phone_move_popup_closed",
+			_on_phone_move_popup_closed
 		)
 	_fit_phone_popup("%CoinTossWindow", Vector2i(430, 410))
 	_fit_phone_popup("%EnemyMoveWindow", Vector2i(440, 790))
@@ -657,8 +672,12 @@ func _fit_phone_portrait_content(root: Control, content_size: float) -> void:
 		_fit_phone_portrait_content(control, content_size)
 
 
-func _on_phone_move_pressed() -> void:
-	_show_battle_view(&"roll")
+func _on_phone_move_popup_closed() -> void:
+	_show_battle_view(&"moves")
+
+
+func _on_phone_attack_animation_requested() -> void:
+	_show_battle_view(&"arena")
 
 
 func _on_battle_phase_changed(phase: StringName) -> void:
@@ -671,7 +690,14 @@ func _on_battle_phase_changed(phase: StringName) -> void:
 			if phase != &"select_target":
 				_clear_phone_roll_confirmations()
 			_show_battle_view(&"roll")
-		&"resolving", &"ai_resolving", &"ai_thinking", &"battle_finished":
+		&"resolving", &"ai_resolving":
+			_show_battle_view(&"roll")
+		&"ai_thinking":
+			# Waiting for the opponent to choose is still an arena state.
+			# Switch to ROLL only when their resolved dice event arrives and
+			# BattleGameUI emits ai_rolling.
+			_show_battle_view(&"arena")
+		&"battle_finished":
 			_show_battle_view(&"arena")
 
 
