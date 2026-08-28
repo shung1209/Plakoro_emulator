@@ -2122,8 +2122,11 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 	var dice_result: Variant = DICE_RESULT_DATA.new()
 	for key: Variant in Dictionary(result.get("energy_counts", {})).keys():
 		dice_result.energy_counts[StringName(key)] = int(result["energy_counts"][key])
-	if bool(result.get("energy_met", false)):
-		dice_result.kyokoro_orientation = StringName(result.get("charakoro_orientation", ""))
+	var energy_met: bool = bool(result.get("energy_met", false))
+	var actor_charakoro_orientation := StringName(
+		result.get("charakoro_orientation", "")
+	)
+	if energy_met:
 		dice_result.set_additional_kyokoro_orientations(
 			Array(result.get("additional_kyokoro_orientations", []))
 		)
@@ -2152,9 +2155,24 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 		if face_index >= 0 and face_index < orientations.size():
 			roll_record.energy_die_face_ids.append(orientations[face_index])
 	roll_record.energy_counts = dice_result.energy_counts.duplicate(true)
-	roll_record.kyokoro_orientation = dice_result.kyokoro_orientation
+	# Online resolution is deliberately presented in rule order: Enerkoro
+	# first, then Charakoro only after payment succeeds. Keeping the actor
+	# orientation out of the first batch prevents a previous landed face from
+	# appearing to be reused while the Energy result is still being checked.
+	roll_record.kyokoro_orientation = &""
 	roll_result_panel.visible = true
-	await battle_dice_roll_presenter.play_result(dice_result, energy_profiles, roll_record)
+	await battle_dice_roll_presenter.play_result(
+		dice_result,
+		energy_profiles,
+		roll_record,
+		false
+	)
+	if energy_met and actor_charakoro_orientation != &"":
+		dice_result.kyokoro_orientation = actor_charakoro_orientation
+		roll_record.kyokoro_orientation = actor_charakoro_orientation
+		await battle_dice_roll_presenter.play_charakoro_result(
+			actor_charakoro_orientation
+		)
 	if not dice_result.additional_kyokoro_orientations.is_empty():
 		await battle_dice_roll_presenter.play_kyokoro_sequence(
 			dice_result.additional_kyokoro_orientations

@@ -214,7 +214,8 @@ func reset_display() -> void:
 func play_result(
     dice_result: Variant,
     energy_profiles: Array = [],
-    roll_record: Variant = null
+    roll_record: Variant = null,
+    include_charakoro: bool = true
 ) -> void:
     if _icon_rows.is_empty():
         _build_slots()
@@ -234,7 +235,8 @@ func play_result(
     )
 
     var kyokoro_enabled: bool = (
-        final_orientation != &""
+        include_charakoro
+        and final_orientation != &""
     )
 
     var base_batch: Array[Array] = []
@@ -251,7 +253,8 @@ func play_result(
     await _play_base_batch(
         base_batch,
         final_orientation,
-        kyokoro_enabled
+        kyokoro_enabled,
+        include_charakoro
     )
 
     # Extra dice always animate after the base roll. A presentation batch
@@ -357,7 +360,7 @@ func play_opponent_enerkoro_result(
         )
 
 
-func play_opponent_kyokoro_roll(
+func play_charakoro_result(
     orientation: StringName
 ) -> void:
     if orientation == &"":
@@ -374,6 +377,8 @@ func play_opponent_kyokoro_roll(
         _slot_panels[index].visible = false
 
     _slot_panels[3].visible = true
+    _reset_slot_transform(3)
+    _show_unrolled_charakoro(true)
 
     await _animate_batch(
         [],
@@ -389,13 +394,23 @@ func play_opponent_kyokoro_roll(
     )
 
     _labels[3].text = (
-        "Opponent Charakoro  |  "
+        "Charakoro  |  "
         + String(
             orientation
         ).replace(
             "_",
             " "
         ).capitalize()
+    )
+
+
+func play_opponent_kyokoro_roll(
+    orientation: StringName
+) -> void:
+    await play_charakoro_result(orientation)
+    _labels[3].text = (
+        "Opponent Charakoro  |  "
+        + String(orientation).replace("_", " ").capitalize()
     )
 
 
@@ -479,16 +494,17 @@ func play_kyokoro_sequence(
 func _play_base_batch(
     final_dice: Array[Array],
     final_orientation: StringName,
-    kyokoro_enabled: bool = true
+    kyokoro_enabled: bool = true,
+    show_charakoro_slot: bool = true
 ) -> void:
     for index: int in range(3):
         _slot_panels[index].visible = (
             index < final_dice.size()
         )
 
-    _slot_panels[3].visible = true
+    _slot_panels[3].visible = show_charakoro_slot
 
-    if not kyokoro_enabled:
+    if show_charakoro_slot and not kyokoro_enabled:
         _show_unrolled_charakoro(true)
         _labels[3].text = "Charakoro"
 
