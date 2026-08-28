@@ -2123,9 +2123,14 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 	for key: Variant in Dictionary(result.get("energy_counts", {})).keys():
 		dice_result.energy_counts[StringName(key)] = int(result["energy_counts"][key])
 	var energy_met: bool = bool(result.get("energy_met", false))
-	var actor_charakoro_orientation := StringName(
-		result.get("charakoro_orientation", "")
+	var actor_charakoro_orientation: StringName = &""
+	var raw_actor_charakoro_orientation: Variant = result.get(
+		"charakoro_orientation", null
 	)
+	if raw_actor_charakoro_orientation != null:
+		actor_charakoro_orientation = StringName(
+			str(raw_actor_charakoro_orientation)
+		)
 	if energy_met:
 		dice_result.set_additional_kyokoro_orientations(
 			Array(result.get("additional_kyokoro_orientations", []))
