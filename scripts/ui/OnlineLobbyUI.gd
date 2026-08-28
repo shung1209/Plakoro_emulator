@@ -64,6 +64,7 @@ func _ready() -> void:
 	OnlineBattleService.connection_state_changed.connect(_on_connection_state_changed)
 	OnlineBattleService.room_changed.connect(_on_room_changed)
 	OnlineBattleService.matchmaking_state_changed.connect(_on_matchmaking_state_changed)
+	OnlineBattleService.server_capabilities_changed.connect(_on_server_capabilities_changed)
 	OnlineBattleService.server_error.connect(_on_server_error)
 	OnlineBattleService.match_ready.connect(_on_match_ready)
 	OnlineBattleService.battle_session_started.connect(_on_battle_session_started)
@@ -86,6 +87,8 @@ func _exit_tree() -> void:
 		OnlineBattleService.room_changed.disconnect(_on_room_changed)
 	if OnlineBattleService.matchmaking_state_changed.is_connected(_on_matchmaking_state_changed):
 		OnlineBattleService.matchmaking_state_changed.disconnect(_on_matchmaking_state_changed)
+	if OnlineBattleService.server_capabilities_changed.is_connected(_on_server_capabilities_changed):
+		OnlineBattleService.server_capabilities_changed.disconnect(_on_server_capabilities_changed)
 	if OnlineBattleService.server_error.is_connected(_on_server_error):
 		OnlineBattleService.server_error.disconnect(_on_server_error)
 	if OnlineBattleService.match_ready.is_connected(_on_match_ready):
@@ -257,7 +260,18 @@ func _on_connection_state_changed(_state: StringName) -> void:
 	connect_button.disabled = connecting
 	create_room_button.disabled = not connected or searching
 	open_join_button.disabled = not connected or searching
-	random_match_button.disabled = not connected
+	random_match_button.disabled = (
+		not connected
+		or not OnlineBattleService.supports_capability("random_matchmaking")
+	)
+	random_match_button.tooltip_text = (
+		""
+		if not connected or OnlineBattleService.supports_capability("random_matchmaking")
+		else LocalizationService.tr_key(
+			"online.random_server_update_required",
+			"Random VS requires the latest Online server deployment."
+		)
+	)
 	join_room_button.disabled = not connected or room_code_edit.text.length() != 6
 	_refresh_connection_text()
 	_apply_lobby_page_visibility(OnlineBattleService.current_room)
@@ -307,6 +321,10 @@ func _on_room_changed(room: Dictionary) -> void:
 
 func _on_matchmaking_state_changed(_searching: bool) -> void:
 	_apply_localized_text()
+	_on_connection_state_changed(OnlineBattleService.connection_state)
+
+
+func _on_server_capabilities_changed(_capabilities: Array[String]) -> void:
 	_on_connection_state_changed(OnlineBattleService.connection_state)
 
 
@@ -393,8 +411,15 @@ func _on_battle_session_started(session: Dictionary) -> void:
 	GameFlow.open_battle.call_deferred()
 
 
-func _on_server_error(_code: String, message: String) -> void:
-	status_label.text = message
+func _on_server_error(code: String, message: String) -> void:
+	status_label.text = (
+		LocalizationService.tr_key(
+			"online.random_server_update_required",
+			"Random VS requires the latest Online server deployment."
+		)
+		if code == "random_matchmaking_unavailable"
+		else message
+	)
 
 
 func _go_back() -> void:

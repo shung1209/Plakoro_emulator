@@ -70,6 +70,7 @@
     "online.random_vs": "ランダム対戦",
     "online.random_cancel": "検索をキャンセル",
     "online.random_searching": "対戦相手を検索中…",
+    "online.random_server_update_required": "ランダム対戦には最新のオンラインサーバーが必要です。",
     "online.join_room": "ルームに参加",
     "online.join": "参加",
     "online.leave": "ルームを退出",

@@ -70,6 +70,7 @@
     "online.random_vs": "RANDOM VS",
     "online.random_cancel": "CANCEL SEARCH",
     "online.random_searching": "SEARCHING FOR AN OPPONENT...",
+    "online.random_server_update_required": "Random VS requires the latest Online server deployment.",
     "online.join_room": "Join Room",
     "online.join": "JOIN",
     "online.leave": "LEAVE ROOM",

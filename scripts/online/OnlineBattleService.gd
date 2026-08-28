@@ -3,6 +3,7 @@ extends Node
 signal connection_state_changed(state: StringName)
 signal room_changed(room: Dictionary)
 signal matchmaking_state_changed(searching: bool)
+signal server_capabilities_changed(capabilities: Array[String])
 signal match_ready(players: Array)
 signal battle_session_started(session: Dictionary)
 signal turn_resolved(result: Dictionary)
@@ -28,6 +29,7 @@ var reconnect_attempt: int = 0
 var reconnect_at_msec: int = 0
 var intentional_disconnect: bool = false
 var matchmaking_searching: bool = false
+var server_capabilities: Array[String] = []
 
 
 func _ready() -> void:
@@ -98,7 +100,17 @@ func join_room(room_code: String, player_name: String) -> void:
 
 
 func join_random_queue(player_name: String) -> void:
+	if not supports_capability("random_matchmaking"):
+		server_error.emit(
+			"random_matchmaking_unavailable",
+			"Random VS requires the latest Online server deployment."
+		)
+		return
 	_send({"type": "join_random_queue", "player_name": player_name})
+
+
+func supports_capability(capability: String) -> bool:
+	return server_capabilities.has(capability)
 
 
 func leave_random_queue() -> void:
@@ -185,6 +197,7 @@ func _receive_packet(packet: PackedByteArray) -> void:
 		"connected":
 			player_id = String(message.get("player_id", ""))
 			reconnect_token = String(message.get("reconnect_token", ""))
+			_set_server_capabilities(Array(message.get("capabilities", [])))
 			if not resume_token.is_empty():
 				_send({
 					"type": "resume_session",
@@ -195,6 +208,7 @@ func _receive_packet(packet: PackedByteArray) -> void:
 			reconnect_token = String(message.get("reconnect_token", resume_token))
 			resume_token = ""
 			reconnect_attempt = 0
+			_set_server_capabilities(Array(message.get("capabilities", [])))
 			_set_state(&"connected")
 		"room_joined", "room_updated":
 			_set_matchmaking_searching(false)
@@ -238,6 +252,16 @@ func _receive_packet(packet: PackedByteArray) -> void:
 				String(message.get("message", ""))
 			)
 		"error":
+			if (
+				String(message.get("code", "")) == "unknown_message"
+				and matchmaking_searching
+			):
+				_set_matchmaking_searching(false)
+				server_error.emit(
+					"random_matchmaking_unavailable",
+					"Random VS requires the latest Online server deployment."
+				)
+				return
 			if String(message.get("code", "")) == "resume_failed":
 				_clear_online_session()
 			server_error.emit(
@@ -267,6 +291,18 @@ func _set_matchmaking_searching(searching: bool) -> void:
 	matchmaking_state_changed.emit(matchmaking_searching)
 
 
+func _set_server_capabilities(raw_capabilities: Array) -> void:
+	var next_capabilities: Array[String] = []
+	for raw_capability: Variant in raw_capabilities:
+		var capability: String = String(raw_capability)
+		if not capability.is_empty() and not next_capabilities.has(capability):
+			next_capabilities.append(capability)
+	if server_capabilities == next_capabilities:
+		return
+	server_capabilities = next_capabilities
+	server_capabilities_changed.emit(server_capabilities.duplicate())
+
+
 func _clear_room_state() -> void:
 	current_room.clear()
 	revealed_players.clear()
@@ -276,6 +312,7 @@ func _clear_room_state() -> void:
 func _clear_online_session() -> void:
 	_clear_room_state()
 	_set_matchmaking_searching(false)
+	_set_server_capabilities([])
 	player_id = ""
 	reconnect_token = ""
 	resume_token = ""

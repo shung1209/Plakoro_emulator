@@ -70,6 +70,7 @@
     "online.random_vs": "隨機對戰",
     "online.random_cancel": "取消配對",
     "online.random_searching": "正在尋找對手……",
+    "online.random_server_update_required": "隨機對戰需要部署最新版本的線上伺服器。",
     "online.join_room": "加入房間",
     "online.join": "加入",
     "online.leave": "離開房間",

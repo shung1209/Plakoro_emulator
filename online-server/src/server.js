@@ -219,7 +219,8 @@ function sendConnected(client, resumed) {
     type: resumed ? "session_resumed" : "connected",
     player_id: client.id,
     reconnect_token: client.reconnectToken,
-    protocol: 3
+    protocol: 3,
+    capabilities: ["random_matchmaking"]
   });
 }
 

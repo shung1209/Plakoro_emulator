@@ -70,6 +70,7 @@
     "online.random_vs": "COMBATE ALEATORIO",
     "online.random_cancel": "CANCELAR BÚSQUEDA",
     "online.random_searching": "BUSCANDO OPONENTE...",
+    "online.random_server_update_required": "El combate aleatorio requiere la versión más reciente del servidor en línea.",
     "online.join_room": "Unirse a una sala",
     "online.join": "UNIRSE",
     "online.leave": "SALIR DE LA SALA",
