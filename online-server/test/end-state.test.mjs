@@ -215,7 +215,7 @@ async function run() {
       natural.playerTwo.next("turn_resolved")
     ]);
     assert.deepEqual(finalOne.match, finalTwo.match);
-    if (finalOne.energy_met) lastSuccessfulMoveById.set(actor.id, selectedMove);
+    lastSuccessfulMoveById.set(actor.id, selectedMove);
     match = finalOne.match;
   }
   assert.equal(match.phase, "finished", "A normal match must eventually finish at zero HP");

@@ -501,7 +501,8 @@ function serializeMatch(match) {
     created_at: match.createdAt,
     winner_id: match.winnerId,
     coin_heads: match.coinHeads,
-    hp: { ...match.hp }
+    hp: { ...match.hp },
+    last_move_by_player: { ...match.lastMoveByPlayer }
   };
 }
 
@@ -525,10 +526,6 @@ function resolveTurn(client, moveId) {
     sendError(client.socket, "move_not_in_loadout", "That Move is not in your loadout.");
     return;
   }
-  if (match.lastMoveByPlayer[client.id] === moveId) {
-    sendError(client.socket, "move_repeated", "The same Move cannot be used twice in a row.");
-    return;
-  }
   if (match.effects[client.id]?.lockedMoveId === moveId) {
     sendError(client.socket, "move_locked", "That Move is locked for this turn.");
     return;
@@ -542,8 +539,18 @@ function resolveTurn(client, moveId) {
     sendError(client.socket, "move_not_found", "Move data could not be loaded.");
     return;
   }
+  const moveNameId = move.move_name_id ?? moveId;
+  if (match.lastMoveByPlayer[client.id] === moveNameId) {
+    sendError(client.socket, "move_repeated", "The same Move cannot be used twice in a row.");
+    return;
+  }
 
   match.phase = "resolving";
+  // Choosing a Move consumes its consecutive-use slot even when Enerkoro
+  // payment fails. This mirrors BattleController.mark_move_used(). Store the
+  // shared move-name identity rather than the physical card id as required by
+  // the tabletop rule.
+  match.lastMoveByPlayer[client.id] = moveNameId;
   const actorEffects = match.effects[client.id];
   const defenderEffects = match.effects[defender.id];
   // Official rule: the coin-toss winner rolls two Enerkoro on turn 1.
@@ -565,13 +572,18 @@ function resolveTurn(client, moveId) {
   let additionalKyokoroOrientations = [];
   let opponentEnergyRoll = [];
   let repeatMoveCount = 0;
+  // Next-owner-turn Charakoro statuses are consumed when the turn begins,
+  // even if Enerkoro payment later fails and the Charakoro is not validated.
+  // This keeps Headstand and Kyokoro-disable aligned with the local engine.
+  const forcedOrientation = actorEffects.forcedOrientation;
+  const kyokoroDisabled = actorEffects.kyokoroDisabled;
+  actorEffects.forcedOrientation = null;
+  actorEffects.kyokoroDisabled = false;
 
   if (energyMet) {
-    if (!actorEffects.kyokoroDisabled) {
-      orientation = actorEffects.forcedOrientation ?? rollCharakoro(client.loadout.pokemon_id);
+    if (!kyokoroDisabled) {
+      orientation = forcedOrientation ?? rollCharakoro(client.loadout.pokemon_id);
     }
-    actorEffects.forcedOrientation = null;
-    actorEffects.kyokoroDisabled = false;
     const actionContext = { match, actorId: client.id, defenderId: defender.id };
     const matchedActions = expandConditionalActions(
       getMatchedActions(move, orientation),
@@ -631,7 +643,6 @@ function resolveTurn(client, moveId) {
     }
     const actorMaxHp = Number(loadPokemon(client.loadout.pokemon_id).max_hp ?? 120);
     match.hp[client.id] = Math.min(actorMaxHp, Math.max(0, Number(match.hp[client.id]) + healing - recoil));
-    match.lastMoveByPlayer[client.id] = moveId;
     match.lastTurnByPlayer[client.id] = {
       moveId,
       moveNameId: move.move_name_id ?? moveId,

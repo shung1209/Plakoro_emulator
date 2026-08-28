@@ -1768,36 +1768,153 @@ func _start_online_battle() -> void:
 
 
 func _present_online_game_start() -> void:
-	if online_turn_transition_layer == null or online_turn_transition_label == null:
-		return
-	if online_turn_transition_tween != null and online_turn_transition_tween.is_valid():
-		online_turn_transition_tween.kill()
-	var viewport_width: float = maxf(get_viewport_rect().size.x, 480.0)
-	online_turn_transition_label.text = LocalizationService.tr_key(
-		"online.game_start", "GAME START"
+	var compact: bool = GameFlow.phone_mode or get_viewport_rect().size.x < 760.0
+	var overlay := Control.new()
+	overlay.name = "OnlineGameStartReveal"
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 1000
+	overlay.modulate.a = 0.0
+	add_child(overlay)
+
+	var backdrop := ColorRect.new()
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.color = Color(0.015, 0.028, 0.055, 0.985)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.add_child(backdrop)
+
+	# Colored edge glows make the reveal read as a full-screen transition,
+	# while the center flash supplies a clean impact beat before the coin toss.
+	var player_glow := ColorRect.new()
+	player_glow.set_anchors_preset(Control.PRESET_FULL_RECT)
+	player_glow.anchor_right = 0.5
+	player_glow.color = Color(0.08, 0.48, 0.88, 0.16)
+	player_glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(player_glow)
+	var opponent_glow := ColorRect.new()
+	opponent_glow.set_anchors_preset(Control.PRESET_FULL_RECT)
+	opponent_glow.anchor_left = 0.5
+	opponent_glow.color = Color(0.9, 0.12, 0.3, 0.14)
+	opponent_glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(opponent_glow)
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(center)
+	var stage := VBoxContainer.new()
+	stage.alignment = BoxContainer.ALIGNMENT_CENTER
+	stage.add_theme_constant_override("separation", 18 if compact else 28)
+	center.add_child(stage)
+	var start_label := Label.new()
+	start_label.text = LocalizationService.tr_key("online.game_start", "GAME START")
+	start_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	start_label.add_theme_font_size_override("font_size", 34 if compact else 52)
+	start_label.add_theme_constant_override("outline_size", 9)
+	start_label.add_theme_color_override("font_color", Color("ffd04a"))
+	start_label.add_theme_color_override("font_outline_color", Color(0.01, 0.02, 0.04, 1.0))
+	stage.add_child(start_label)
+
+	var matchup := BoxContainer.new()
+	matchup.vertical = compact
+	matchup.alignment = BoxContainer.ALIGNMENT_CENTER
+	matchup.add_theme_constant_override("separation", 14 if compact else 30)
+	stage.add_child(matchup)
+	var player_card: PanelContainer = _create_online_vs_reveal_card(
+		player_loadout_data, true, compact
 	)
-	online_turn_transition_label.add_theme_color_override(
-		"font_color", Color("ffd04a")
+	matchup.add_child(player_card)
+	var versus := Label.new()
+	versus.text = "VS"
+	versus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	versus.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	versus.add_theme_font_size_override("font_size", 48 if compact else 78)
+	versus.add_theme_constant_override("outline_size", 12)
+	versus.add_theme_color_override("font_color", Color("fff2bc"))
+	versus.add_theme_color_override("font_outline_color", Color("a52d43"))
+	matchup.add_child(versus)
+	var opponent_card: PanelContainer = _create_online_vs_reveal_card(
+		ai_loadout_data, false, compact
 	)
-	# Consume pointer input while keyboard/gamepad actions remain battle-locked.
-	online_turn_transition_layer.mouse_filter = Control.MOUSE_FILTER_STOP
-	online_turn_transition_layer.visible = true
-	online_turn_transition_layer.position = Vector2(-viewport_width, 0.0)
-	online_turn_transition_tween = create_tween()
-	online_turn_transition_tween.set_trans(Tween.TRANS_QUART)
-	online_turn_transition_tween.set_ease(Tween.EASE_OUT)
-	online_turn_transition_tween.tween_property(
-		online_turn_transition_layer, "position:x", 0.0, 0.38
+	matchup.add_child(opponent_card)
+
+	var flash := ColorRect.new()
+	flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	flash.color = Color(1.0, 0.93, 0.66, 0.0)
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash.z_index = 2
+	overlay.add_child(flash)
+
+	await get_tree().process_frame
+	var travel: float = maxf(get_viewport_rect().size.x * 0.72, 420.0)
+	player_card.position.x -= travel
+	opponent_card.position.x += travel
+	versus.pivot_offset = versus.size * 0.5
+	versus.scale = Vector2(0.25, 0.25)
+	var reveal := create_tween()
+	reveal.set_parallel(true)
+	reveal.set_trans(Tween.TRANS_BACK)
+	reveal.set_ease(Tween.EASE_OUT)
+	reveal.tween_property(overlay, "modulate:a", 1.0, 0.18)
+	reveal.tween_property(player_card, "position:x", player_card.position.x + travel, 0.58)
+	reveal.tween_property(opponent_card, "position:x", opponent_card.position.x - travel, 0.58)
+	reveal.tween_property(versus, "scale", Vector2.ONE, 0.62)
+	await reveal.finished
+
+	var impact := create_tween()
+	impact.tween_property(flash, "color:a", 0.58, 0.08)
+	impact.tween_property(flash, "color:a", 0.0, 0.24)
+	impact.parallel().tween_property(versus, "scale", Vector2(1.16, 1.16), 0.12)
+	impact.tween_property(versus, "scale", Vector2.ONE, 0.16)
+	impact.tween_interval(1.05)
+	impact.tween_property(overlay, "modulate:a", 0.0, 0.34)
+	await impact.finished
+	overlay.queue_free()
+
+
+func _create_online_vs_reveal_card(
+	loadout_data: Variant,
+	is_local: bool,
+	compact: bool
+) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(270, 205) if compact else Vector2(350, 330)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.035, 0.06, 0.105, 0.97)
+	style.border_color = Color("4baeff") if is_local else Color("ff557f")
+	style.set_border_width_all(4)
+	style.set_corner_radius_all(18)
+	style.content_margin_left = 16
+	style.content_margin_right = 16
+	style.content_margin_top = 12
+	style.content_margin_bottom = 12
+	panel.add_theme_stylebox_override("panel", style)
+	var column := VBoxContainer.new()
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_theme_constant_override("separation", 6)
+	panel.add_child(column)
+	var role := Label.new()
+	role.text = LocalizationService.tr_key(
+		"battle.you" if is_local else "online.opponent",
+		"YOU" if is_local else "OPPONENT"
 	)
-	online_turn_transition_tween.tween_interval(1.0)
-	online_turn_transition_tween.set_ease(Tween.EASE_IN)
-	online_turn_transition_tween.tween_property(
-		online_turn_transition_layer, "position:x", viewport_width, 0.38
-	)
-	await online_turn_transition_tween.finished
-	online_turn_transition_layer.visible = false
-	online_turn_transition_layer.position = Vector2.ZERO
-	online_turn_transition_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	role.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	role.add_theme_font_size_override("font_size", 17 if compact else 22)
+	role.add_theme_color_override("font_color", Color("72c8ff") if is_local else Color("ff7898"))
+	column.add_child(role)
+	var pokemon: Variant = database.get_pokemon(loadout_data.pokemon_id)
+	var portrait: Control = PLAKORO_PORTRAIT.instantiate()
+	portrait.custom_minimum_size = Vector2(150, 150) if compact else Vector2(240, 240)
+	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	column.add_child(portrait)
+	portrait.setup(pokemon, true)
+	var name_label := Label.new()
+	name_label.text = GameContentLocalizationService.localize_pokemon(pokemon)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.add_theme_font_size_override("font_size", 22 if compact else 28)
+	name_label.add_theme_color_override("font_color", Color.WHITE)
+	column.add_child(name_label)
+	return panel
 
 
 func _sync_online_battle_state(
@@ -1817,6 +1934,13 @@ func _sync_online_battle_state(
 	var hp: Dictionary = Dictionary(session.get("hp", {}))
 	battle.state.player.current_hp = int(hp.get(String(local_entry.get("id", "")), battle.state.player.current_hp))
 	battle.state.enemy.current_hp = int(hp.get(String(opponent_entry.get("id", "")), battle.state.enemy.current_hp))
+	var last_moves: Dictionary = Dictionary(session.get("last_move_by_player", {}))
+	battle.state.player.last_move_name_id = StringName(
+		last_moves.get(String(local_entry.get("id", "")), "")
+	)
+	battle.state.enemy.last_move_name_id = StringName(
+		last_moves.get(String(opponent_entry.get("id", "")), "")
+	)
 	battle.state.turn_number = int(session.get("turn", battle.state.turn_number))
 	battle.state.current_participant_id = (
 		&"player"
@@ -2089,9 +2213,12 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 		move_card,
 		dice_result
 	))
-	if bool(result.get("energy_met", false)) and move_card != null:
+	# The official consecutive-use restriction applies to the selected Move
+	# even when its Enerkoro payment fails. Keep both online clients aligned
+	# with the authoritative server before refreshing button availability.
+	if move_card != null:
 		var actor: Variant = battle.state.player if actor_is_local else battle.state.enemy
-		actor.last_move_name_id = StringName(move_card.move_name_id)
+		actor.mark_move_used(StringName(move_card.move_name_id))
 	var player_hp_before: int = int(battle.state.player.current_hp)
 	var enemy_hp_before: int = int(battle.state.enemy.current_hp)
 	if bool(result.get("energy_met", false)) and move_card != null:
