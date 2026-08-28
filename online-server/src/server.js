@@ -580,10 +580,17 @@ function resolveTurn(client, moveId) {
   actorEffects.forcedOrientation = null;
   actorEffects.kyokoroDisabled = false;
 
+  // Enerkoro and Charakoro are physically rolled together. The Charakoro
+  // face is always sent for presentation, but it only becomes a validated
+  // orientation when the Enerkoro payment succeeds. Keeping these two values
+  // separate prevents clients from accidentally activating face effects on
+  // a failed Energy check while still showing the actual simultaneous roll.
+  const charakoroRollOrientation = kyokoroDisabled
+    ? null
+    : forcedOrientation ?? rollCharakoro(client.loadout.pokemon_id);
+
   if (energyMet) {
-    if (!kyokoroDisabled) {
-      orientation = forcedOrientation ?? rollCharakoro(client.loadout.pokemon_id);
-    }
+    orientation = charakoroRollOrientation;
     const actionContext = { match, actorId: client.id, defenderId: defender.id };
     const matchedActions = expandConditionalActions(
       getMatchedActions(move, orientation),
@@ -683,6 +690,7 @@ function resolveTurn(client, moveId) {
     energy_roll: energyRoll,
     energy_counts: energyCounts,
     energy_met: energyMet,
+    charakoro_roll_orientation: charakoroRollOrientation,
     charakoro_orientation: orientation,
     additional_kyokoro_orientations: additionalKyokoroOrientations,
     opponent_kyokoro_orientations: opponentKyokoroOrientations,

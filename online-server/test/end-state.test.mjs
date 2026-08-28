@@ -215,6 +215,26 @@ async function run() {
       natural.playerTwo.next("turn_resolved")
     ]);
     assert.deepEqual(finalOne.match, finalTwo.match);
+    assert.ok(
+      finalOne.charakoro_roll_orientation === null
+        || typeof finalOne.charakoro_roll_orientation === "string",
+      "Every turn must expose its display-only Charakoro roll"
+    );
+    if (finalOne.energy_met) {
+      assert.equal(
+        finalOne.charakoro_orientation,
+        finalOne.charakoro_roll_orientation,
+        "A successful Energy check validates the displayed Charakoro face"
+      );
+    } else {
+      assert.equal(
+        finalOne.charakoro_orientation,
+        null,
+        "A failed Energy check must not validate Charakoro"
+      );
+      assert.equal(finalOne.charakoro_bonus, 0);
+      assert.equal(finalOne.damage, 0);
+    }
     lastSuccessfulMoveById.set(actor.id, selectedMove);
     match = finalOne.match;
   }

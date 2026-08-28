@@ -2131,6 +2131,15 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 		actor_charakoro_orientation = StringName(
 			str(raw_actor_charakoro_orientation)
 		)
+	var displayed_charakoro_orientation: StringName = &""
+	var raw_displayed_charakoro_orientation: Variant = result.get(
+		"charakoro_roll_orientation",
+		raw_actor_charakoro_orientation
+	)
+	if raw_displayed_charakoro_orientation != null:
+		displayed_charakoro_orientation = StringName(
+			str(raw_displayed_charakoro_orientation)
+		)
 	if energy_met:
 		dice_result.set_additional_kyokoro_orientations(
 			Array(result.get("additional_kyokoro_orientations", []))
@@ -2160,24 +2169,24 @@ func _on_online_turn_resolved(result: Dictionary) -> void:
 		if face_index >= 0 and face_index < orientations.size():
 			roll_record.energy_die_face_ids.append(orientations[face_index])
 	roll_record.energy_counts = dice_result.energy_counts.duplicate(true)
-	# Online resolution is deliberately presented in rule order: Enerkoro
-	# first, then Charakoro only after payment succeeds. Keeping the actor
-	# orientation out of the first batch prevents a previous landed face from
-	# appearing to be reused while the Energy result is still being checked.
-	roll_record.kyokoro_orientation = &""
+	# Enerkoro and Charakoro are shown as one physical roll. The server keeps
+	# this displayed face separate from the validated orientation, so a failed
+	# Energy payment can never activate a Charakoro outcome.
+	dice_result.kyokoro_orientation = displayed_charakoro_orientation
+	roll_record.kyokoro_orientation = displayed_charakoro_orientation
 	roll_result_panel.visible = true
 	await battle_dice_roll_presenter.play_result(
 		dice_result,
 		energy_profiles,
-		roll_record,
-		false
+		roll_record
 	)
-	if energy_met and actor_charakoro_orientation != &"":
-		dice_result.kyokoro_orientation = actor_charakoro_orientation
-		roll_record.kyokoro_orientation = actor_charakoro_orientation
-		await battle_dice_roll_presenter.play_charakoro_result(
-			actor_charakoro_orientation
-		)
+	# From this point onward only the validated orientation may be consumed by
+	# timeline/effect presentation. Energy failure therefore shows the rolled
+	# face above but has no Charakoro verification or follow-up effects.
+	dice_result.kyokoro_orientation = (
+		actor_charakoro_orientation if energy_met else &""
+	)
+	roll_record.kyokoro_orientation = dice_result.kyokoro_orientation
 	if not dice_result.additional_kyokoro_orientations.is_empty():
 		await battle_dice_roll_presenter.play_kyokoro_sequence(
 			dice_result.additional_kyokoro_orientations
