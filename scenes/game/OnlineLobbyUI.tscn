@@ -109,12 +109,14 @@ placeholder_text = "wss://service.onrender.com/ws"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 52)
 layout_mode = 2
+theme_type_variation = &"SecondaryButton"
 text = "CONNECT"
 
 [node name="CreateRoomButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
+theme_type_variation = &"BlueButton"
 disabled = true
 text = "CREATE PRIVATE ROOM"
 
@@ -127,6 +129,7 @@ text = "Join Room"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
+theme_type_variation = &"BlueButton"
 disabled = true
 text = "JOIN ROOM"
 
@@ -188,18 +191,21 @@ alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 52)
 layout_mode = 2
+theme_type_variation = &"SecondaryButton"
 text = "DEL"
 
 [node name="CodeClearButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow/JoinControls"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 52)
 layout_mode = 2
+theme_type_variation = &"DangerButton"
 text = "CLEAR"
 
 [node name="JoinRoomButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/JoinRow/JoinControls"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 52)
 layout_mode = 2
+theme_type_variation = &"PrimaryButton"
 disabled = true
 text = "JOIN"
 
@@ -249,6 +255,7 @@ unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
+theme_type_variation = &"BlueButton"
 text = "CONFIGURE MY LOADOUT"
 
 [node name="Spacer" type="Control" parent="Margin/Center/Panel/PanelMargin/Content"]
@@ -265,6 +272,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"SecondaryButton"
 text = "BACK"
 
 [node name="LeaveRoomButton" type="Button" parent="Margin/Center/Panel/PanelMargin/Content/BottomRow"]
@@ -273,4 +281,5 @@ visible = false
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"SecondaryButton"
 text = "LEAVE ROOM"

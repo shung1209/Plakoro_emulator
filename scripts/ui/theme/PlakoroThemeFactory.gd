@@ -285,6 +285,9 @@ static func _configure_buttons(theme: Theme) -> void:
 		theme.set_constant("outline_size", type_name, 0)
 	if is_warm_theme():
 		_configure_button_variant(
+			theme, &"SecondaryButton", WARM_SURFACE_ELEVATED, WARM_TEXT
+		)
+		_configure_button_variant(
 			theme, &"PrimaryButton", Color("c9574f"), Color.WHITE
 		)
 		_configure_button_variant(
@@ -300,6 +303,9 @@ static func _configure_buttons(theme: Theme) -> void:
 			theme, &"DangerButton", Color("a94b55"), Color.WHITE
 		)
 	else:
+		_configure_button_variant(
+			theme, &"SecondaryButton", COLOR_SURFACE_ELEVATED, COLOR_TEXT
+		)
 		_configure_button_variant(
 			theme, &"PrimaryButton", Color("245f9c"), COLOR_TEXT
 		)
