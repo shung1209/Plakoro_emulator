@@ -30,6 +30,7 @@ UIInteractionMotion="*res://scripts/ui/UIInteractionMotion.gd"
 WebUIUsability="*res://scripts/ui/WebUIUsability.gd"
 PhoneOrientationGuard="*res://scripts/ui/phone/PhoneOrientationGuard.gd"
 OnlineBattleService="*res://scripts/online/OnlineBattleService.gd"
+ServerWakeService="*res://scripts/online/ServerWakeService.gd"
 
 [online]
 

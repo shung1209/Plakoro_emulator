@@ -420,11 +420,18 @@ func _rebuild_localized_move_buttons() -> void:
 	_create_move_buttons()
 
 
+func _battle_mode_title() -> String:
+	if GameFlow.local_battle_mode:
+		return LocalizationService.tr_key("battle.mode.local", "Local Versus")
+	if GameFlow.online_battle_mode:
+		return LocalizationService.tr_key("battle.mode.online", "Online Versus")
+	if GameFlow.free_mode:
+		return LocalizationService.tr_key("battle.mode.free", "Free Mode")
+	return LocalizationService.tr_key("battle.mode.story", "Story Mode")
+
+
 func _apply_localized_text() -> void:
-	page_title.text = LocalizationService.tr_key(
-		"battle.title",
-		"PLAKORO Battle"
-	)
+	page_title.text = _battle_mode_title()
 	back_to_preparation_button.text = (
 		"<- "
 		+ LocalizationService.tr_key(
@@ -1262,13 +1269,15 @@ func _set_battle_action_state(
 		if phase == &"ai_thinking":
 			phase_key = "online.opponent_choosing"
 
-	var story_battle: bool = (
-		not GameFlow.free_mode
-		and not GameFlow.local_battle_mode
-		and not GameFlow.online_battle_mode
-	)
-	if story_battle and phase in [&"choose_move", &"ai_thinking"]:
-		_present_online_turn_transition_if_needed(phase == &"choose_move")
+	if (
+		not GameFlow.online_battle_mode
+		and phase in [&"choose_move", &"ai_thinking"]
+		and battle != null
+		and battle.state != null
+	):
+		_present_online_turn_transition_if_needed(
+			battle.state.current_participant_id == &"player"
+		)
 
 	var actor_text: String = LocalizationService.tr_key(
 		actor_key,
@@ -1392,6 +1401,7 @@ func _start_new_battle() -> void:
 		return
 
 	input_locked = true
+	last_online_turn_transition_key = ""
 	battle_report_transition_requested = false
 	_set_battle_navigation_locked(false)
 	roll_result_panel.visible = layout_prototype.visible
@@ -1643,6 +1653,7 @@ func _start_new_battle() -> void:
 	_create_move_buttons()
 	_refresh_ui()
 	_set_battle_navigation_locked(true)
+	await _present_game_start()
 	await _present_coin_toss(coin_heads)
 
 	if starting_participant_id == &"enemy":
@@ -1752,7 +1763,7 @@ func _start_online_battle() -> void:
 	_refresh_ui()
 	_set_player_input_enabled(false)
 	_set_battle_navigation_locked(true)
-	await _present_online_game_start()
+	await _present_game_start()
 	var first_player_name: String = LocalizationService.tr_key("online.opponent", "Opponent")
 	if local_starts:
 		first_player_name = LocalizationService.tr_key("battle.you", "You")
@@ -1767,10 +1778,10 @@ func _start_online_battle() -> void:
 	_refresh_online_turn_prompt()
 
 
-func _present_online_game_start() -> void:
+func _present_game_start() -> void:
 	var compact: bool = GameFlow.phone_mode or get_viewport_rect().size.x < 760.0
 	var overlay := Control.new()
-	overlay.name = "OnlineGameStartReveal"
+	overlay.name = "GameStartReveal"
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	overlay.z_index = 1000
@@ -1820,7 +1831,7 @@ func _present_online_game_start() -> void:
 	matchup.alignment = BoxContainer.ALIGNMENT_CENTER
 	matchup.add_theme_constant_override("separation", 14 if compact else 30)
 	stage.add_child(matchup)
-	var player_card: PanelContainer = _create_online_vs_reveal_card(
+	var player_card: PanelContainer = _create_vs_reveal_card(
 		player_loadout_data, true, compact
 	)
 	matchup.add_child(player_card)
@@ -1833,7 +1844,7 @@ func _present_online_game_start() -> void:
 	versus.add_theme_color_override("font_color", Color("fff2bc"))
 	versus.add_theme_color_override("font_outline_color", Color("a52d43"))
 	matchup.add_child(versus)
-	var opponent_card: PanelContainer = _create_online_vs_reveal_card(
+	var opponent_card: PanelContainer = _create_vs_reveal_card(
 		ai_loadout_data, false, compact
 	)
 	matchup.add_child(opponent_card)
@@ -1872,7 +1883,7 @@ func _present_online_game_start() -> void:
 	overlay.queue_free()
 
 
-func _create_online_vs_reveal_card(
+func _create_vs_reveal_card(
 	loadout_data: Variant,
 	is_local: bool,
 	compact: bool
@@ -1895,8 +1906,20 @@ func _create_online_vs_reveal_card(
 	panel.add_child(column)
 	var role := Label.new()
 	role.text = LocalizationService.tr_key(
-		"battle.you" if is_local else "online.opponent",
-		"YOU" if is_local else "OPPONENT"
+		(
+			"battle.player_one" if is_local else "battle.player_two"
+		)
+		if GameFlow.local_battle_mode
+		else (
+			"battle.you" if is_local else "online.opponent"
+		),
+		(
+			"PLAYER 1" if is_local else "PLAYER 2"
+		)
+		if GameFlow.local_battle_mode
+		else (
+			"YOU" if is_local else "OPPONENT"
+		)
 	)
 	role.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	role.add_theme_font_size_override("font_size", 17 if compact else 22)
@@ -2029,14 +2052,8 @@ func _create_online_turn_transition_layer() -> void:
 
 
 func _present_online_turn_transition_if_needed(my_turn: bool) -> void:
-	var story_battle: bool = (
-		not GameFlow.free_mode
-		and not GameFlow.local_battle_mode
-		and not GameFlow.online_battle_mode
-	)
 	if (
-		(not GameFlow.online_battle_mode and not story_battle)
-		or battle == null
+		battle == null
 		or battle.state == null
 	):
 		return
@@ -2057,8 +2074,20 @@ func _play_online_turn_transition(my_turn: bool) -> void:
 		online_turn_transition_tween.kill()
 	var viewport_width: float = maxf(get_viewport_rect().size.x, 480.0)
 	online_turn_transition_label.text = LocalizationService.tr_key(
-		"online.your_turn_short" if my_turn else "online.opponent_turn_short",
-		"YOUR TURN" if my_turn else "OPPONENT TURN"
+		(
+			"battle.player_one" if my_turn else "battle.player_two"
+		)
+		if GameFlow.local_battle_mode
+		else (
+			"online.your_turn_short" if my_turn else "online.opponent_turn_short"
+		),
+		(
+			"PLAYER 1" if my_turn else "PLAYER 2"
+		)
+		if GameFlow.local_battle_mode
+		else (
+			"YOUR TURN" if my_turn else "OPPONENT TURN"
+		)
 	)
 	online_turn_transition_label.add_theme_color_override(
 		"font_color",
@@ -3447,10 +3476,9 @@ func _present_phone_roll_confirmation(
 	turn_result: Variant
 ) -> void:
 	if not GameFlow.phone_mode:
-		if not GameFlow.local_battle_mode:
-			await _present_desktop_roll_confirmation(
-				actor_name, move_name, enerkoro_succeeded, turn_result
-			)
+		await _present_desktop_roll_confirmation(
+			actor_name, move_name, enerkoro_succeeded, turn_result
+		)
 		return
 	phone_roll_confirmation_changed.emit(
 		&"move",
